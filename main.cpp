@@ -15,7 +15,7 @@ int main(int argc, char *argv[]) {
     BoLog::init();
     int ret = avformat_open_input(&context, "", 0, 0);
     if (ret != 0) {
-        BOPLAYER_ERROR("failed to avformat_open_input");
+        BO_ERROR("failed to avformat_open_input");
     }
     return a.exec();
 }

@@ -15,10 +15,10 @@ class BoLog {
     static std::shared_ptr<spdlog::logger> s_logger;
 };
 
-#define BOPLAYER_CRITICAL(...) BoLog::getLogger()->critical(__VA_ARGS__)
-#define BOPLAYER_ERROR(...) BoLog::getLogger()->error(__VA_ARGS__)
-#define BOPLAYER_WARN(...) BoLog::getLogger()->warn(__VA_ARGS__)
-#define BOPLAYER_INFO(...) BoLog::getLogger()->info(__VA_ARGS__)
-#define BOPLAYER_TRACE(...) BoLog::getLogger()->trace(__VA_ARGS__)
+#define BO_CRITICAL(...) BoLog::getLogger()->critical(__VA_ARGS__)
+#define BO_ERROR(...) BoLog::getLogger()->error(__VA_ARGS__)
+#define BO_WARN(...) BoLog::getLogger()->warn(__VA_ARGS__)
+#define BO_INFO(...) BoLog::getLogger()->info(__VA_ARGS__)
+#define BO_TRACE(...) BoLog::getLogger()->trace(__VA_ARGS__)
 
 #endif // BOLOG_H

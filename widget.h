@@ -4,18 +4,22 @@
 #include <QWidget>
 
 QT_BEGIN_NAMESPACE
-namespace Ui { class Widget; }
+namespace Ui {
+class Widget;
+}
 QT_END_NAMESPACE
 
-class Widget : public QWidget
-{
+class Widget : public QWidget {
     Q_OBJECT
 
-public:
+  public:
     Widget(QWidget *parent = nullptr);
     ~Widget();
 
-private:
+  private:
     Ui::Widget *ui;
+
+  private slots:
+    void openFile();
 };
 #endif // WIDGET_H

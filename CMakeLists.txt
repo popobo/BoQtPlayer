@@ -19,8 +19,11 @@ set(PROJECT_SOURCES
         widget.cpp
         widget.h
         widget.ui
-        BoLog.h
-        BoLog.cpp
+        BoLog.h BoLog.cpp
+        BoData.h BoData.cpp
+        IDemux.h
+        FFDemux.h FFDemux.cpp
+        BoUtil.h
 )
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
