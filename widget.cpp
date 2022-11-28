@@ -1,18 +1,11 @@
 #include "widget.h"
 #include "./ui_widget.h"
-extern "C"{
+extern "C" {
 #include "libavformat/avformat.h"
 }
 
-Widget::Widget(QWidget *parent)
-    : QWidget(parent)
-    , ui(new Ui::Widget)
-{
+Widget::Widget(QWidget *parent) : QWidget(parent), ui(new Ui::Widget) {
     ui->setupUi(this);
 }
 
-Widget::~Widget()
-{
-    delete ui;
-}
-
+Widget::~Widget() { delete ui; }

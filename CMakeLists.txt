@@ -19,6 +19,8 @@ set(PROJECT_SOURCES
         widget.cpp
         widget.h
         widget.ui
+        BoLog.h
+        BoLog.cpp
 )
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
@@ -44,7 +46,8 @@ else()
     endif()
 endif()
 
-target_include_directories(BoPlayer PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/Dependency/ffmpeg/include)
+target_include_directories(BoPlayer PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/Dependency/ffmpeg/include
+                                           ${CMAKE_CURRENT_SOURCE_DIR}/Dependency/spdlog/include)
 
 target_link_directories(BoPlayer PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/Dependency/ffmpeg/lib)
 
