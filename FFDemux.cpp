@@ -64,6 +64,8 @@ BoData FFDemux::read() {
     boData.data = (unsigned char *)pkt;
     boData.size = pkt->size;
 
+    BO_INFO("size {0}, pts {0}", pkt->size, pkt->pts);
+
     return boData;
 }
 

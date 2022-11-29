@@ -14,8 +14,13 @@ Widget::Widget(QWidget *parent) : QWidget(parent), ui(new Ui::Widget) {
 Widget::~Widget() { delete ui; }
 
 void Widget::openFile() {
+    // 测试用代码
     QString filename = QFileDialog::getOpenFileName(this, "oepn file");
     std::string stdFilename = filename.toStdString();
-    FFDemux demux;
-    demux.open(stdFilename.c_str());
+
+    IDemux *demux = new FFDemux();
+    demux->open(stdFilename.c_str());
+    demux->start();
+    boSleep(3000);
+    demux->stop();
 }
