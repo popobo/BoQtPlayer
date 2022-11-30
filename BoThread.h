@@ -17,12 +17,13 @@ class BoThread {
     //入口主函数
     virtual void main(){};
 
+    void threadMain();
+
   protected:
     bool m_isExit = false;
     bool m_isRunning = false;
 
   private:
-    void threadMain();
 };
 
 #endif // BOTHREAD_H

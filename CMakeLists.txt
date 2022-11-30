@@ -13,6 +13,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Widgets)
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets)
+find_package(Qt6 REQUIRED COMPONENTS OpenGLWidgets)
 
 set(PROJECT_SOURCES
         main.cpp
@@ -28,6 +29,9 @@ set(PROJECT_SOURCES
         IObserver.h IObserver.cpp
         ISubject.h ISubject.cpp
         BoParameter.h BoParameter.cpp
+        IDecode.h IDecode.cpp
+        FFDecode.h FFDecode.cpp
+        BoOpenGLWidget.h BoOpenGLWidget.cpp
 )
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
@@ -59,6 +63,7 @@ target_include_directories(BoPlayer PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/Dependenc
 target_link_directories(BoPlayer PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/Dependency/ffmpeg/lib)
 
 target_link_libraries(BoPlayer PRIVATE Qt${QT_VERSION_MAJOR}::Widgets
+                               PRIVATE Qt6::OpenGLWidgets
                                avformat
                                swscale
                                swresample

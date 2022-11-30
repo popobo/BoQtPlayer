@@ -2,6 +2,7 @@
 #define IDEMUX_H
 
 #include "BoData.h"
+#include "BoParameter.h"
 #include "BoThread.h"
 #include "ISubject.h"
 
@@ -15,14 +16,18 @@ class IDemux : public BoThread, public ISubject {
     virtual BoData read() = 0;
 
     //总时间 ms
-    virtual int getTotalTime() = 0;
+    virtual int64_t getTotalTime() = 0;
+
+    virtual BoParameter getVideoParameter() = 0;
+
+    virtual BoParameter getAudioParameter() = 0;
 
   protected:
     //不要让用户访问
     virtual void main();
 
   protected:
-    int totalMs = 0;
+    int64_t totalMs = 0;
 };
 
 #endif // IDEMUX_H

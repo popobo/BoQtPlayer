@@ -9,4 +9,11 @@
         }                                                                      \
     }
 
+#define PRINT_FFMPEG_ERROR(ret)                                                \
+    {                                                                          \
+        char errBuffer[1024]{0};                                               \
+        av_strerror(ret, errBuffer, sizeof(errBuffer));                        \
+        BO_ERROR(errBuffer);                                                   \
+    }
+
 #endif // BOUTIL_H

@@ -9,8 +9,11 @@ class BoParameter {
   public:
     BoParameter();
 
+    const AVCodecParameters *getPara() const;
+    void setPara(AVCodecParameters *newPara);
+
   private:
-    std::shared_ptr<AVCodecParameters> para = nullptr;
+    AVCodecParameters *para = nullptr;
 };
 
 #endif // BOPARAMETER_H

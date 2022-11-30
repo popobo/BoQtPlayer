@@ -3,9 +3,9 @@
 
 class BoData {
   public:
-    unsigned char *getData();
+    unsigned char *getData() const;
 
-    int getSize();
+    int getSize() const;
 
     void drop();
 
@@ -22,7 +22,7 @@ class BoData {
     bool isAudio() const;
     void setIsAudio(bool newIsAudio);
 
-private:
+  private:
     unsigned char *m_data = nullptr;
     int m_size = 0;
     bool m_isAudio = false;
