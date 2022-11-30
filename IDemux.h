@@ -3,9 +3,10 @@
 
 #include "BoData.h"
 #include "BoThread.h"
+#include "ISubject.h"
 
 //解封装接口类
-class IDemux : public BoThread {
+class IDemux : public BoThread, public ISubject {
   public:
     //打开文件或者流媒体 rtmp http rtsp
     virtual bool open(const char *url) = 0;

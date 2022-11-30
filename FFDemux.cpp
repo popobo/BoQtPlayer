@@ -61,8 +61,8 @@ BoData FFDemux::read() {
         av_packet_free(&pkt);
         return BoData();
     }
-    boData.data = (unsigned char *)pkt;
-    boData.size = pkt->size;
+    boData.setData((unsigned char *)pkt);
+    boData.setSize(pkt->size);
 
     BO_INFO("size {0}, pts {0}", pkt->size, pkt->pts);
 

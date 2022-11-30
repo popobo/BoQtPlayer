@@ -26,6 +26,8 @@ set(PROJECT_SOURCES
         BoUtil.h
         BoThread.h BoThread.cpp
         IObserver.h IObserver.cpp
+        ISubject.h ISubject.cpp
+        BoParameter.h BoParameter.cpp
 )
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
