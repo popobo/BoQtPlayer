@@ -1,38 +1,47 @@
 #include "widget.h"
 #include "./ui_widget.h"
-#include "FFDecode.h"
+#include "FFDecoder.h"
 #include "FFDemux.h"
 #include <QFileDialog>
 
 Widget::Widget(QWidget *parent) : QWidget(parent), ui(new Ui::Widget) {
     ui->setupUi(this);
+
+    openGLWidget = new BoOpenGLWidget(this);
+    openGLWidget->setObjectName("openGLWidget");
+    openGLWidget->setGeometry(QRect(0, 0, 800, 600));
+
+    m_demux = std::make_shared<FFDemux>();
+    m_videoDecoder = std::make_shared<FFDecoder>();
+    m_audioDecoder = std::make_shared<FFDecoder>();
+    m_frameDispatcher = std::make_shared<FrameDispatcher>();
+
+    m_demux->addObs(m_videoDecoder);
+    m_demux->addObs(m_audioDecoder);
+
+    m_videoDecoder->addStrongObs(m_frameDispatcher);
+
     connect(ui->pushButtonOpenFile, SIGNAL(clicked()), this, SLOT(openFile()));
+
+    // connect一直返回false， 因为BoOpenGLWidget忘记
+    qRegisterMetaType<BoData>("BoData");
+    connect(m_frameDispatcher.get(), SIGNAL(sendData(BoData)), ui->openGLWidget,
+            SLOT(receiveData(BoData)));
 }
 
 Widget::~Widget() { delete ui; }
 
 void Widget::openFile() {
     // 测试用代码
-    QString filename = QFileDialog::getOpenFileName(this, "oepn file");
+    QString filename = QFileDialog::getOpenFileName(nullptr, "oepn file");
     std::string stdFilename = filename.toStdString();
 
-    // IDemux *demux = new FFDemux();
-    std::shared_ptr<FFDemux> demux = std::make_shared<FFDemux>();
-    // FFDemux *demux = new FFDemux();
-    demux->open(stdFilename.c_str());
-    auto videoDecoder = std::make_shared<FFDecode>();
-    videoDecoder->open(demux->getVideoParameter());
+    m_demux->open(stdFilename.c_str());
 
-    auto audioDecoder = std::make_shared<FFDecode>();
-    audioDecoder->open(demux->getAudioParameter());
+    m_videoDecoder->open(m_demux->getVideoParameter());
+    m_audioDecoder->open(m_demux->getAudioParameter());
 
-    demux->addObs(videoDecoder);
-    demux->addObs(audioDecoder);
-
-    demux->start();
-    videoDecoder->start();
-    audioDecoder->start();
-
-    // 这个是必须的
-    boSleep(6000);
+    m_demux->start();
+    m_videoDecoder->start();
+    m_audioDecoder->start();
 }

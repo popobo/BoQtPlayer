@@ -1,31 +1,19 @@
 #ifndef BODATA_H
 #define BODATA_H
+extern "C" {
+#include "libavformat/avformat.h"
+}
 
-class BoData {
-  public:
-    unsigned char *getData() const;
-
-    int getSize() const;
+struct BoData {
+    unsigned char *data{nullptr};
+    unsigned char *datas[AV_NUM_DATA_POINTERS]{nullptr};
+    int size{0};
+    int width{0};
+    int height{0};
+    int format{0};
+    bool isAudio{false};
 
     void drop();
-
-    void setData(unsigned char *newData);
-
-    void setSize(int newSize);
-
-    BoData();
-
-    BoData(const BoData &boData);
-
-    BoData &operator=(const BoData &boData);
-
-    bool isAudio() const;
-    void setIsAudio(bool newIsAudio);
-
-  private:
-    unsigned char *m_data = nullptr;
-    int m_size = 0;
-    bool m_isAudio = false;
 };
 
 #endif // BODATA_H

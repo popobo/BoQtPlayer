@@ -58,13 +58,13 @@ BoData FFDemux::read() {
         av_packet_free(&pkt);
         return BoData();
     }
-    boData.setData((unsigned char *)pkt);
-    boData.setSize(pkt->size);
+    boData.data = (unsigned char *)pkt;
+    boData.size = pkt->size;
 
     if (pkt->stream_index == m_audioStream) {
-        boData.setIsAudio(true);
+        boData.isAudio = true;
     } else if (pkt->stream_index == m_videoStream) {
-        boData.setIsAudio(false);
+        boData.isAudio = false;
     } else {
         av_packet_free(&pkt);
         return BoData();

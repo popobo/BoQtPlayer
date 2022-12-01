@@ -1,5 +1,5 @@
-#ifndef IDECODE_H
-#define IDECODE_H
+#ifndef IDECODER_H
+#define IDECODER_H
 
 #include "BoData.h"
 #include "BoParameter.h"
@@ -8,7 +8,7 @@
 #include "ISubject.h"
 #include <list>
 
-class IDecode : public IObserver, public BoThread, public ISubject {
+class IDecoder : public IObserver, public BoThread, public ISubject {
   public:
     //打开解码器
     virtual bool open(const BoParameter &parameter) = 0;
@@ -27,10 +27,11 @@ class IDecode : public IObserver, public BoThread, public ISubject {
 
     void setIsAudio(bool newIsAudio);
 
-    const int MAX_LIST = 100;
-
     // BoThread interface
     virtual void main() override;
+
+  public:
+    const int MAX_LIST = 100;
 
   protected:
     bool m_isAudio = false;
@@ -40,4 +41,4 @@ class IDecode : public IObserver, public BoThread, public ISubject {
     std::mutex m_boDataListMutex;
 };
 
-#endif // IDECODE_H
+#endif // IDECODER_H

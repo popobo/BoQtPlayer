@@ -1,15 +1,18 @@
 #include "BoLog.h"
 #include "widget.h"
-extern "C" {
-#include "libavformat/avformat.h"
-}
 
 #include <QApplication>
-
-AVFormatContext *context = nullptr;
+#include <QSurfaceFormat>
 
 int main(int argc, char *argv[]) {
     BoLog::init();
+
+    QSurfaceFormat format;
+    format.setDepthBufferSize(24);
+    format.setStencilBufferSize(8);
+    format.setVersion(3, 3);
+    format.setProfile(QSurfaceFormat::CoreProfile);
+    QSurfaceFormat::setDefaultFormat(format);
 
     QApplication a(argc, argv);
     Widget w;

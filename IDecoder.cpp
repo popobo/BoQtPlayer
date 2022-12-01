@@ -1,10 +1,10 @@
-#include "IDecode.h"
+#include "IDecoder.h"
 
-bool IDecode::isAudio() const { return m_isAudio; }
+bool IDecoder::isAudio() const { return m_isAudio; }
 
-void IDecode::setIsAudio(bool newIsAudio) { m_isAudio = newIsAudio; }
+void IDecoder::setIsAudio(bool newIsAudio) { m_isAudio = newIsAudio; }
 
-void IDecode::main() {
+void IDecoder::main() {
     while (!m_isExit) {
         std::unique_lock<std::mutex> lock(m_boDataListMutex);
         if (m_boDataList.empty()) {
@@ -24,7 +24,7 @@ void IDecode::main() {
                 //获取解码器
                 //获取解码数据
                 BoData frame = recvFrame();
-                if (!frame.getData()) {
+                if (!frame.data) {
                     break;
                 }
                 //发送数据给观察者
@@ -36,8 +36,8 @@ void IDecode::main() {
     }
 }
 
-void IDecode::update(BoData boData) {
-    if (boData.isAudio() != m_isAudio) {
+void IDecoder::update(BoData boData) {
+    if (boData.isAudio != m_isAudio) {
         return;
     }
     // why循环

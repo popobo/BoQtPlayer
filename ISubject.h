@@ -9,14 +9,19 @@
 
 class ISubject {
   public:
-    virtual void addObs(std::weak_ptr<IObserver> observer);
+    virtual void addObs(const std::weak_ptr<IObserver> &observer);
 
-    virtual void delObs(std::weak_ptr<IObserver> delObserver);
+    virtual void addStrongObs(const std::shared_ptr<IObserver> &observer);
+
+    virtual void delObs(const std::weak_ptr<IObserver> &delObserver);
+
+    virtual void delStrongObs(const std::shared_ptr<IObserver> &observer);
 
     void notify(BoData boData);
 
   protected:
     std::vector<std::weak_ptr<IObserver>> m_observers;
+    std::vector<std::shared_ptr<IObserver>> m_strongObservers;
     std::mutex m_mux;
 };
 

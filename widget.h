@@ -1,7 +1,12 @@
 #ifndef WIDGET_H
 #define WIDGET_H
 
+#include "BoOpenGLWidget.h"
+#include "FrameDispatcher.h"
+#include "IDecoder.h"
+#include "IDemux.h"
 #include <QWidget>
+#include <memory>
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -18,7 +23,12 @@ class Widget : public QWidget {
 
   private:
     Ui::Widget *ui;
+    std::shared_ptr<IDemux> m_demux;
+    std::shared_ptr<IDecoder> m_videoDecoder;
+    std::shared_ptr<IDecoder> m_audioDecoder;
+    std::shared_ptr<FrameDispatcher> m_frameDispatcher;
 
+    BoOpenGLWidget *openGLWidget;
   private slots:
     void openFile();
 };

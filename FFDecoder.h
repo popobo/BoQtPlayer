@@ -1,16 +1,16 @@
-#ifndef FFDECODE_H
-#define FFDECODE_H
+#ifndef FFDECODER_H
+#define FFDECODER_H
 
-#include "IDecode.h"
+#include "IDecoder.h"
 extern "C" {
 #include "libavcodec/avcodec.h"
 }
 
-class FFDecode : public IDecode {
+class FFDecoder : public IDecoder {
   public:
-    FFDecode();
+    FFDecoder();
 
-    // IDecode interface
+    // IDecoder interface
     virtual bool open(const BoParameter &parameter) override;
     virtual bool sendPacket(const BoData &boData) override;
     virtual BoData recvFrame() override;
@@ -20,4 +20,4 @@ class FFDecode : public IDecode {
     AVFrame *m_frame = nullptr;
 };
 
-#endif // FFDECODE_H
+#endif // FFDECODER_H

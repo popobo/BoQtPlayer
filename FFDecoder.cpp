@@ -1,10 +1,10 @@
-#include "FFDecode.h"
+#include "FFDecoder.h"
 #include "BoLog.h"
 #include "BoUtil.h"
 
-FFDecode::FFDecode() {}
+FFDecoder::FFDecoder() {}
 
-bool FFDecode::open(const BoParameter &parameter) {
+bool FFDecoder::open(const BoParameter &parameter) {
     if (!parameter.getPara()) {
         return false;
     }
@@ -38,8 +38,8 @@ bool FFDecode::open(const BoParameter &parameter) {
     return true;
 }
 
-bool FFDecode::sendPacket(const BoData &boData) {
-    if (boData.getSize() <= 0 || !boData.getData()) {
+bool FFDecoder::sendPacket(const BoData &boData) {
+    if (boData.size <= 0 || !boData.data) {
         return false;
     }
 
@@ -47,7 +47,7 @@ bool FFDecode::sendPacket(const BoData &boData) {
         return false;
     }
 
-    int ret = avcodec_send_packet(m_codecContext, (AVPacket *)boData.getData());
+    int ret = avcodec_send_packet(m_codecContext, (AVPacket *)boData.data);
     if (ret != 0) {
         PRINT_FFMPEG_ERROR(ret);
         return false;
@@ -55,7 +55,7 @@ bool FFDecode::sendPacket(const BoData &boData) {
     return true;
 }
 
-BoData FFDecode::recvFrame() {
+BoData FFDecoder::recvFrame() {
     if (!m_codecContext) {
         return BoData();
     }
@@ -67,24 +67,28 @@ BoData FFDecode::recvFrame() {
     //再次调用会复用上次空间，线程不安全
     int ret = avcodec_receive_frame(m_codecContext, m_frame);
     if (ret != 0) {
-        PRINT_FFMPEG_ERROR(ret);
+        // PRINT_FFMPEG_ERROR(ret);
         return BoData();
     }
 
     BoData boData;
-    boData.setData((unsigned char *)m_frame);
+    boData.data = (unsigned char *)m_frame;
 
     if (AVMEDIA_TYPE_VIDEO == m_codecContext->codec_type) {
         // yuv
-        boData.setSize((m_frame->linesize[0] + m_frame->linesize[1] +
-                        m_frame->linesize[2]) *
-                       m_frame->height);
+        boData.size = (m_frame->linesize[0] + m_frame->linesize[1] +
+                       m_frame->linesize[2]) *
+                      m_frame->height;
+
+        boData.width = m_frame->width;
+        boData.height = m_frame->height;
 
     } else if (AVMEDIA_TYPE_AUDIO == m_codecContext->codec_type) {
         //样本字节数 * 单通道样本数 * 通道数
-        boData.setSize(
-            av_get_bytes_per_sample((AVSampleFormat)m_frame->format) *
-            m_frame->nb_samples * m_frame->ch_layout.nb_channels);
+        boData.size = av_get_bytes_per_sample((AVSampleFormat)m_frame->format) *
+                      m_frame->nb_samples * m_frame->ch_layout.nb_channels;
     }
+    boData.format = m_frame->format;
+    memcpy(boData.datas, m_frame->data, sizeof(boData.datas));
     return boData;
 }
