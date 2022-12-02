@@ -1,5 +1,11 @@
 #ifndef BOUTIL_H
 #define BOUTIL_H
+#include "glad/glad.h"
+#include <iostream>
+
+void GLClearError();
+
+bool GLLogCall(const char *function, const char *file, int line);
 
 #define BO_ASSERT(x, ...)                                                      \
     {                                                                          \
@@ -15,5 +21,10 @@
         av_strerror(ret, errBuffer, sizeof(errBuffer));                        \
         BO_ERROR(errBuffer);                                                   \
     }
+
+#define GLCall(x)                                                              \
+    GLClearError();                                                            \
+    x;                                                                         \
+    GLLogCall(#x, __FILE__, __LINE__)
 
 #endif // BOUTIL_H

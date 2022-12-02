@@ -26,24 +26,7 @@
     <string>Open</string>
    </property>
   </widget>
-  <widget class="BoOpenGLWidget" name="openGLWidget">
-   <property name="geometry">
-    <rect>
-     <x>0</x>
-     <y>0</y>
-     <width>1280</width>
-     <height>720</height>
-    </rect>
-   </property>
-  </widget>
  </widget>
- <customwidgets>
-  <customwidget>
-   <class>BoOpenGLWidget</class>
-   <extends>QOpenGLWidget</extends>
-   <header>BoOpenGLWidget.h</header>
-  </customwidget>
- </customwidgets>
  <resources/>
  <connections/>
  <slots>

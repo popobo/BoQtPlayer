@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.5)
 
-project(BoPlayer VERSION 0.1 LANGUAGES CXX)
+project(BoPlayer VERSION 0.1 LANGUAGES CXX C)
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
@@ -18,9 +18,6 @@ find_package(Qt6 REQUIRED COMPONENTS OpenGLWidgets)
 
 set(PROJECT_SOURCES
         main.cpp
-        widget.cpp
-        widget.h
-        widget.ui
         BoLog.h BoLog.cpp
         BoData.h BoData.cpp
         IDemux.h IDemux.cpp
@@ -32,9 +29,16 @@ set(PROJECT_SOURCES
         BoParameter.h BoParameter.cpp
         IDecoder.h IDecoder.cpp
         FFDecoder.h FFDecoder.cpp
-        BoOpenGLWidget.h BoOpenGLWidget.cpp
         FrameDispatcher.h FrameDispatcher.cpp
-)
+        ${CMAKE_CURRENT_SOURCE_DIR}/Dependency/OpenGL/glad/glad.c
+        ${CMAKE_CURRENT_SOURCE_DIR}/OpenGLRender/OpenGLMesh.h ${CMAKE_CURRENT_SOURCE_DIR}/OpenGLRender/OpenGLMesh.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/OpenGLRender/OpenGLRenderingThread.h ${CMAKE_CURRENT_SOURCE_DIR}/OpenGLRender/OpenGLRenderingThread.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/OpenGLRender/OpenGLWidget.h ${CMAKE_CURRENT_SOURCE_DIR}/OpenGLRender/OpenGLWidget.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/OpenGLRender/ElapsedTimer.h ${CMAKE_CURRENT_SOURCE_DIR}/OpenGLRender/ElapsedTimer.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/OpenGLRender/OpenGLQuad.h ${CMAKE_CURRENT_SOURCE_DIR}/OpenGLRender/OpenGLQuad.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/OpenGLRender/OpenGLShader.h ${CMAKE_CURRENT_SOURCE_DIR}/OpenGLRender/OpenGLShader.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/OpenGLRender/OpenGLViewportTarget.h ${CMAKE_CURRENT_SOURCE_DIR}/OpenGLRender/OpenGLViewportTarget.cpp
+    )
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
     qt_add_executable(BoPlayer
@@ -60,7 +64,9 @@ else()
 endif()
 
 target_include_directories(BoPlayer PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/Dependency/ffmpeg/include
-                                           ${CMAKE_CURRENT_SOURCE_DIR}/Dependency/spdlog/include)
+                                           ${CMAKE_CURRENT_SOURCE_DIR}/Dependency/spdlog/include
+                                           ${CMAKE_CURRENT_SOURCE_DIR}/Dependency/OpenGL/glad/include
+                                           ${CMAKE_CURRENT_SOURCE_DIR}/Dependency/OpenGL/glm)
 
 target_link_directories(BoPlayer PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/Dependency/ffmpeg/lib)
 
