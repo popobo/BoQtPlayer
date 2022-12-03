@@ -162,26 +162,4 @@ void Mesh::render(GLenum drawStyle, GLenum indexDataType) {
     GLCall(glDrawElements(drawStyle, m_data->indexCount, indexDataType, 0));
 }
 
-// template <typename T>
-// void Mesh::writeVertexData(const std::vector<T> &vertexData) {
-//     writeVertexData(vertexData.size() * sizeof(T), vertexData.size(),
-//                     vertexData.data());
-// }
-
-// template <typename T> void Mesh::readVertexData(std::vector<T> &vertexData) {
-//     vertexData.resize(vertexCount());
-//     readVertexData(vertexData.size() * sizeof(T), vertexData.data());
-// }
-
-// template <typename T>
-// void Mesh::writeIndexData(const std::vector<T> &indexData) {
-//     writeIndexData(indexData.size() * sizeof(T), indexData.size(),
-//                    indexData.data());
-// }
-
-// template <typename T> void Mesh::readIndexData(std::vector<T> &indexData) {
-//     indexData.resize(indexCount());
-//     readIndexData(indexData.size() * sizeof(T), indexData.data());
-// }
-
 } // namespace OpenGLRender

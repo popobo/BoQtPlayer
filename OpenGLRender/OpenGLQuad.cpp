@@ -66,11 +66,14 @@ struct Quad::Data {
         shader->setVertexShader(vertexShaderSource);
         shader->setFragmentShader(fragmentShaderSource);
         shader->link();
+
+        model = glm::mat4(1.0f);
     }
 
     float width = 1.0f;
     float height = 1.0f;
     glm::quat yaw;
+    glm::mat4 model;
     std::shared_ptr<Mesh> mesh;
     std::shared_ptr<Shader> shader;
 };
@@ -79,16 +82,15 @@ Quad::Quad(float width, float height)
     : m_data(std::make_shared<Data>(width, height)) {}
 
 void Quad::update(float elapsed) {
-    const float angleChangePerMillisecond = 180.0f / 1000.0f;
+    const float angleChangePerMillisecond = 1800.0f / 1000.0f;
     const float angelChange = angleChangePerMillisecond * elapsed;
 
-    m_data->yaw *=
-        glm::angleAxis(glm::radians(angelChange), glm::vec3(0.0f, 1.0f, 0.0f));
+    m_data->model = glm::rotate(m_data->model, glm::radians(angelChange),
+                                glm::vec3(0.0f, 1.0f, 0.0f));
 }
 
 void Quad::render(const glm::mat4 &view, const glm::mat4 &projection) {
-    const glm::mat4 model = glm::mat4_cast(m_data->yaw);
-    const glm::mat4 cameraMatrix = projection * view * model;
+    const glm::mat4 cameraMatrix = projection * view * m_data->model;
 
     m_data->mesh->bind();
     m_data->shader->bind();
