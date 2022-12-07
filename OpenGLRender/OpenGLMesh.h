@@ -9,6 +9,12 @@ class Mesh {
   public:
     Mesh();
 
+    ~Mesh();
+
+    void initData();
+
+    void destroyData();
+
     template <typename T>
     void writeVertexData(const std::vector<T> &vertexData) {
         writeVertexData(vertexData.size() * sizeof(T), vertexData.size(),
@@ -55,5 +61,11 @@ class Mesh {
   private:
     struct Data;
     std::shared_ptr<Data> m_data;
+
+    GLuint m_vbo = 0;
+    GLuint m_ibo = 0;
+    GLuint m_vao = 0;
+    GLuint m_indexCount = 0;
+    GLuint m_vertexCount = 0;
 };
 } // namespace OpenGLRender
