@@ -1,17 +1,22 @@
-#include "OpenGLWidget.h"
+#include "OpenGLRenderWidget.h".h "
+#include "BoLog.h"
 #include "OpenGLRenderingThread.h"
 #include "OpenGLViewportTarget.h"
 
 namespace OpenGLRender {
 
-struct Widget::Data {
+struct OpenGLRenderWidget::Data {
+
+    //    Data(QWidget *widget = nullptr) : widget(widget) {}
+    //    QWidget *widget = nullptr;
     std::shared_ptr<RenderingThread> renderingThread;
     std::shared_ptr<ViewportTarget> viewportTarget;
 };
 
-Widget::Widget() : m_data(std::make_shared<Data>()) {}
+OpenGLRenderWidget::OpenGLRenderWidget(QWidget *widget)
+    : QOpenGLWidget(widget), m_data(std::make_shared<Data>()) {}
 
-void Widget::startThread() {
+void OpenGLRenderWidget::startThread() {
     if (m_data->renderingThread) {
         stopThread();
     }
@@ -20,16 +25,15 @@ void Widget::startThread() {
     m_data->renderingThread->start();
 }
 
-void Widget::stopThread() {
+void OpenGLRenderWidget::stopThread() {
     if (m_data->renderingThread && m_data->renderingThread->isRunning()) {
         m_data->renderingThread->stop();
         m_data->renderingThread->quit();
         m_data->renderingThread->wait();
     }
-    m_data->renderingThread.reset();
 }
 
-void Widget::paintGL() {
+void OpenGLRenderWidget::paintGL() {
     if (!m_data->renderingThread || !m_data->renderingThread->isInitialized()) {
         return;
     }
@@ -41,9 +45,10 @@ void Widget::paintGL() {
     m_data->renderingThread->lock();
     const GLuint textureId = m_data->renderingThread->framebufferTexture();
     m_data->viewportTarget->render(textureId);
+    m_data->renderingThread->setCurrentFramePainted(true);
     m_data->renderingThread->unlock();
 }
 
-void Widget::closeEvent(QCloseEvent *e) { stopThread(); }
+void OpenGLRenderWidget::closeEvent(QCloseEvent *e) { stopThread(); }
 
 } // namespace OpenGLRender

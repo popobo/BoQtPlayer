@@ -4,7 +4,7 @@
 #include "FrameDispatcher.h"
 #include "IDecoder.h"
 #include "IDemux.h"
-#include "OpenGLRender/OpenGLWidget.h"
+#include "OpenGLRender/OpenGLRenderWidget.h"
 #include <QWidget>
 #include <memory>
 
@@ -27,7 +27,7 @@ class Widget : public QWidget {
     std::shared_ptr<IDecoder> m_videoDecoder;
     std::shared_ptr<IDecoder> m_audioDecoder;
     std::shared_ptr<FrameDispatcher> m_frameDispatcher;
-    std::shared_ptr<OpenGLRender::Widget> m_OpenGLRenderWidget;
+    OpenGLRender::OpenGLRenderWidget *m_OpenGLRenderWidget;
 
   private slots:
     void openFile();

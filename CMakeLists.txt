@@ -18,6 +18,9 @@ find_package(Qt6 REQUIRED COMPONENTS OpenGLWidgets)
 
 set(PROJECT_SOURCES
         main.cpp
+        widget.cpp
+        widget.h
+        widget.ui
         BoLog.h BoLog.cpp
         BoData.h BoData.cpp
         IDemux.h IDemux.cpp
@@ -33,7 +36,7 @@ set(PROJECT_SOURCES
         ${CMAKE_CURRENT_SOURCE_DIR}/Dependency/OpenGL/glad/glad.c
         ${CMAKE_CURRENT_SOURCE_DIR}/OpenGLRender/OpenGLMesh.h ${CMAKE_CURRENT_SOURCE_DIR}/OpenGLRender/OpenGLMesh.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/OpenGLRender/OpenGLRenderingThread.h ${CMAKE_CURRENT_SOURCE_DIR}/OpenGLRender/OpenGLRenderingThread.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/OpenGLRender/OpenGLWidget.h ${CMAKE_CURRENT_SOURCE_DIR}/OpenGLRender/OpenGLWidget.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/OpenGLRender/OpenGLRenderWidget.h ${CMAKE_CURRENT_SOURCE_DIR}/OpenGLRender/OpenGLRenderWidget.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/OpenGLRender/ElapsedTimer.h ${CMAKE_CURRENT_SOURCE_DIR}/OpenGLRender/ElapsedTimer.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/OpenGLRender/OpenGLQuad.h ${CMAKE_CURRENT_SOURCE_DIR}/OpenGLRender/OpenGLQuad.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/OpenGLRender/OpenGLShader.h ${CMAKE_CURRENT_SOURCE_DIR}/OpenGLRender/OpenGLShader.cpp

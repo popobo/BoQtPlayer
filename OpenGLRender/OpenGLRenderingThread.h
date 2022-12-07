@@ -1,6 +1,6 @@
 #pragma once
 
-#include "OpenGLWidget.h"
+#include "OpenGLRenderWidget.h"
 #include <QThread>
 #include <memory>
 
@@ -8,7 +8,7 @@ namespace OpenGLRender {
 
 class RenderingThread : public QThread {
   public:
-    RenderingThread(Widget *widget);
+    RenderingThread(OpenGLRenderWidget *widget);
 
     void stop();
 
@@ -19,6 +19,10 @@ class RenderingThread : public QThread {
     bool isInitialized();
 
     GLuint framebufferTexture() const;
+
+    bool isCurrentFramePainted() const;
+
+    void setCurrentFramePainted(bool rendered);
 
   protected:
     void run() override;

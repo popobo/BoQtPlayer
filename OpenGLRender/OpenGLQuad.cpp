@@ -2,6 +2,7 @@
 #include "OpenGLMesh.h"
 #include "OpenGLShader.h"
 #include <glm/gtx/quaternion.hpp>
+#include <qDebug>
 
 namespace OpenGLRender {
 struct Quad::Data {
@@ -66,14 +67,12 @@ struct Quad::Data {
         shader->setVertexShader(vertexShaderSource);
         shader->setFragmentShader(fragmentShaderSource);
         shader->link();
-
-        model = glm::mat4(1.0f);
     }
 
     float width = 1.0f;
     float height = 1.0f;
-    glm::quat yaw;
-    glm::mat4 model;
+    glm::mat4 model{1.0};
+    float currentAngle = 0.0;
     std::shared_ptr<Mesh> mesh;
     std::shared_ptr<Shader> shader;
 };
@@ -82,11 +81,15 @@ Quad::Quad(float width, float height)
     : m_data(std::make_shared<Data>(width, height)) {}
 
 void Quad::update(float elapsed) {
-    const float angleChangePerMillisecond = 1800.0f / 1000.0f;
-    const float angelChange = angleChangePerMillisecond * elapsed;
-
-    m_data->model = glm::rotate(m_data->model, glm::radians(angelChange),
-                                glm::vec3(0.0f, 1.0f, 0.0f));
+    const float angleChangePerMillisecond = 180.0f / 1000.0f;
+    m_data->currentAngle += angleChangePerMillisecond * elapsed;
+    m_data->currentAngle = m_data->currentAngle > 360.0f
+                               ? m_data->currentAngle - 360.0f
+                               : m_data->currentAngle;
+    m_data->model = glm::mat4(1.0f);
+    m_data->model =
+        glm::rotate(m_data->model, glm::radians(m_data->currentAngle),
+                    glm::vec3(0.0f, 1.0f, 0.0f));
 }
 
 void Quad::render(const glm::mat4 &view, const glm::mat4 &projection) {

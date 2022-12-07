@@ -10,14 +10,15 @@
 Widget::Widget(QWidget *parent) : QWidget(parent), ui(new Ui::Widget) {
     ui->setupUi(this);
 
+    connect(ui->pushButtonOpenFile, SIGNAL(clicked()), this, SLOT(openFile()));
+
     if (!QOpenGLContext::supportsThreadedOpenGL()) {
         BO_INFO("Threaded OpenGL is not supported");
         return;
     }
 
-    m_OpenGLRenderWidget = std::make_shared<OpenGLRender::Widget>();
+    m_OpenGLRenderWidget = new OpenGLRender::OpenGLRenderWidget(this);
     m_OpenGLRenderWidget->setGeometry(QRect(0, 0, 800, 600));
-    m_OpenGLRenderWidget->startThread();
 
     m_demux = std::make_shared<FFDemux>();
     m_videoDecoder = std::make_shared<FFDecoder>();
@@ -37,12 +38,14 @@ void Widget::openFile() {
     QString filename = QFileDialog::getOpenFileName(nullptr, "oepn file");
     std::string stdFilename = filename.toStdString();
 
-    m_demux->open(stdFilename.c_str());
+    //    m_demux->open(stdFilename.c_str());
 
-    m_videoDecoder->open(m_demux->getVideoParameter());
-    m_audioDecoder->open(m_demux->getAudioParameter());
+    //    m_videoDecoder->open(m_demux->getVideoParameter());
+    //    m_audioDecoder->open(m_demux->getAudioParameter());
 
-    m_demux->start();
-    m_videoDecoder->start();
-    m_audioDecoder->start();
+    //    m_demux->start();
+    //    m_videoDecoder->start();
+    //    m_audioDecoder->start();
+
+    m_OpenGLRenderWidget->startThread();
 }

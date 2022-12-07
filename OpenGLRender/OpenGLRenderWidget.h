@@ -6,9 +6,11 @@
 
 namespace OpenGLRender {
 
-class Widget : public QOpenGLWidget {
+class OpenGLRenderWidget : public QOpenGLWidget {
+    Q_OBJECT
+
   public:
-    Widget();
+    OpenGLRenderWidget(QWidget *widget = nullptr);
 
     void startThread();
 

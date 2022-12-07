@@ -3,7 +3,6 @@
 #include "BoUtil.h"
 #include "ElapsedTimer.h"
 #include "OpenGLQuad.h"
-#include "OpenGLWidget.h"
 #include "glm/gtx/transform.hpp"
 #include <QMutex>
 #include <QOffscreenSurface>
@@ -13,16 +12,17 @@
 namespace OpenGLRender {
 
 struct RenderingThread::Data {
-    Data(Widget *widget, const QSize &framebufferSize)
+    Data(OpenGLRenderWidget *widget, const QSize &framebufferSize)
         : widget(widget), framebufferSize(framebufferSize) {}
 
     std::shared_ptr<QOpenGLContext> context;
     std::shared_ptr<QOffscreenSurface> surface;
-    Widget *widget;
+    OpenGLRenderWidget *widget;
     QSize framebufferSize;
     QMutex mutex;
     bool exiting = false;
     bool initialized = false;
+    bool isCurrentFramePainted = true;
     ElapsedTimer timer;
     std::shared_ptr<Quad> quad;
 
@@ -91,14 +91,13 @@ void renderFrame(std::shared_ptr<RenderingThread::Data> data) {
     data->renderFramebufferObject->release();
     // Take the current framebuffer texture Id
     data->framebufferTextureId = data->renderFramebufferObject->texture();
-
     // Swap the framebuffers for double-buffering
     std::swap(data->renderFramebufferObject, data->displayFramebufferObject);
 }
 
 } // namespace
 
-RenderingThread::RenderingThread(Widget *widget)
+RenderingThread::RenderingThread(OpenGLRenderWidget *widget)
     : data(std::make_shared<Data>(widget, widget->size())) {
 
     data->context = std::make_shared<QOpenGLContext>();
@@ -114,9 +113,9 @@ RenderingThread::RenderingThread(Widget *widget)
 }
 
 void RenderingThread::stop() {
-    data->mutex.lock();
+    lock();
     data->exiting = true;
-    data->mutex.unlock();
+    unlock();
 }
 
 void RenderingThread::lock() { data->mutex.lock(); }
@@ -129,12 +128,23 @@ GLuint RenderingThread::framebufferTexture() const {
     return data->framebufferTextureId;
 }
 
+bool RenderingThread::isCurrentFramePainted() const {
+    return data->isCurrentFramePainted;
+}
+
+void RenderingThread::setCurrentFramePainted(bool rendered) {
+    data->isCurrentFramePainted = rendered;
+}
+
 void RenderingThread::run() {
     for (;;) {
-        QMutexLocker lock(&data->mutex);
-
         if (data->exiting) {
             break;
+        }
+
+        if (!isCurrentFramePainted()) {
+            QThread::msleep(1);
+            continue;
         }
 
         // Make the OpenGL context current on offscreen surface.
@@ -144,13 +154,15 @@ void RenderingThread::run() {
             initialize(data);
             data->initialized = true;
         }
-
+        lock();
         renderFrame(data);
-
+        setCurrentFramePainted(false);
+        unlock();
         data->context->doneCurrent();
 
         // Notify UI about new frame.
         QMetaObject::invokeMethod(data->widget, "update");
+        QThread::msleep(1);
     }
 }
 
