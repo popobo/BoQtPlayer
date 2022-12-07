@@ -26,59 +26,43 @@ bool isIndexBufferCurrent(GLuint ibo) {
 
 } // namespace
 
-struct Mesh::Data {
-    Data() { createData(); }
+Mesh::Mesh() {
+    initData();
+}
 
-    ~Data() { destoryData(); }
-
-    void createData() {
-        GLCall(glGenVertexArrays(1, &vao));
-        if (0 == vao) {
+void Mesh::initData() {
+        GLCall(glGenVertexArrays(1, &m_vao));
+        if (0 == m_vao) {
             BO_INFO("Failed to generate VAO");
         }
 
-        GLCall(glGenBuffers(1, &vbo));
-        if (0 == vbo) {
+        GLCall(glGenBuffers(1, &m_vbo));
+        if (0 == m_vbo) {
             BO_INFO("Failed to generate VBO");
         }
 
-        GLCall(glGenBuffers(1, &ibo));
-        if (0 == ibo) {
+        GLCall(glGenBuffers(1, &m_ibo));
+        if (0 == m_ibo) {
             BO_INFO("Failed to generate IBO");
         }
-    }
+}
 
-    void destoryData() {
-        glDeleteBuffers(1, &ibo);
-        glDeleteBuffers(1, &vbo);
-        glDeleteVertexArrays(1, &vao);
-    }
+int Mesh::vertexCount() const { return m_vertexCount; }
 
-    GLuint vbo = 0;
-    GLuint ibo = 0;
-    GLuint vao = 0;
-    GLuint indexCount = 0;
-    GLuint vertexCount = 0;
-};
-
-Mesh::Mesh() : m_data(std::make_shared<Data>()) {}
-
-int Mesh::vertexCount() const { return m_data->vertexCount; }
-
-int Mesh::indexCount() const { return m_data->indexCount; }
+int Mesh::indexCount() const { return m_indexCount; }
 
 void Mesh::writeVertexData(int byteSize, int count, const void *vertexData) {
-    GLCall(glBindVertexArray(m_data->vao));
-    if (!isVertexArrayCurrent(m_data->vao)) {
+    GLCall(glBindVertexArray(m_vao));
+    if (!isVertexArrayCurrent(m_vao)) {
         BO_ERROR("Failed to bind VAO");
     }
 
-    GLCall(glBindBuffer(GL_ARRAY_BUFFER, m_data->vbo));
-    if (!isVertexBufferCurrent(m_data->vbo)) {
+    GLCall(glBindBuffer(GL_ARRAY_BUFFER, m_vbo));
+    if (!isVertexBufferCurrent(m_vbo)) {
         BO_ERROR("Failed to bind VBO");
     }
 
-    m_data->vertexCount = count;
+    m_vertexCount = count;
     GLCall(glBufferData(GL_ARRAY_BUFFER, byteSize, vertexData, GL_STATIC_DRAW));
 
     GLCall(glBindVertexArray(0)); // VAO before VBO
@@ -86,8 +70,8 @@ void Mesh::writeVertexData(int byteSize, int count, const void *vertexData) {
 }
 
 void Mesh::readVertexData(int byteCount, void *data) {
-    GLCall(glBindBuffer(GL_ARRAY_BUFFER, m_data->vbo));
-    if (!isVertexBufferCurrent(m_data->vbo)) {
+    GLCall(glBindBuffer(GL_ARRAY_BUFFER, m_vbo));
+    if (!isVertexBufferCurrent(m_vbo)) {
         BO_ERROR("Failed to bind VBO");
     }
 
@@ -96,17 +80,17 @@ void Mesh::readVertexData(int byteCount, void *data) {
 }
 
 void Mesh::writeIndexData(int byteSize, int count, const void *indexData) {
-    GLCall(glBindVertexArray(m_data->vao));
-    if (!isVertexArrayCurrent(m_data->vao)) {
+    GLCall(glBindVertexArray(m_vao));
+    if (!isVertexArrayCurrent(m_vao)) {
         BO_ERROR("Failed to bind VAO");
     }
 
-    GLCall(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_data->ibo));
-    if (!isIndexBufferCurrent(m_data->ibo)) {
+    GLCall(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_ibo));
+    if (!isIndexBufferCurrent(m_ibo)) {
         BO_INFO("Failed to bind IBO");
     }
 
-    m_data->indexCount = count;
+    m_indexCount = count;
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, byteSize, indexData, GL_STATIC_DRAW);
 
     GLCall(glBindVertexArray(0)); // VAO before VBO
@@ -114,8 +98,8 @@ void Mesh::writeIndexData(int byteSize, int count, const void *indexData) {
 }
 
 void Mesh::readIndexData(int byteCount, void *data) {
-    GLCall(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_data->ibo));
-    if (!isIndexBufferCurrent(m_data->ibo)) {
+    GLCall(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_ibo));
+    if (!isIndexBufferCurrent(m_ibo)) {
         BO_ERROR("Failed to bind VBO");
     }
 
@@ -125,18 +109,18 @@ void Mesh::readIndexData(int byteCount, void *data) {
 
 void Mesh::setAttributeDefinition(int index, int tupleSize, int stride,
                                   int offset, GLenum type) {
-    GLCall(glBindVertexArray(m_data->vao));
-    if (!isVertexArrayCurrent(m_data->vao)) {
+    GLCall(glBindVertexArray(m_vao));
+    if (!isVertexArrayCurrent(m_vao)) {
         BO_ERROR("Failed to bind VAO");
     }
 
-    GLCall(glBindBuffer(GL_ARRAY_BUFFER, m_data->vbo));
-    if (!isVertexBufferCurrent(m_data->vbo)) {
+    GLCall(glBindBuffer(GL_ARRAY_BUFFER, m_vbo));
+    if (!isVertexBufferCurrent(m_vbo)) {
         BO_ERROR("Failed to bind VBO");
     }
 
-    GLCall(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_data->ibo));
-    if (!isIndexBufferCurrent(m_data->ibo)) {
+    GLCall(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_ibo));
+    if (!isIndexBufferCurrent(m_ibo)) {
         BO_ERROR("Failed to bind VBO");
     }
 
@@ -150,8 +134,8 @@ void Mesh::setAttributeDefinition(int index, int tupleSize, int stride,
 }
 
 void Mesh::bind() {
-    GLCall(glBindVertexArray(m_data->vao));
-    if (!isVertexArrayCurrent(m_data->vao)) {
+    GLCall(glBindVertexArray(m_vao));
+    if (!isVertexArrayCurrent(m_vao)) {
         BO_ERROR("Failed to bind VAO");
     }
 }
@@ -159,7 +143,17 @@ void Mesh::bind() {
 void Mesh::release() { GLCall(glBindVertexArray(0)); }
 
 void Mesh::render(GLenum drawStyle, GLenum indexDataType) {
-    GLCall(glDrawElements(drawStyle, m_data->indexCount, indexDataType, 0));
+    GLCall(glDrawElements(drawStyle, m_indexCount, indexDataType, 0));
+}
+
+void Mesh::destroyData() {
+    GLCall(glDeleteBuffers(1, &m_ibo));
+    GLCall(glDeleteBuffers(1, &m_vbo));
+    GLCall(glDeleteVertexArrays(1, &m_vao));
+}
+
+Mesh::~Mesh() {
+    destroyData();
 }
 
 } // namespace OpenGLRender

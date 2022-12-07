@@ -106,6 +106,7 @@ RenderingThread::RenderingThread(OpenGLRenderWidget *widget)
     data->context->create();
     data->context->moveToThread(this);
 
+    // 延迟删除，否则在关闭窗口时会报错, 具体原因有待学习
     data->surface = {new QOffscreenSurface{}, [](QOffscreenSurface *surface) {
                          surface->deleteLater();
                      }};
@@ -158,6 +159,7 @@ void RenderingThread::run() {
         }
         lock();
         renderFrame(data);
+        // 保证双缓冲机制正常运行
         setCurrentFramePainted(false);
         unlock();
         data->context->doneCurrent();
