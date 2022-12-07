@@ -27,7 +27,7 @@ class Widget : public QWidget {
     std::shared_ptr<IDecoder> m_videoDecoder;
     std::shared_ptr<IDecoder> m_audioDecoder;
     std::shared_ptr<FrameDispatcher> m_frameDispatcher;
-    OpenGLRender::OpenGLRenderWidget *m_OpenGLRenderWidget;
+    std::shared_ptr<OpenGLRender::OpenGLRenderWidget> m_OpenGLRenderWidget;
 
   private slots:
     void openFile();

@@ -106,7 +106,9 @@ RenderingThread::RenderingThread(OpenGLRenderWidget *widget)
     data->context->create();
     data->context->moveToThread(this);
 
-    data->surface = std::make_shared<QOffscreenSurface>();
+    data->surface = {new QOffscreenSurface{}, [](QOffscreenSurface *surface) {
+                         surface->deleteLater();
+                     }};
     data->surface->setFormat(data->context->format());
     data->surface->create();
     data->surface->moveToThread(this);

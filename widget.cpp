@@ -10,6 +10,8 @@
 Widget::Widget(QWidget *parent) : QWidget(parent), ui(new Ui::Widget) {
     ui->setupUi(this);
 
+    setWindowFlag(Qt::FramelessWindowHint);
+
     connect(ui->pushButtonOpenFile, SIGNAL(clicked()), this, SLOT(openFile()));
 
     if (!QOpenGLContext::supportsThreadedOpenGL()) {
@@ -17,7 +19,9 @@ Widget::Widget(QWidget *parent) : QWidget(parent), ui(new Ui::Widget) {
         return;
     }
 
-    m_OpenGLRenderWidget = new OpenGLRender::OpenGLRenderWidget(this);
+    m_OpenGLRenderWidget =
+        std::make_shared<OpenGLRender::OpenGLRenderWidget>(this);
+
     m_OpenGLRenderWidget->setGeometry(QRect(0, 0, 800, 600));
 
     m_demux = std::make_shared<FFDemux>();
@@ -29,6 +33,13 @@ Widget::Widget(QWidget *parent) : QWidget(parent), ui(new Ui::Widget) {
     m_demux->addObs(m_audioDecoder);
 
     m_videoDecoder->addStrongObs(m_frameDispatcher);
+
+    connect(ui->pushButtonCloseWindow, &QPushButton::clicked,
+            m_OpenGLRenderWidget.get(),
+            &OpenGLRender::OpenGLRenderWidget::stopThread);
+    connect(m_OpenGLRenderWidget.get(),
+            &OpenGLRender::OpenGLRenderWidget::threadStopped, this,
+            &QWidget::close);
 }
 
 Widget::~Widget() { delete ui; }

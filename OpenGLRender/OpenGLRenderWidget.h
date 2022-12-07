@@ -20,6 +20,9 @@ class OpenGLRenderWidget : public QOpenGLWidget {
     void paintGL() override;
     void closeEvent(QCloseEvent *e) override;
 
+  signals:
+    void threadStopped();
+
   private:
     struct Data;
     std::shared_ptr<Data> m_data;

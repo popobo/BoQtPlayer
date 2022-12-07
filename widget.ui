@@ -26,6 +26,19 @@
     <string>Open</string>
    </property>
   </widget>
+  <widget class="QPushButton" name="pushButtonCloseWindow">
+   <property name="geometry">
+    <rect>
+     <x>960</x>
+     <y>0</y>
+     <width>40</width>
+     <height>40</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>X</string>
+   </property>
+  </widget>
  </widget>
  <resources/>
  <connections/>

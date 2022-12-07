@@ -1,4 +1,4 @@
-#include "OpenGLRenderWidget.h".h "
+#include "OpenGLRenderWidget.h"
 #include "BoLog.h"
 #include "OpenGLRenderingThread.h"
 #include "OpenGLViewportTarget.h"
@@ -30,6 +30,7 @@ void OpenGLRenderWidget::stopThread() {
         m_data->renderingThread->stop();
         m_data->renderingThread->quit();
         m_data->renderingThread->wait();
+        emit threadStopped();
     }
 }
 
