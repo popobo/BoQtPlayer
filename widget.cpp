@@ -3,7 +3,7 @@
 #include "BoLog.h"
 #include "FFDecoder.h"
 #include "FFDemux.h"
-
+#include "OpenGLRender/Renderer/OpenGLQuadFactory.h"
 #include <QFileDialog>
 #include <QOpenGLContext>
 
@@ -19,8 +19,10 @@ Widget::Widget(QWidget *parent) : QWidget(parent), ui(new Ui::Widget) {
         return;
     }
 
+    std::shared_ptr<OpenGLRender::IRendererFactory> renderFactory =
+        std::make_shared<OpenGLRender::OpenGLQuadFactory>();
     m_OpenGLRenderWidget =
-        std::make_shared<OpenGLRender::OpenGLRenderWidget>(this);
+        std::make_shared<OpenGLRender::OpenGLRenderWidget>(renderFactory, this);
 
     m_OpenGLRenderWidget->setGeometry(QRect(0, 0, 800, 600));
 

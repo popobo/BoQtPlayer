@@ -16,12 +16,18 @@ struct OpenGLRenderWidget::Data {
 OpenGLRenderWidget::OpenGLRenderWidget(QWidget *widget)
     : QOpenGLWidget(widget), m_data(std::make_shared<Data>()) {}
 
+OpenGLRenderWidget::OpenGLRenderWidget(
+    std::shared_ptr<IRendererFactory> rendererFactory, QWidget *widget)
+    : QOpenGLWidget(widget),
+      m_data(std::make_shared<Data>()), m_rendererFactory{rendererFactory} {}
+
 void OpenGLRenderWidget::startThread() {
     if (m_data->renderingThread) {
         stopThread();
     }
 
-    m_data->renderingThread = std::make_shared<RenderingThread>(this);
+    m_data->renderingThread =
+        std::make_shared<RenderingThread>(shared_from_this());
     m_data->renderingThread->start();
 }
 
@@ -32,6 +38,10 @@ void OpenGLRenderWidget::stopThread() {
         m_data->renderingThread->wait();
         emit threadStopped();
     }
+}
+
+std::shared_ptr<IRendererFactory> OpenGLRenderWidget::getRendererFactory() {
+    return m_rendererFactory;
 }
 
 void OpenGLRenderWidget::paintGL() {

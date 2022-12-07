@@ -33,14 +33,17 @@ set(PROJECT_SOURCES
         IDecoder.h IDecoder.cpp
         FFDecoder.h FFDecoder.cpp
         FrameDispatcher.h FrameDispatcher.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/Dependency/OpenGL/glad/glad.c
-        ${CMAKE_CURRENT_SOURCE_DIR}/OpenGLRender/OpenGLMesh.h ${CMAKE_CURRENT_SOURCE_DIR}/OpenGLRender/OpenGLMesh.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/OpenGLRender/OpenGLRenderingThread.h ${CMAKE_CURRENT_SOURCE_DIR}/OpenGLRender/OpenGLRenderingThread.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/OpenGLRender/OpenGLRenderWidget.h ${CMAKE_CURRENT_SOURCE_DIR}/OpenGLRender/OpenGLRenderWidget.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/OpenGLRender/ElapsedTimer.h ${CMAKE_CURRENT_SOURCE_DIR}/OpenGLRender/ElapsedTimer.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/OpenGLRender/OpenGLQuad.h ${CMAKE_CURRENT_SOURCE_DIR}/OpenGLRender/OpenGLQuad.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/OpenGLRender/OpenGLShader.h ${CMAKE_CURRENT_SOURCE_DIR}/OpenGLRender/OpenGLShader.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/OpenGLRender/OpenGLViewportTarget.h ${CMAKE_CURRENT_SOURCE_DIR}/OpenGLRender/OpenGLViewportTarget.cpp
+        Dependency/OpenGL/glad/glad.c
+        OpenGLRender/OpenGLMesh.h OpenGLRender/OpenGLMesh.cpp
+        OpenGLRender/OpenGLRenderingThread.h OpenGLRender/OpenGLRenderingThread.cpp
+        OpenGLRender/OpenGLRenderWidget.h OpenGLRender/OpenGLRenderWidget.cpp
+        OpenGLRender/ElapsedTimer.h OpenGLRender/ElapsedTimer.cpp
+        OpenGLRender/Renderer/OpenGLQuad.h OpenGLRender/Renderer/OpenGLQuad.cpp
+        OpenGLRender/OpenGLShader.h OpenGLRender/OpenGLShader.cpp
+        OpenGLRender/OpenGLViewportTarget.h OpenGLRender/OpenGLViewportTarget.cpp
+        OpenGLRender/Renderer/IOpenGLRenderer.h
+        OpenGLRender/Renderer/IRendererFactory.h
+        OpenGLRender/Renderer/OpenGLQuadFactory.h OpenGLRender/Renderer/OpenGLQuadFactory.cpp
     )
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
@@ -66,10 +69,11 @@ else()
     endif()
 endif()
 
-target_include_directories(BoPlayer PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/Dependency/ffmpeg/include
-                                           ${CMAKE_CURRENT_SOURCE_DIR}/Dependency/spdlog/include
-                                           ${CMAKE_CURRENT_SOURCE_DIR}/Dependency/OpenGL/glad/include
-                                           ${CMAKE_CURRENT_SOURCE_DIR}/Dependency/OpenGL/glm)
+target_include_directories(BoPlayer PUBLIC Dependency/ffmpeg/include
+                                           Dependency/spdlog/include
+                                           Dependency/OpenGL/glad/include
+                                           Dependency/OpenGL/glm
+                                           OpenGLRender/  )
 
 target_link_directories(BoPlayer PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/Dependency/ffmpeg/lib)
 

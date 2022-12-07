@@ -2,38 +2,12 @@
 #include "BoLog.h"
 #include "BoUtil.h"
 #include "ElapsedTimer.h"
-#include "OpenGLQuad.h"
 #include "glm/gtx/transform.hpp"
-#include <QMutex>
-#include <QOffscreenSurface>
-#include <QOpenGLContext>
-#include <QOpenGLFramebufferObject>
 
 namespace OpenGLRender {
 
-struct RenderingThread::Data {
-    Data(OpenGLRenderWidget *widget, const QSize &framebufferSize)
-        : widget(widget), framebufferSize(framebufferSize) {}
-
-    std::shared_ptr<QOpenGLContext> context;
-    std::shared_ptr<QOffscreenSurface> surface;
-    OpenGLRenderWidget *widget;
-    QSize framebufferSize;
-    QMutex mutex;
-    bool exiting = false;
-    bool initialized = false;
-    bool isCurrentFramePainted = true;
-    ElapsedTimer timer;
-    std::shared_ptr<Quad> quad;
-
-    GLuint framebufferTextureId = 0;
-    std::shared_ptr<QOpenGLFramebufferObject> renderFramebufferObject;
-    std::shared_ptr<QOpenGLFramebufferObject> displayFramebufferObject;
-};
-
-namespace {
-void initialize(std::shared_ptr<RenderingThread::Data> data) {
-    if (data->initialized) {
+void RenderingThread::initialize() {
+    if (m_initialized) {
         return;
     }
     if (!gladLoadGL()) {
@@ -43,24 +17,30 @@ void initialize(std::shared_ptr<RenderingThread::Data> data) {
 
     // Create the framebuffer objects. Two framebuffers is needed
     // for double-buffering.
-    data->quad = std::make_shared<Quad>(2.0f, 2.0f);
+    if (!m_widget.lock()) {
+        BO_ERROR("m_widget is nullptr");
+        return;
+    }
+
+    m_renderer = m_widget.lock()->getRendererFactory()->createOpenGLRender();
+
     QOpenGLFramebufferObjectFormat framebufferFormat;
 
     framebufferFormat.setAttachment(
         QOpenGLFramebufferObject::CombinedDepthStencil);
-    data->renderFramebufferObject = std::make_shared<QOpenGLFramebufferObject>(
-        data->framebufferSize, framebufferFormat);
+    m_renderFramebufferObject = std::make_shared<QOpenGLFramebufferObject>(
+        m_framebufferSize, framebufferFormat);
 
-    data->displayFramebufferObject = std::make_shared<QOpenGLFramebufferObject>(
-        data->framebufferSize, framebufferFormat);
+    m_displayFramebufferObject = std::make_shared<QOpenGLFramebufferObject>(
+        m_framebufferSize, framebufferFormat);
 }
 
-void renderFrame(std::shared_ptr<RenderingThread::Data> data) {
+void RenderingThread::renderFrame() {
     // bind the framebuffer for rendering
-    data->renderFramebufferObject->bind();
+    m_renderFramebufferObject->bind();
 
     // set the viewport
-    const QSize size = data->framebufferSize;
+    const QSize size = m_framebufferSize;
     GLCall(glViewport(0, 0, size.width(), size.height()));
 
     const float aspect = float(size.width()) / float(size.height());
@@ -81,67 +61,64 @@ void renderFrame(std::shared_ptr<RenderingThread::Data> data) {
     GLCall(glDisable(GL_CULL_FACE));
 
     // Render the quad
-    data->quad->update(data->timer.elapsed());
-    data->quad->render(view, projection);
+    m_renderer->update(m_timer.elapsed());
+    m_renderer->render(view, projection);
 
     // flush the pipeline
     GLCall(glFlush());
 
     // Release the framebuffer
-    data->renderFramebufferObject->release();
+    m_renderFramebufferObject->release();
     // Take the current framebuffer texture Id
-    data->framebufferTextureId = data->renderFramebufferObject->texture();
+    m_framebufferTextureId = m_renderFramebufferObject->texture();
     // Swap the framebuffers for double-buffering
-    std::swap(data->renderFramebufferObject, data->displayFramebufferObject);
+    std::swap(m_renderFramebufferObject, m_displayFramebufferObject);
 }
 
-} // namespace
+RenderingThread::RenderingThread(std::shared_ptr<OpenGLRenderWidget> widget)
+    : m_widget{widget}, m_framebufferSize{widget->size()} {
 
-RenderingThread::RenderingThread(OpenGLRenderWidget *widget)
-    : data(std::make_shared<Data>(widget, widget->size())) {
-
-    data->context = std::make_shared<QOpenGLContext>();
-    data->context->setShareContext(widget->context());
-    data->context->setFormat(widget->context()->format());
-    data->context->create();
-    data->context->moveToThread(this);
+    m_context = std::make_shared<QOpenGLContext>();
+    m_context->setShareContext(widget->context());
+    m_context->setFormat(widget->context()->format());
+    m_context->create();
+    m_context->moveToThread(this);
 
     // 延迟删除，否则在关闭窗口时会报错, 具体原因有待学习
-    data->surface = {new QOffscreenSurface{}, [](QOffscreenSurface *surface) {
-                         surface->deleteLater();
-                     }};
-    data->surface->setFormat(data->context->format());
-    data->surface->create();
-    data->surface->moveToThread(this);
+    m_surface = {new QOffscreenSurface{},
+                 [](QOffscreenSurface *surface) { surface->deleteLater(); }};
+    m_surface->setFormat(m_context->format());
+    m_surface->create();
+    m_surface->moveToThread(this);
 }
 
 void RenderingThread::stop() {
     lock();
-    data->exiting = true;
+    m_exiting = true;
     unlock();
 }
 
-void RenderingThread::lock() { data->mutex.lock(); }
+void RenderingThread::lock() { m_mutex.lock(); }
 
-void RenderingThread::unlock() { data->mutex.unlock(); }
+void RenderingThread::unlock() { m_mutex.unlock(); }
 
-bool RenderingThread::isInitialized() { return data->initialized; }
+bool RenderingThread::isInitialized() { return m_initialized; }
 
 GLuint RenderingThread::framebufferTexture() const {
-    return data->framebufferTextureId;
+    return m_framebufferTextureId;
 }
 
 bool RenderingThread::isCurrentFramePainted() const {
-    return data->isCurrentFramePainted;
+    return m_isCurrentFramePainted;
 }
 
 void RenderingThread::setCurrentFramePainted(bool rendered) {
-    data->isCurrentFramePainted = rendered;
+    m_isCurrentFramePainted = rendered;
 }
 
 void RenderingThread::run() {
     for (;;) {
-        if (data->exiting) {
+        if (m_exiting) {
             break;
         }
 
@@ -151,21 +128,25 @@ void RenderingThread::run() {
         }
 
         // Make the OpenGL context current on offscreen surface.
-        data->context->makeCurrent(data->surface.get());
+        m_context->makeCurrent(m_surface.get());
 
-        if (!data->initialized) {
-            initialize(data);
-            data->initialized = true;
+        if (!m_initialized) {
+            initialize();
+            m_initialized = true;
         }
         lock();
-        renderFrame(data);
+        renderFrame();
         // 保证双缓冲机制正常运行
         setCurrentFramePainted(false);
         unlock();
-        data->context->doneCurrent();
+        m_context->doneCurrent();
 
         // Notify UI about new frame.
-        QMetaObject::invokeMethod(data->widget, "update");
+        if (!m_widget.lock()) {
+            QThread::msleep(1);
+            continue;
+        }
+        QMetaObject::invokeMethod(m_widget.lock().get(), "update");
         QThread::msleep(1);
     }
 }
