@@ -1,7 +1,8 @@
 #pragma once
 
+#include "OpenGLRenderingThread.h"
+#include "OpenGLViewportTarget.h"
 #include "Renderer/IRendererFactory.h"
-#include "glad/glad.h"
 #include <QOpenGLWidget>
 #include <memory>
 
@@ -33,10 +34,10 @@ class OpenGLRenderWidget
     void threadStopped();
 
   private:
-    struct Data;
-    std::shared_ptr<Data> m_data;
-
-    std::shared_ptr<IRendererFactory> m_rendererFactory{nullptr};
+    // std::shared_ptr的默认构造函数创建的是指向nullptr的，没必要再强调一遍
+    std::shared_ptr<IRendererFactory> m_rendererFactory;
+    std::shared_ptr<RenderingThread> m_renderingThread;
+    std::shared_ptr<ViewportTarget> m_viewportTarget;
 };
 
 } // namespace OpenGLRender

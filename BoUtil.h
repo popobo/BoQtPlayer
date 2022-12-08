@@ -1,5 +1,5 @@
-#ifndef BOUTIL_H
-#define BOUTIL_H
+#pragma once
+
 #include "glad/glad.h"
 #include <iostream>
 
@@ -26,5 +26,3 @@ bool GLLogCall(const char *function, const char *file, int line);
     GLClearError();                                                            \
     x;                                                                         \
     GLLogCall(#x, __FILE__, __LINE__)
-
-#endif // BOUTIL_H

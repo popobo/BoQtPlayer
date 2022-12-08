@@ -17,12 +17,12 @@ void RenderingThread::initialize() {
 
     // Create the framebuffer objects. Two framebuffers is needed
     // for double-buffering.
-    if (!m_widget.lock()) {
-        BO_ERROR("m_widget is nullptr");
+    if (!m_renderer) {
+        BO_ERROR("m_renderer is nullptr");
         return;
     }
 
-    m_renderer = m_widget.lock()->getRendererFactory()->createOpenGLRender();
+    m_renderer->init();
 
     QOpenGLFramebufferObjectFormat framebufferFormat;
 
@@ -61,6 +61,10 @@ void RenderingThread::renderFrame() {
     GLCall(glDisable(GL_CULL_FACE));
 
     // Render the quad
+    if (!m_renderer) {
+        BO_ERROR("m_renderer is nullptr");
+        return;
+    }
     m_renderer->update(m_timer.elapsed());
     m_renderer->render(view, projection);
 
@@ -75,12 +79,19 @@ void RenderingThread::renderFrame() {
     std::swap(m_renderFramebufferObject, m_displayFramebufferObject);
 }
 
-RenderingThread::RenderingThread(std::shared_ptr<OpenGLRenderWidget> widget)
-    : m_widget{widget}, m_framebufferSize{widget->size()} {
+void RenderingThread::setTriggerPaintFunc(const std::function<void()> &func) {
+    m_triggerPaintGLFunc = func;
+}
 
+void RenderingThread::setRenderer(
+    const std::shared_ptr<IOpenGLRenderer> &renderer) {
+    m_renderer = renderer;
+}
+
+void RenderingThread::setOpenGLContext(QOpenGLContext *context) {
     m_context = std::make_shared<QOpenGLContext>();
-    m_context->setShareContext(widget->context());
-    m_context->setFormat(widget->context()->format());
+    m_context->setShareContext(context);
+    m_context->setFormat(context->format());
     m_context->create();
     m_context->moveToThread(this);
 
@@ -91,6 +102,12 @@ RenderingThread::RenderingThread(std::shared_ptr<OpenGLRenderWidget> widget)
     m_surface->create();
     m_surface->moveToThread(this);
 }
+
+void RenderingThread::setFrameBufferSize(const QSize &size) {
+    m_framebufferSize = size;
+}
+
+RenderingThread::RenderingThread() {}
 
 void RenderingThread::stop() {
     lock();
@@ -142,11 +159,10 @@ void RenderingThread::run() {
         m_context->doneCurrent();
 
         // Notify UI about new frame.
-        if (!m_widget.lock()) {
-            QThread::msleep(1);
-            continue;
+        if (m_triggerPaintGLFunc) {
+            m_triggerPaintGLFunc();
         }
-        QMetaObject::invokeMethod(m_widget.lock().get(), "update");
+
         QThread::msleep(1);
     }
 }

@@ -44,6 +44,7 @@ set(PROJECT_SOURCES
         OpenGLRender/Renderer/IOpenGLRenderer.h
         OpenGLRender/Renderer/IRendererFactory.h
         OpenGLRender/Renderer/OpenGLQuadFactory.h OpenGLRender/Renderer/OpenGLQuadFactory.cpp
+        OpenGLRender/Renderer/YUVRenderer.h OpenGLRender/Renderer/YUVRenderer.cpp
     )
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
