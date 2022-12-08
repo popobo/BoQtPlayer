@@ -90,8 +90,6 @@ void RenderingThread::renderFrame() {
     // Take the current framebuffer texture Id
     m_framebufferTextureId = m_renderFramebufferObject->texture();
     // Swap the framebuffers for double-buffering
-    QImage image = m_renderFramebufferObject->toImage();
-    image.save("iamge2.png", "PNG");
     std::swap(m_renderFramebufferObject, m_displayFramebufferObject);
 }
 
@@ -187,7 +185,7 @@ void RenderingThread::run() {
             m_triggerPaintGLFunc();
         }
 
-        QThread::msleep(100);
+        QThread::msleep(25);
     }
 }
 

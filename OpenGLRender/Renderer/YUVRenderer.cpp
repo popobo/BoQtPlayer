@@ -6,40 +6,6 @@ namespace OpenGLRender {
 
 namespace {
 
-const char *vertexShaderCode = R"(
-        #version 330 core
-        layout (location = 0) in vec3 aPosition; //顶点信息
-        layout (location = 1) in vec2 aTexCoord; //材质坐标
-        out vec2 vTexCoord; //输出的材质坐标
-        void main(){
-            vTexCoord = vec2(aTexCoord.x, 1.0 - aTexCoord.y);//以左上角为原点
-            gl_Position = vec4(aPosition, 1.0); //现实的顶点
-        })";
-
-const char *fragmentShaderYUV420PCode = R"(
-        #version 330 core
-
-        uniform sampler2D yTexture;  //输入的材质(不透明灰度, 单像素)
-        uniform sampler2D uTexture;
-        uniform sampler2D vTexture;
-
-        in vec2 vTexCoord; //顶点着色器传递的坐标
-        out vec4 FragColor;
-        void main(){
-            vec3 yuv;//vec3含有三个元素的向量
-            vec3 rgb;
-            //这变的rgb相当于yuv
-            yuv.r = texture2D(yTexture, vTexCoord).r;
-            yuv.g = texture2D(uTexture, vTexCoord).r - 0.5;
-            yuv.b = texture2D(vTexture, vTexCoord).r - 0.5;
-            rgb = mat3(1.0, 1.0, 1.0,
-                       0.0, -0.39465, 2.03211,
-                       1.13983, -0.5863, 0.0) * yuv;
-            //输出像素颜色
-            FragColor = vec4(0.5, 0.3, 0.8, 1.0);
-        }
-)";
-
 unsigned int generateTextureID() {
     unsigned int textureId = 0;
 
@@ -61,62 +27,21 @@ unsigned int generateTextureID() {
 YUVRenderer::YUVRenderer() {}
 
 void YUVRenderer::init() {
-    /*
-        //    static const float vertexs[] = {-1.0f, -1.0f, 0.0f,  0.0f,  0.0f,
-        //                                    1.0f, -1.0f, 0.0f,  1.0f,  0.0f,
-        //                                    1.0f,  0.5f, 0.0f,  1.0f,  1.0f,
-        //                                    1.0f,  1.0f, 0.0f,  1.0f,  1.0f,
-        //                                   -1.0f,  1.0f, 0.0f,  0.0f,  1.0f,
-        //                                   -1.0f, -1.0f, 0.0f,  0.0f,  0.0f,};
-        const std::vector<float> vertexData = {
-            -1.0f, -1.0f, 0.0f, 0.0f, 0.0f, 1.0f,  -1.0f, 0.0f, 1.0f, 0.0f,
-            1.0f,  1.0f,  0.0f, 1.0f, 1.0f, 1.0f,  1.0f,  0.0f, 1.0f, 1.0f,
-            -1.0f, 1.0f,  0.0f, 0.0f, 1.0f, -1.0f, -1.0f, 0.0f, 0.0f, 0.0f,
-        };
-
-        m_mesh = std::make_shared<Mesh>();
-        m_mesh->writeVertexData(vertexData);
-        m_mesh->setAttributeDefinition(0, 3, 5 * sizeof(float), 0);
-        m_mesh->setAttributeDefinition(1, 2, 5 * sizeof(float), 3 *
-       sizeof(float));
-
-        m_shader = std::make_shared<Shader>();
-        m_shader->setVertexShader(vertexShaderCode);
-        m_shader->setFragmentShader(fragmentShaderYUV420PCode);
-        m_shader->link();
-
-        //    // 必须先bind，才能setUniform
-        //    m_shader->bind();
-        //    // 设定纹理位置值（纹理单元）
-        //    m_shader->setUniform("yTexture", (unsigned
-       int)TextureIndex::index_0);
-        //    m_shader->setUniform("uTexture", (unsigned
-       int)TextureIndex::index_1);
-        //    // main里没有使用vTexture, location会返回-1
-        //    m_shader->setUniform("vTexture", (unsigned
-       int)TextureIndex::index_2);
-        //    m_shader->release();
-
-        m_yTextureId = generateTextureID();
-        m_uTextureId = generateTextureID();
-        m_vTextureId = generateTextureID();
-        */
-
-    const float w = 1.0 * 0.5;
-    const float h = 1.0 * 0.5;
+    const float w = 1.0;
+    const float h = 1.0;
 
     //        const std::vector<float> vertexData ={
-    //            // x   y   z     r     g     b
-    //            -w, -h, 0.0f, 1.0f, 0.0f, 0.0f,
-    //             w, -h, 0.0f, 0.0f, 1.0f, 0.0f,
-    //             w,  h, 0.0f, 0.0f, 0.0f, 1.0f,
-    //            -w,  h, 0.0f, 1.0f, 1.0f, 0.0f
+    //            // x   y   z   u     v
+    //            -w, -h, 0.0f, 0.0f, 0.0f,
+    //             w, -h, 0.0f, 1.0f, 0.0f,
+    //             w,  h, 0.0f, 1.0f, 1.0f,
+    //            -w,  h, 0.0f, 0.0f, 1.0f
     //        }
 
     const std::vector<float> vertexData = {
-        // x   y   z     r     g     b
-        -w, -h, 0.0f, 1.0f, 0.0f, 0.0f, w,  -h, 0.0f, 0.0f, 1.0f, 0.0f,
-        w,  h,  0.0f, 0.0f, 0.0f, 1.0f, -w, h,  0.0f, 1.0f, 1.0f, 0.0f};
+        // x   y   z   u     v
+        -w, -h, 0.0f, 0.0f, 0.0f, w,  -h, 0.0f, 1.0f, 0.0f,
+        w,  h,  0.0f, 1.0f, 1.0f, -w, h,  0.0f, 0.0f, 1.0f};
 
     //        const std::vector<unsigned int> indexData = {
     //            0u, 1u, 2u,
@@ -127,8 +52,8 @@ void YUVRenderer::init() {
     m_mesh = std::make_shared<Mesh>();
     m_mesh->writeVertexData(vertexData);
     m_mesh->writeIndexData(indexData);
-    m_mesh->setAttributeDefinition(0, 3, 6 * sizeof(float), 0);
-    m_mesh->setAttributeDefinition(1, 3, 6 * sizeof(float), 3 * sizeof(float));
+    m_mesh->setAttributeDefinition(0, 3, 5 * sizeof(float), 0);
+    m_mesh->setAttributeDefinition(1, 2, 5 * sizeof(float), 3 * sizeof(float));
     m_yTextureId = generateTextureID();
     m_uTextureId = generateTextureID();
     m_vTextureId = generateTextureID();
@@ -136,23 +61,19 @@ void YUVRenderer::init() {
     const std::string vertexShaderSource = R"(
                 #version 330 core
                 layout (location = 0) in vec3 position;
-                layout (location = 1) in vec3 color;
+                layout (location = 1) in vec2 aTexCoord; //材质坐标
 
-                uniform mat4 cameraMatrix;
-                out vec4 colorIn;
                 out vec2 vTexCoord;
 
                 void main(void)
                 {
                     gl_Position = vec4(position, 1.0);
-                    colorIn = vec4(color, 1.0);
-                    vTexCoord = vec2(position.x, position.y);
+                    vTexCoord = vec2(aTexCoord.x, 1.0 - aTexCoord.y);
                 }
             )";
 
     const std::string fragmentShaderSource = R"(
                 #version 330 core
-                in vec4 colorIn;
                 out vec4 colorOut;
 
                 uniform sampler2D yTexture;  //输入的材质(不透明灰度, 单像素)
@@ -166,7 +87,12 @@ void YUVRenderer::init() {
                     vec3 rgb;
                     //这变的rgb相当于yuv
                     yuv.r = texture2D(yTexture, vTexCoord).r;
-                    colorOut = vec4(yuv.r,yuv.r,yuv.r,1.0);
+                    yuv.g = texture2D(uTexture, vTexCoord).r - 0.5;
+                    yuv.b = texture2D(vTexture, vTexCoord).r - 0.5;
+                    rgb = mat3(1.0, 1.0, 1.0,
+                               0.0, -0.39465, 2.03211,
+                               1.13983, -0.58060, 0.0) * yuv;
+                    colorOut = vec4(rgb, 1.0);
                 }
             )";
 
