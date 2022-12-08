@@ -50,6 +50,10 @@ std::shared_ptr<IRendererFactory> OpenGLRenderWidget::getRendererFactory() {
     return m_rendererFactory;
 }
 
+void OpenGLRenderWidget::receiveBoData(BoData data) {
+    m_boDataQueue.push(data);
+}
+
 void OpenGLRenderWidget::paintGL() {
     if (!m_renderingThread || !m_renderingThread->isInitialized()) {
         return;
@@ -59,7 +63,23 @@ void OpenGLRenderWidget::paintGL() {
         m_viewportTarget = std::make_shared<ViewportTarget>();
     }
 
+    // 主线程
     m_renderingThread->lock();
+
+    if (!m_boDataQueue.empty() &&
+        m_renderingThread->getTextureTupleSize() == 0) {
+        m_renderingThread->addTextureData(
+            TextureIndex::index_0, m_boDataQueue.front().width,
+            m_boDataQueue.front().height, m_boDataQueue.front().datas[0]);
+        m_renderingThread->addTextureData(
+            TextureIndex::index_1, m_boDataQueue.front().width / 2,
+            m_boDataQueue.front().height / 2, m_boDataQueue.front().datas[1]);
+        m_renderingThread->addTextureData(
+            TextureIndex::index_2, m_boDataQueue.front().width / 2,
+            m_boDataQueue.front().height / 2, m_boDataQueue.front().datas[2]);
+        m_boDataQueue.pop();
+    }
+
     const GLuint textureId = m_renderingThread->framebufferTexture();
     m_viewportTarget->render(textureId);
     m_renderingThread->setCurrentFramePainted(true);

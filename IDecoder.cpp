@@ -13,7 +13,7 @@ void IDecoder::main() {
             continue;
         }
 
-        //去除packet 消费者
+        //取出packet 消费者
         BoData boData = m_boDataList.front();
         m_boDataList.pop_front();
 

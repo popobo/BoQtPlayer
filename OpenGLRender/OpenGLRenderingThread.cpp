@@ -4,6 +4,8 @@
 #include "ElapsedTimer.h"
 #include "glm/gtx/transform.hpp"
 
+#include <QImage>
+
 namespace OpenGLRender {
 
 void RenderingThread::initialize() {
@@ -35,6 +37,7 @@ void RenderingThread::initialize() {
         m_framebufferSize, framebufferFormat);
 }
 
+// 只能再run()中调用，且注意线程安全
 void RenderingThread::renderFrame() {
     // bind the framebuffer for rendering
     m_renderFramebufferObject->bind();
@@ -66,7 +69,18 @@ void RenderingThread::renderFrame() {
         return;
     }
     m_renderer->update(m_timer.elapsed());
+
+    for (const auto &textureData : m_textureTuples) {
+        // auto [index, width, height, data] = textureData;
+        //        m_renderer->attachTextureData(
+        //            std::get<0>(textureData), std::get<1>(textureData),
+        //            std::get<2>(textureData), std::get<3>(textureData));
+        m_renderer->attachTextureData(textureData);
+    }
+
     m_renderer->render(view, projection);
+
+    m_textureTuples.clear();
 
     // flush the pipeline
     GLCall(glFlush());
@@ -76,6 +90,8 @@ void RenderingThread::renderFrame() {
     // Take the current framebuffer texture Id
     m_framebufferTextureId = m_renderFramebufferObject->texture();
     // Swap the framebuffers for double-buffering
+    QImage image = m_renderFramebufferObject->toImage();
+    image.save("iamge2.png", "PNG");
     std::swap(m_renderFramebufferObject, m_displayFramebufferObject);
 }
 
@@ -121,6 +137,13 @@ void RenderingThread::unlock() { m_mutex.unlock(); }
 
 bool RenderingThread::isInitialized() { return m_initialized; }
 
+void RenderingThread::addTextureData(TextureIndex index, int width, int height,
+                                     unsigned char *data) {
+    m_textureTuples.push_back({index, width, height, data});
+}
+
+int RenderingThread::getTextureTupleSize() { return m_textureTuples.size(); }
+
 GLuint RenderingThread::framebufferTexture() const {
     return m_framebufferTextureId;
 }
@@ -151,11 +174,12 @@ void RenderingThread::run() {
             initialize();
             m_initialized = true;
         }
-        lock();
+
+        QMutexLocker locker(&m_mutex);
         renderFrame();
         // 保证双缓冲机制正常运行
         setCurrentFramePainted(false);
-        unlock();
+        locker.unlock();
         m_context->doneCurrent();
 
         // Notify UI about new frame.
@@ -163,7 +187,7 @@ void RenderingThread::run() {
             m_triggerPaintGLFunc();
         }
 
-        QThread::msleep(1);
+        QThread::msleep(100);
     }
 }
 

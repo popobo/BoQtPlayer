@@ -1,10 +1,12 @@
 #pragma once
 
+#include "BoData.h"
 #include "OpenGLRenderingThread.h"
 #include "OpenGLViewportTarget.h"
 #include "Renderer/IRendererFactory.h"
 #include <QOpenGLWidget>
 #include <memory>
+#include <queue>
 
 namespace OpenGLRender {
 
@@ -26,6 +28,8 @@ class OpenGLRenderWidget
 
     std::shared_ptr<IRendererFactory> getRendererFactory();
 
+    void receiveBoData(BoData data);
+
   protected:
     void paintGL() override;
     void closeEvent(QCloseEvent *e) override;
@@ -38,6 +42,7 @@ class OpenGLRenderWidget
     std::shared_ptr<IRendererFactory> m_rendererFactory;
     std::shared_ptr<RenderingThread> m_renderingThread;
     std::shared_ptr<ViewportTarget> m_viewportTarget;
+    std::queue<BoData> m_boDataQueue;
 };
 
 } // namespace OpenGLRender

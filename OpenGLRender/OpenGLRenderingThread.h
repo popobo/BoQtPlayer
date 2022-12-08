@@ -43,6 +43,11 @@ class RenderingThread : public QThread {
 
     bool isInitialized();
 
+    void addTextureData(TextureIndex index, int width, int height,
+                        unsigned char *data);
+
+    int getTextureTupleSize();
+
   protected:
     void run() override;
     // this method should be called between
@@ -56,6 +61,8 @@ class RenderingThread : public QThread {
     std::shared_ptr<IOpenGLRenderer> m_renderer;
     std::shared_ptr<QOpenGLFramebufferObject> m_renderFramebufferObject;
     std::shared_ptr<QOpenGLFramebufferObject> m_displayFramebufferObject;
+    std::vector<std::tuple<TextureIndex, int, int, unsigned char *>>
+        m_textureTuples;
 
     QSize m_framebufferSize;
     QMutex m_mutex;

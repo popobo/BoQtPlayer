@@ -1,6 +1,10 @@
 #include "FFDecoder.h"
 #include "BoLog.h"
 #include "BoUtil.h"
+extern "C" {
+#include "libswscale/swscale.h"
+}
+#include <QImage>
 
 FFDecoder::FFDecoder() {}
 
@@ -88,7 +92,6 @@ BoData FFDecoder::recvFrame() {
         boData.size = av_get_bytes_per_sample((AVSampleFormat)m_frame->format) *
                       m_frame->nb_samples * m_frame->ch_layout.nb_channels;
     }
-    boData.format = m_frame->format;
     memcpy(boData.datas, m_frame->data, sizeof(boData.datas));
     return boData;
 }

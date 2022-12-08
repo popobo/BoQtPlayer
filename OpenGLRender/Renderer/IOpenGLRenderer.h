@@ -2,7 +2,15 @@
 
 #include "glm/mat4x4.hpp"
 
+#include <tuple>
+
 namespace OpenGLRender {
+
+enum class TextureIndex : unsigned int {
+    index_0 = 0,
+    index_1,
+    index_2,
+};
 
 class IOpenGLRenderer {
   public:
@@ -14,7 +22,11 @@ class IOpenGLRenderer {
 
     virtual void render(const glm::mat4 &view, const glm::mat4 &projection) = 0;
 
-    virtual void attachTextureData(unsigned char *data) = 0;
+    virtual void attachTextureData(TextureIndex index, int width, int height,
+                                   unsigned char *data) = 0;
+
+    virtual void attachTextureData(
+        std::tuple<TextureIndex, int, int, unsigned char *> textureData) = 0;
 
     ~IOpenGLRenderer(){};
 };
