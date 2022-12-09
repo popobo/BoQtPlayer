@@ -36,11 +36,20 @@ void IDecoder::main() {
     }
 }
 
+void IDecoder::clear() {
+    std::unique_lock<std::mutex> locker{m_boDataListMutex};
+    while (!m_boDataList.empty()) {
+        m_boDataList.front().drop();
+        m_boDataList.pop_front();
+    }
+}
+
 void IDecoder::update(BoData boData) {
     if (boData.isAudio != m_isAudio) {
         return;
     }
     // why循环
+    // 循环是为了阻塞住FFDemux让其不要读取数据了
     while (!m_isExit) {
         std::unique_lock<std::mutex> lock(m_boDataListMutex);
         if (m_boDataList.size() < MAX_LIST) {

@@ -66,6 +66,17 @@ void OpenGLRenderWidget::paintGL() {
     // 主线程
     m_renderingThread->lock();
 
+    attachTextureToRenderer();
+    const GLuint textureId = m_renderingThread->framebufferTexture();
+    m_viewportTarget->render(textureId);
+    m_renderingThread->setCurrentFramePainted(true);
+
+    m_renderingThread->unlock();
+}
+
+void OpenGLRenderWidget::closeEvent(QCloseEvent *e) { stopThread(); }
+
+void OpenGLRenderWidget::attachTextureToRenderer() {
     if (!m_boDataQueue.empty() &&
         m_renderingThread->getTextureTupleSize() == 0) {
         m_renderingThread->addTextureData(
@@ -79,13 +90,6 @@ void OpenGLRenderWidget::paintGL() {
             m_boDataQueue.front().height / 2, m_boDataQueue.front().datas[2]);
         m_boDataQueue.pop();
     }
-
-    const GLuint textureId = m_renderingThread->framebufferTexture();
-    m_viewportTarget->render(textureId);
-    m_renderingThread->setCurrentFramePainted(true);
-    m_renderingThread->unlock();
 }
-
-void OpenGLRenderWidget::closeEvent(QCloseEvent *e) { stopThread(); }
 
 } // namespace OpenGLRender

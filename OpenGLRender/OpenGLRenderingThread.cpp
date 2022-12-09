@@ -71,10 +71,6 @@ void RenderingThread::renderFrame() {
     m_renderer->update(m_timer.elapsed());
 
     for (const auto &textureData : m_textureTuples) {
-        // auto [index, width, height, data] = textureData;
-        //        m_renderer->attachTextureData(
-        //            std::get<0>(textureData), std::get<1>(textureData),
-        //            std::get<2>(textureData), std::get<3>(textureData));
         m_renderer->attachTextureData(textureData);
     }
 

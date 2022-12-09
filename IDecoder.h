@@ -10,6 +10,10 @@
 
 class IDecoder : public IObserver, public BoThread, public ISubject {
   public:
+    IDecoder() {}
+
+    virtual ~IDecoder() {}
+
     //打开解码器
     virtual bool open(const BoParameter &parameter) = 0;
 
@@ -23,12 +27,17 @@ class IDecoder : public IObserver, public BoThread, public ISubject {
     // IObserver Interface
     virtual void update(BoData boData) override;
 
+    // BoThread interface
+    virtual void main() override;
+
+    // 清理缓冲
+    virtual void clear();
+
+    virtual void close() = 0;
+
     bool isAudio() const;
 
     void setIsAudio(bool newIsAudio);
-
-    // BoThread interface
-    virtual void main() override;
 
   public:
     const int MAX_LIST = 100;

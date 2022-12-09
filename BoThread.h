@@ -7,6 +7,8 @@ class BoThread {
   public:
     BoThread();
 
+    ~BoThread() {}
+
     //启动线程
     virtual void start();
 

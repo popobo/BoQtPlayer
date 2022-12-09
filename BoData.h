@@ -1,8 +1,12 @@
-#ifndef BODATA_H
-#define BODATA_H
+#pragma once
+
 extern "C" {
 #include "libavformat/avformat.h"
 }
+
+enum class DataTyep {
+
+};
 
 struct BoData {
     unsigned char *data{nullptr};
@@ -14,6 +18,6 @@ struct BoData {
     bool isAudio{false};
 
     void drop();
-};
 
-#endif // BODATA_H
+    BoData(const BoData &data);
+};

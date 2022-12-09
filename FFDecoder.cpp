@@ -8,6 +8,8 @@ extern "C" {
 
 FFDecoder::FFDecoder() {}
 
+FFDecoder::~FFDecoder() {}
+
 bool FFDecoder::open(const BoParameter &parameter) {
     if (!parameter.getPara()) {
         return false;
@@ -92,6 +94,11 @@ BoData FFDecoder::recvFrame() {
         boData.size = av_get_bytes_per_sample((AVSampleFormat)m_frame->format) *
                       m_frame->nb_samples * m_frame->ch_layout.nb_channels;
     }
+    // m_frame->data什么时候回收
     memcpy(boData.datas, m_frame->data, sizeof(boData.datas));
     return boData;
 }
+
+void FFDecoder::clear() { IDecoder::clear(); }
+
+void FFDecoder::close() {}

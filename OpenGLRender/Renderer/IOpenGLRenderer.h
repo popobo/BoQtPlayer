@@ -10,6 +10,7 @@ enum class TextureIndex : unsigned int {
     index_0 = 0,
     index_1,
     index_2,
+    index_3
 };
 
 class IOpenGLRenderer {
@@ -21,9 +22,6 @@ class IOpenGLRenderer {
     virtual void update(float elapsed) = 0;
 
     virtual void render(const glm::mat4 &view, const glm::mat4 &projection) = 0;
-
-    virtual void attachTextureData(TextureIndex index, int width, int height,
-                                   unsigned char *data) = 0;
 
     virtual void attachTextureData(
         std::tuple<TextureIndex, int, int, unsigned char *> textureData) = 0;

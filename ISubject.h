@@ -9,6 +9,10 @@
 
 class ISubject {
   public:
+    ISubject() {}
+
+    virtual ~ISubject() {}
+
     virtual void addObs(const std::weak_ptr<IObserver> &observer);
 
     virtual void addStrongObs(const std::shared_ptr<IObserver> &observer);

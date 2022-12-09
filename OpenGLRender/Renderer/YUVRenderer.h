@@ -14,12 +14,13 @@ class YUVRenderer : public IOpenGLRenderer {
     virtual void render(const glm::mat4 &view,
                         const glm::mat4 &projection) override;
 
-    virtual void attachTextureData(TextureIndex index, int width, int height,
-                                   unsigned char *data) override;
-
     virtual void attachTextureData(
         std::tuple<TextureIndex, int, int, unsigned char *> textureData)
         override;
+
+  private:
+    void attachTextureData(TextureIndex index, int width, int height,
+                           unsigned char *data);
 
   private:
     std::shared_ptr<Mesh> m_mesh;

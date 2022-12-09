@@ -9,3 +9,8 @@ void BoData::drop() {
     data = nullptr;
     size = 0;
 }
+
+BoData::BoData(const BoData &data)
+{
+
+}
