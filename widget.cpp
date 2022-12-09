@@ -39,13 +39,21 @@ Widget::Widget(QWidget *parent) : QWidget(parent), ui(new Ui::Widget) {
             &OpenGLRender::OpenGLRenderWidget::stopThread);
     connect(m_OpenGLRenderWidget.get(),
             &OpenGLRender::OpenGLRenderWidget::threadStopped, this,
-            &QWidget::close);
+            &Widget::closeWidget);
     connect(m_frameDispatcher.get(), &FrameDispatcher::sendData,
             m_OpenGLRenderWidget.get(),
             &OpenGLRender::OpenGLRenderWidget::receiveBoData);
 }
 
 Widget::~Widget() { delete ui; }
+
+void Widget::closeWidget() {
+    m_demux->stop();
+    m_videoDecoder->stop();
+    m_audioDecoder->stop();
+
+    QWidget::close();
+}
 
 void Widget::openFile() {
     // 测试用代码

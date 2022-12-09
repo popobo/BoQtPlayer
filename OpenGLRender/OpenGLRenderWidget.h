@@ -28,7 +28,7 @@ class OpenGLRenderWidget
 
     std::shared_ptr<IRendererFactory> getRendererFactory();
 
-    void receiveBoData(BoData data);
+    void receiveBoData(const std::shared_ptr<BoData> &data);
 
   protected:
     void paintGL() override;
@@ -44,7 +44,7 @@ class OpenGLRenderWidget
     std::shared_ptr<IRendererFactory> m_rendererFactory;
     std::shared_ptr<RenderingThread> m_renderingThread;
     std::shared_ptr<ViewportTarget> m_viewportTarget;
-    std::queue<BoData> m_boDataQueue;
+    std::queue<std::shared_ptr<BoData>> m_boDataQueue;
 };
 
 } // namespace OpenGLRender

@@ -14,10 +14,9 @@ class FFDecoder : public IDecoder {
 
     // IDecoder interface
     virtual bool open(const BoParameter &parameter) override;
-    virtual bool sendPacket(const BoData &boData) override;
-    virtual BoData recvFrame() override;
+    virtual bool sendPacket(const std::shared_ptr<BoData> &boData) override;
+    virtual std::shared_ptr<BoData> recvFrame() override;
 
-    virtual void clear() override;
     virtual void close() override;
 
   private:

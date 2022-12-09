@@ -30,7 +30,7 @@ void ISubject::delStrongObs(const std::shared_ptr<IObserver> &delObserver) {
     m_strongObservers.erase(delIterator);
 }
 
-void ISubject::notify(BoData boData) {
+void ISubject::notify(const std::shared_ptr<BoData> & boData) {
     std::unique_lock<std::mutex> lock(m_mux);
     // 小心少了引用
     for (auto &observer : m_observers) {

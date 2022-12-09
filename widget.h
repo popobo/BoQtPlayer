@@ -21,6 +21,8 @@ class Widget : public QWidget {
     Widget(QWidget *parent = nullptr);
     ~Widget();
 
+    void closeWidget();
+
   private:
     Ui::Widget *ui;
     std::shared_ptr<IDemux> m_demux;

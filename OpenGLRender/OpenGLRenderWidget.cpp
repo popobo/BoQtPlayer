@@ -50,7 +50,7 @@ std::shared_ptr<IRendererFactory> OpenGLRenderWidget::getRendererFactory() {
     return m_rendererFactory;
 }
 
-void OpenGLRenderWidget::receiveBoData(BoData data) {
+void OpenGLRenderWidget::receiveBoData(const std::shared_ptr<BoData> & data) {
     m_boDataQueue.push(data);
 }
 
@@ -80,14 +80,14 @@ void OpenGLRenderWidget::attachTextureToRenderer() {
     if (!m_boDataQueue.empty() &&
         m_renderingThread->getTextureTupleSize() == 0) {
         m_renderingThread->addTextureData(
-            TextureIndex::index_0, m_boDataQueue.front().width,
-            m_boDataQueue.front().height, m_boDataQueue.front().datas[0]);
+            TextureIndex::index_0, m_boDataQueue.front()->width,
+            m_boDataQueue.front()->height, m_boDataQueue.front()->datas[0]);
         m_renderingThread->addTextureData(
-            TextureIndex::index_1, m_boDataQueue.front().width / 2,
-            m_boDataQueue.front().height / 2, m_boDataQueue.front().datas[1]);
+            TextureIndex::index_1, m_boDataQueue.front()->width / 2,
+            m_boDataQueue.front()->height / 2, m_boDataQueue.front()->datas[1]);
         m_renderingThread->addTextureData(
-            TextureIndex::index_2, m_boDataQueue.front().width / 2,
-            m_boDataQueue.front().height / 2, m_boDataQueue.front().datas[2]);
+            TextureIndex::index_2, m_boDataQueue.front()->width / 2,
+            m_boDataQueue.front()->height / 2, m_boDataQueue.front()->datas[2]);
         m_boDataQueue.pop();
     }
 }

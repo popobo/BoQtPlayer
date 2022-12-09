@@ -44,8 +44,8 @@ bool FFDecoder::open(const BoParameter &parameter) {
     return true;
 }
 
-bool FFDecoder::sendPacket(const BoData &boData) {
-    if (boData.size <= 0 || !boData.data) {
+bool FFDecoder::sendPacket(const std::shared_ptr<BoData> &boData) {
+    if (boData->size <= 0 || !boData->structData) {
         return false;
     }
 
@@ -53,7 +53,8 @@ bool FFDecoder::sendPacket(const BoData &boData) {
         return false;
     }
 
-    int ret = avcodec_send_packet(m_codecContext, (AVPacket *)boData.data);
+    int ret =
+        avcodec_send_packet(m_codecContext, (AVPacket *)boData->structData);
     if (ret != 0) {
         PRINT_FFMPEG_ERROR(ret);
         return false;
@@ -61,9 +62,10 @@ bool FFDecoder::sendPacket(const BoData &boData) {
     return true;
 }
 
-BoData FFDecoder::recvFrame() {
+std::shared_ptr<BoData> FFDecoder::recvFrame() {
+    auto boData = std::make_shared<BoData>();
     if (!m_codecContext) {
-        return BoData();
+        return nullptr;
     }
 
     if (!m_frame) {
@@ -73,32 +75,30 @@ BoData FFDecoder::recvFrame() {
     //再次调用会复用上次空间，线程不安全
     int ret = avcodec_receive_frame(m_codecContext, m_frame);
     if (ret != 0) {
-        // PRINT_FFMPEG_ERROR(ret);
-        return BoData();
+        // sPRINT_FFMPEG_ERROR(ret);
+        return nullptr;
     }
 
-    BoData boData;
-    boData.data = (unsigned char *)m_frame;
+    boData->structData = (unsigned char *)m_frame;
 
     if (AVMEDIA_TYPE_VIDEO == m_codecContext->codec_type) {
         // yuv
-        boData.size = (m_frame->linesize[0] + m_frame->linesize[1] +
-                       m_frame->linesize[2]) *
-                      m_frame->height;
+        boData->size = (m_frame->linesize[0] + m_frame->linesize[1] +
+                        m_frame->linesize[2]) *
+                       m_frame->height;
 
-        boData.width = m_frame->width;
-        boData.height = m_frame->height;
+        boData->width = m_frame->width;
+        boData->height = m_frame->height;
 
     } else if (AVMEDIA_TYPE_AUDIO == m_codecContext->codec_type) {
         //样本字节数 * 单通道样本数 * 通道数
-        boData.size = av_get_bytes_per_sample((AVSampleFormat)m_frame->format) *
-                      m_frame->nb_samples * m_frame->ch_layout.nb_channels;
+        boData->size =
+            av_get_bytes_per_sample((AVSampleFormat)m_frame->format) *
+            m_frame->nb_samples * m_frame->ch_layout.nb_channels;
     }
     // m_frame->data什么时候回收
-    memcpy(boData.datas, m_frame->data, sizeof(boData.datas));
+    memcpy(boData->datas, m_frame->data, sizeof(boData->datas));
     return boData;
 }
-
-void FFDecoder::clear() { IDecoder::clear(); }
 
 void FFDecoder::close() {}

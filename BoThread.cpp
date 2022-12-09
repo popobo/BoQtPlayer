@@ -12,7 +12,7 @@ void BoThread::start() {
 }
 
 void BoThread::stop() {
-    m_isExit = false;
+    m_isExit = true;
     for (int i = 0; i < 200; ++i) {
         boSleep(1);
         if (!m_isRunning) {

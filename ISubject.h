@@ -21,7 +21,7 @@ class ISubject {
 
     virtual void delStrongObs(const std::shared_ptr<IObserver> &observer);
 
-    void notify(BoData boData);
+    void notify(const std::shared_ptr<BoData> &boData);
 
   protected:
     std::vector<std::weak_ptr<IObserver>> m_observers;

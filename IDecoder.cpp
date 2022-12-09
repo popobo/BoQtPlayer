@@ -14,7 +14,12 @@ void IDecoder::main() {
         }
 
         //取出packet 消费者
-        BoData boData = m_boDataList.front();
+        if (m_boDataList.empty()) {
+            lock.unlock();
+            boSleep(1);
+            continue;
+        }
+        std::shared_ptr<BoData> boData = m_boDataList.front();
         m_boDataList.pop_front();
 
         //开启解码
@@ -23,8 +28,8 @@ void IDecoder::main() {
             while (!m_isExit) {
                 //获取解码器
                 //获取解码数据
-                BoData frame = recvFrame();
-                if (!frame.data) {
+                auto frame = recvFrame();
+                if (!frame) {
                     break;
                 }
                 //发送数据给观察者
@@ -32,20 +37,11 @@ void IDecoder::main() {
             }
         }
         //消费者负责清理
-        boData.drop();
     }
 }
 
-void IDecoder::clear() {
-    std::unique_lock<std::mutex> locker{m_boDataListMutex};
-    while (!m_boDataList.empty()) {
-        m_boDataList.front().drop();
-        m_boDataList.pop_front();
-    }
-}
-
-void IDecoder::update(BoData boData) {
-    if (boData.isAudio != m_isAudio) {
+void IDecoder::update(const std::shared_ptr<BoData> &boData) {
+    if (boData->isAudio != m_isAudio) {
         return;
     }
     // why循环

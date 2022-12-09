@@ -13,7 +13,7 @@ class IDemux : public BoThread, public ISubject {
     virtual bool open(const char *url) = 0;
 
     //读取一帧数据。数据由调用者清理
-    virtual BoData read() = 0;
+    virtual std::shared_ptr<BoData> read() = 0;
 
     //总时间 ms
     virtual int64_t getTotalTime() = 0;

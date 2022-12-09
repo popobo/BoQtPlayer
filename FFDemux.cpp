@@ -47,27 +47,29 @@ bool FFDemux::open(const char *url) {
 }
 
 // 读取一帧数据
-BoData FFDemux::read() {
+std::shared_ptr<BoData> FFDemux::read() {
+    auto boData = std::make_shared<BoData>();
     if (!ic) {
-        return BoData();
+        return boData;
     }
-    BoData boData;
+
     AVPacket *pkt = av_packet_alloc();
     int ret = av_read_frame(ic, pkt);
     if (ret != 0) {
         av_packet_free(&pkt);
-        return BoData();
+        return boData;
     }
-    boData.data = (unsigned char *)pkt;
-    boData.size = pkt->size;
+    boData->dataType = DataType::FF_AVPacket;
+    boData->structData = (unsigned char *)pkt;
+    boData->size = pkt->size;
 
     if (pkt->stream_index == m_audioStream) {
-        boData.isAudio = true;
+        boData->isAudio = true;
     } else if (pkt->stream_index == m_videoStream) {
-        boData.isAudio = false;
+        boData->isAudio = false;
     } else {
         av_packet_free(&pkt);
-        return BoData();
+        return boData;
     }
 
     return boData;
