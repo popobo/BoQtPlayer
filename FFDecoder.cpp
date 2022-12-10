@@ -1,6 +1,7 @@
 #include "FFDecoder.h"
 #include "BoLog.h"
 #include "BoUtil.h"
+#include "Data/BoAVFrameData.h"
 extern "C" {
 #include "libswscale/swscale.h"
 }
@@ -44,8 +45,8 @@ bool FFDecoder::open(const BoParameter &parameter) {
     return true;
 }
 
-bool FFDecoder::sendPacket(const std::shared_ptr<BoData> &boData) {
-    if (boData->size <= 0 || !boData->structData) {
+bool FFDecoder::sendPacket(const std::shared_ptr<IBoData> &boData) {
+    if (boData->size() <= 0 || !boData->structDataPtr()) {
         return false;
     }
 
@@ -54,7 +55,7 @@ bool FFDecoder::sendPacket(const std::shared_ptr<BoData> &boData) {
     }
 
     int ret =
-        avcodec_send_packet(m_codecContext, (AVPacket *)boData->structData);
+        avcodec_send_packet(m_codecContext, (AVPacket *)boData->structDataPtr());
     if (ret != 0) {
         PRINT_FFMPEG_ERROR(ret);
         return false;
@@ -62,8 +63,8 @@ bool FFDecoder::sendPacket(const std::shared_ptr<BoData> &boData) {
     return true;
 }
 
-std::shared_ptr<BoData> FFDecoder::recvFrame() {
-    auto boData = std::make_shared<BoData>();
+std::shared_ptr<IBoData> FFDecoder::recvFrame() {
+    auto boData = std::make_shared<BoAVFrameData>();
     if (!m_codecContext) {
         return nullptr;
     }
@@ -79,25 +80,28 @@ std::shared_ptr<BoData> FFDecoder::recvFrame() {
         return nullptr;
     }
 
-    boData->structData = (unsigned char *)m_frame;
+    boData->setStructDataPtr((void *)m_frame);
 
     if (AVMEDIA_TYPE_VIDEO == m_codecContext->codec_type) {
         // yuv
-        boData->size = (m_frame->linesize[0] + m_frame->linesize[1] +
+        boData->setSize((m_frame->linesize[0] + m_frame->linesize[1] +
                         m_frame->linesize[2]) *
-                       m_frame->height;
+                       m_frame->height);
 
-        boData->width = m_frame->width;
-        boData->height = m_frame->height;
+        boData->setWidth(m_frame->width);
+        boData->setHeight(m_frame->height);
 
     } else if (AVMEDIA_TYPE_AUDIO == m_codecContext->codec_type) {
         //样本字节数 * 单通道样本数 * 通道数
-        boData->size =
+        boData->setSize(
             av_get_bytes_per_sample((AVSampleFormat)m_frame->format) *
-            m_frame->nb_samples * m_frame->ch_layout.nb_channels;
+            m_frame->nb_samples * m_frame->ch_layout.nb_channels);
     }
-    // m_frame->data什么时候回收
-    memcpy(boData->datas, m_frame->data, sizeof(boData->datas));
+    // m_frame->data什么时候回收, FFmpeg通过引用计数机制保证，使用需要保证相关方法调用正确
+    for(int i = 0; i < AV_NUM_DATA_POINTERS; ++i){
+        boData->addDatas(m_frame->data[i]);
+    }
+
     return boData;
 }
 

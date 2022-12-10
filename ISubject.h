@@ -1,7 +1,7 @@
 #ifndef ISUBJECT_H
 #define ISUBJECT_H
 
-#include "BoData.h"
+#include "Data/IBoData.h"
 #include "IObserver.h"
 #include <memory>
 #include <mutex>
@@ -21,7 +21,7 @@ class ISubject {
 
     virtual void delStrongObs(const std::shared_ptr<IObserver> &observer);
 
-    void notify(const std::shared_ptr<BoData> &boData);
+    void notify(const std::shared_ptr<IBoData> &boData);
 
   protected:
     std::vector<std::weak_ptr<IObserver>> m_observers;

@@ -12,7 +12,7 @@ class FFDemux : public IDemux {
 
     // IDemux interface
     virtual bool open(const char *url) override;
-    virtual std::shared_ptr<BoData> read() override;
+    virtual std::shared_ptr<IBoData> read() override;
     virtual int64_t getTotalTime() override;
 
     virtual BoParameter getVideoParameter() override;

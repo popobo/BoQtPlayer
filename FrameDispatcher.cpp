@@ -2,6 +2,6 @@
 
 FrameDispatcher::FrameDispatcher() {}
 
-void FrameDispatcher::update(const std::shared_ptr<BoData> &boData) {
+void FrameDispatcher::update(const std::shared_ptr<IBoData> &boData) {
     emit sendData(boData);
 }

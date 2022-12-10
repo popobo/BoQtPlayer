@@ -1,6 +1,7 @@
 #include "FFDemux.h"
 #include "BoLog.h"
 #include "BoUtil.h"
+#include "Data/BoAVPacketData.h"
 extern "C" {
 #include "libavformat/avformat.h"
 }
@@ -47,8 +48,8 @@ bool FFDemux::open(const char *url) {
 }
 
 // 读取一帧数据
-std::shared_ptr<BoData> FFDemux::read() {
-    auto boData = std::make_shared<BoData>();
+std::shared_ptr<IBoData> FFDemux::read() {
+    auto boData = std::make_shared<BoAVPacketData>();
     if (!ic) {
         return boData;
     }
@@ -59,14 +60,14 @@ std::shared_ptr<BoData> FFDemux::read() {
         av_packet_free(&pkt);
         return boData;
     }
-    boData->dataType = DataType::FF_AVPacket;
-    boData->structData = (unsigned char *)pkt;
-    boData->size = pkt->size;
+
+    boData->setStructDataPtr((void *)pkt);
+    boData->setSize(pkt->size);
 
     if (pkt->stream_index == m_audioStream) {
-        boData->isAudio = true;
+        boData->setIsAudio(true);
     } else if (pkt->stream_index == m_videoStream) {
-        boData->isAudio = false;
+        boData->setIsAudio(false);
     } else {
         av_packet_free(&pkt);
         return boData;

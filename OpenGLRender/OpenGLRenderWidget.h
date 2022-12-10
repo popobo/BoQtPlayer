@@ -1,6 +1,6 @@
 #pragma once
 
-#include "BoData.h"
+#include "Data/IBoData.h"
 #include "OpenGLRenderingThread.h"
 #include "OpenGLViewportTarget.h"
 #include "Renderer/IRendererFactory.h"
@@ -28,7 +28,7 @@ class OpenGLRenderWidget
 
     std::shared_ptr<IRendererFactory> getRendererFactory();
 
-    void receiveBoData(const std::shared_ptr<BoData> &data);
+    void receiveBoData(const std::shared_ptr<IBoData> &data);
 
   protected:
     void paintGL() override;
@@ -44,7 +44,7 @@ class OpenGLRenderWidget
     std::shared_ptr<IRendererFactory> m_rendererFactory;
     std::shared_ptr<RenderingThread> m_renderingThread;
     std::shared_ptr<ViewportTarget> m_viewportTarget;
-    std::queue<std::shared_ptr<BoData>> m_boDataQueue;
+    std::queue<std::shared_ptr<IBoData>> m_boDataQueue;
 };
 
 } // namespace OpenGLRender

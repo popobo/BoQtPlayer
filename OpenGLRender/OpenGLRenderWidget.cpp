@@ -50,7 +50,7 @@ std::shared_ptr<IRendererFactory> OpenGLRenderWidget::getRendererFactory() {
     return m_rendererFactory;
 }
 
-void OpenGLRenderWidget::receiveBoData(const std::shared_ptr<BoData> & data) {
+void OpenGLRenderWidget::receiveBoData(const std::shared_ptr<IBoData> &data) {
     m_boDataQueue.push(data);
 }
 
@@ -79,15 +79,17 @@ void OpenGLRenderWidget::closeEvent(QCloseEvent *e) { stopThread(); }
 void OpenGLRenderWidget::attachTextureToRenderer() {
     if (!m_boDataQueue.empty() &&
         m_renderingThread->getTextureTupleSize() == 0) {
-        m_renderingThread->addTextureData(
-            TextureIndex::index_0, m_boDataQueue.front()->width,
-            m_boDataQueue.front()->height, m_boDataQueue.front()->datas[0]);
-        m_renderingThread->addTextureData(
-            TextureIndex::index_1, m_boDataQueue.front()->width / 2,
-            m_boDataQueue.front()->height / 2, m_boDataQueue.front()->datas[1]);
-        m_renderingThread->addTextureData(
-            TextureIndex::index_2, m_boDataQueue.front()->width / 2,
-            m_boDataQueue.front()->height / 2, m_boDataQueue.front()->datas[2]);
+        auto boData = m_boDataQueue.front();
+        auto boDataDatas = boData->datas();
+        m_renderingThread->addTextureData(TextureIndex::index_0,
+                                          boData->width(), boData->height(),
+                                          boDataDatas[0]);
+        m_renderingThread->addTextureData(TextureIndex::index_1,
+                                          boData->width() / 2,
+                                          boData->height() / 2, boDataDatas[1]);
+        m_renderingThread->addTextureData(TextureIndex::index_2,
+                                          boData->width() / 2,
+                                          boData->height() / 2, boDataDatas[2]);
         m_boDataQueue.pop();
     }
 }

@@ -19,7 +19,7 @@ void IDecoder::main() {
             boSleep(1);
             continue;
         }
-        std::shared_ptr<BoData> boData = m_boDataList.front();
+        std::shared_ptr<IBoData> boData = m_boDataList.front();
         m_boDataList.pop_front();
 
         //开启解码
@@ -40,8 +40,8 @@ void IDecoder::main() {
     }
 }
 
-void IDecoder::update(const std::shared_ptr<BoData> &boData) {
-    if (boData->isAudio != m_isAudio) {
+void IDecoder::update(const std::shared_ptr<IBoData> &boData) {
+    if (boData->isAudio() != m_isAudio) {
         return;
     }
     // why循环

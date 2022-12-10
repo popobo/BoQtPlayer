@@ -11,10 +11,10 @@ class FrameDispatcher : public QObject, public IObserver {
     FrameDispatcher();
 
     // IObserver interface
-    virtual void update(const std::shared_ptr<BoData> &boData) override;
+    virtual void update(const std::shared_ptr<IBoData> &boData) override;
 
   signals:
-    void sendData(const std::shared_ptr<BoData> &boData);
+    void sendData(const std::shared_ptr<IBoData> &boData);
 };
 
 #endif // FRAMEDISPATCHER_H

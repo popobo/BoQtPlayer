@@ -15,6 +15,7 @@ find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Widgets)
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets)
 find_package(Qt6 REQUIRED COMPONENTS OpenGL)
 find_package(Qt6 REQUIRED COMPONENTS OpenGLWidgets)
+find_package(Qt6 REQUIRED COMPONENTS Multimedia)
 
 set(PROJECT_SOURCES
         main.cpp
@@ -22,7 +23,6 @@ set(PROJECT_SOURCES
         widget.h
         widget.ui
         BoLog.h BoLog.cpp
-        BoData.h BoData.cpp
         IDemux.h IDemux.cpp
         FFDemux.h FFDemux.cpp
         BoUtil.h BoUtil.cpp
@@ -33,6 +33,11 @@ set(PROJECT_SOURCES
         IDecoder.h IDecoder.cpp
         FFDecoder.h FFDecoder.cpp
         FrameDispatcher.h FrameDispatcher.cpp
+        IResampler.h IResampler.cpp
+        FFResampler.h FFResampler.cpp
+        Data/IBoData.h Data/IBoData.cpp
+        Data/BoAVPacketData.h Data/BoAVPacketData.cpp
+        Data/BoAVFrameData.h Data/BoAVFrameData.cpp
         Dependency/OpenGL/glad/glad.c
         OpenGLRender/OpenGLMesh.h OpenGLRender/OpenGLMesh.cpp
         OpenGLRender/OpenGLRenderingThread.h OpenGLRender/OpenGLRenderingThread.cpp
@@ -82,6 +87,7 @@ target_link_directories(BoPlayer PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/Dependency/f
 target_link_libraries(BoPlayer PRIVATE Qt${QT_VERSION_MAJOR}::Widgets
                                PRIVATE Qt6::OpenGL
                                PRIVATE Qt6::OpenGLWidgets
+                               PRIVATE Qt6::Multimedia
                                avformat
                                swscale
                                swresample

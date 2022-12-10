@@ -1,7 +1,7 @@
 #ifndef IDEMUX_H
 #define IDEMUX_H
 
-#include "BoData.h"
+#include "Data/IBoData.h"
 #include "BoParameter.h"
 #include "BoThread.h"
 #include "ISubject.h"
@@ -13,7 +13,7 @@ class IDemux : public BoThread, public ISubject {
     virtual bool open(const char *url) = 0;
 
     //读取一帧数据。数据由调用者清理
-    virtual std::shared_ptr<BoData> read() = 0;
+    virtual std::shared_ptr<IBoData> read() = 0;
 
     //总时间 ms
     virtual int64_t getTotalTime() = 0;

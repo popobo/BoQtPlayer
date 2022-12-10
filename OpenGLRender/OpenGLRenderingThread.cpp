@@ -174,6 +174,7 @@ void RenderingThread::run() {
         // 保证双缓冲机制正常运行
         setCurrentFramePainted(false);
         locker.unlock();
+
         m_context->doneCurrent();
 
         // Notify UI about new frame.
