@@ -17,12 +17,33 @@ bool FFResampler::open(BoParameter parameterIn, BoParameter parameterOut) {
     }
     m_swrContext = swr_alloc();
     auto paraIn = parameterIn.getPara();
-    auto paraOut = parameterOut.getPara();
+
+    auto audioOutputFormat = parameterOut.getAudioOutputFormat();
+    AVSampleFormat sampleFormat = AV_SAMPLE_FMT_NONE;
+    switch (audioOutputFormat.sampleBits) {
+    case SampleBits::UInt8:
+        sampleFormat = AVSampleFormat::AV_SAMPLE_FMT_U8;
+        break;
+    case SampleBits::Int16:
+        sampleFormat = AVSampleFormat::AV_SAMPLE_FMT_S16;
+        break;
+    case SampleBits::Int32:
+        sampleFormat = AVSampleFormat::AV_SAMPLE_FMT_S32;
+        break;
+    case SampleBits::Float:
+        sampleFormat = AVSampleFormat::AV_SAMPLE_FMT_FLT;
+        break;
+    default:
+        break;
+    }
+
+    AVChannelLayout channelLayout;
+    channelLayout.nb_channels = audioOutputFormat.sampleChannelCount;
+
     int ret = swr_alloc_set_opts2(
-        &m_swrContext, (AVChannelLayout *)&paraOut->ch_layout,
-        (AVSampleFormat)AV_SAMPLE_FMT_S16, paraOut->sample_rate,
-        &paraIn->ch_layout, (AVSampleFormat)paraIn->format, paraIn->sample_rate,
-        0, nullptr);
+        &m_swrContext, &channelLayout, sampleFormat,
+        audioOutputFormat.sampleRate, &paraIn->ch_layout,
+        (AVSampleFormat)paraIn->format, paraIn->sample_rate, 0, nullptr);
     if (ret != 0) {
         BO_ERROR("swr_alloc_set_opts2 error {0}", ret);
         return false;

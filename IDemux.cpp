@@ -1,5 +1,7 @@
 #include "IDemux.h"
 
+IDemux::~IDemux() {}
+
 void IDemux::main() {
     while (!m_isExit) {
         auto boData = read();

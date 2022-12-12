@@ -74,11 +74,34 @@ void Widget::openFile() {
     m_audioDecoder->open(m_demux->getAudioParameter());
 
     auto defaultAudioOutput = QMediaDevices::defaultAudioOutput();
-    // auto audioFormat = defaultAudioOutput.preferredFormat();
+    auto audioFormat = defaultAudioOutput.preferredFormat();
+
+    BoParameter audioOutputParameter;
+    AudioOutputFormat audioOutputFormat;
+    audioOutputFormat.sampleRate = audioFormat.sampleRate();
+    audioOutputFormat.sampleChannelCount = audioFormat.channelCount();
+    switch (audioFormat.sampleFormat()) {
+    case QAudioFormat::SampleFormat::UInt8:
+        audioOutputFormat.sampleBits = SampleBits::UInt8;
+        break;
+    case QAudioFormat::SampleFormat::Int16:
+        audioOutputFormat.sampleBits = SampleBits::Int16;
+        break;
+    case QAudioFormat::SampleFormat::Int32:
+        audioOutputFormat.sampleBits = SampleBits::Int32;
+        break;
+    case QAudioFormat::SampleFormat::Float:
+        audioOutputFormat.sampleBits = SampleBits::Float;
+        break;
+    default:
+        break;
+    }
+    m_audioPlayer->setAudioDevice(defaultAudioOutput);
+    m_audioPlayer->setAudioOutFormat(audioFormat);
+    audioOutputParameter.setAudioOutputFormat(audioOutputFormat);
 
     // 先保持重采样后与原本一致
-    m_resampler->open(m_demux->getAudioParameter(),
-                      m_demux->getAudioParameter());
+    m_resampler->open(m_demux->getAudioParameter(), audioOutputParameter);
 
     m_demux->start();
     m_videoDecoder->start();

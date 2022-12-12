@@ -10,6 +10,8 @@ class FFDemux : public IDemux {
   public:
     FFDemux();
 
+    ~FFDemux();
+
     // IDemux interface
     virtual bool open(const char *url) override;
     virtual std::shared_ptr<IBoData> read() override;

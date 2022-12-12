@@ -79,7 +79,8 @@ std::shared_ptr<IBoData> FFDecoder::recvFrame() {
         // PRINT_FFMPEG_ERROR(ret);
         return nullptr;
     }
-
+    // 这边对m_frame底下的AVBuffer产生了两次引用，
+    // 一次是m_frame自身，一个是在boData里
     boData->setStructDataPtr((void *)m_frame);
 
     if (AVMEDIA_TYPE_VIDEO == m_codecContext->codec_type) {

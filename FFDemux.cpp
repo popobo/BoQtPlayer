@@ -21,6 +21,8 @@ FFDemux::FFDemux() {
     }
 }
 
+FFDemux::~FFDemux() { avformat_close_input(&ic); }
+
 bool FFDemux::open(const char *url) {
     BO_INFO("open url begin", url);
     int ret = avformat_open_input(&ic, url, 0, 0);

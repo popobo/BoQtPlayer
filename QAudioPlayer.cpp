@@ -51,8 +51,13 @@ class AudioBuffer : public QIODevice {
 
 QAudioPlayer::QAudioPlayer() {}
 
+QAudioPlayer::QAudioPlayer(QAudioDevice audioDevice, QAudioFormat audioFormat) {
+    m_audioDevice = audioDevice;
+    m_audioOutFormat = audioFormat;
+}
+
 QAudioPlayer::~QAudioPlayer() {
-    m_ioDevice->close();
+    m_audioBuffer->close();
     m_audioSink->stop();
 }
 
@@ -61,28 +66,20 @@ bool QAudioPlayer::startPlay(BoParameter para) {
         BO_INFO("QAudioPlayer has been start");
         return false;
     }
-    QAudioFormat audioFormat;
-    if (!m_ioDevice) {
-        m_ioDevice = std::make_shared<AudioBuffer>();
+
+    if (!m_audioBuffer) {
+        m_audioBuffer = std::make_shared<AudioBuffer>();
     }
 
-    auto audioPara = para.getPara();
-    audioFormat.setSampleRate(audioPara->sample_rate);
-    audioFormat.setChannelCount(audioPara->ch_layout.nb_channels);
-    // if ((AVSampleFormat)audioPara->format == AV_SAMPLE_FMT_S16) {
-    audioFormat.setSampleFormat(QAudioFormat::SampleFormat::Int16);
-    audioFormat.setChannelConfig(QAudioFormat::ChannelConfigStereo);
-    //}
-    m_defaultAudioDevice = QMediaDevices::defaultAudioOutput();
-    m_ioDevice->open(QIODevice::ReadWrite);
+    m_audioBuffer->open(QIODevice::ReadWrite);
 
     if (!m_audioSink) {
         m_audioSink =
-            std::make_shared<QAudioSink>(m_defaultAudioDevice, audioFormat);
+            std::make_shared<QAudioSink>(m_audioDevice, m_audioOutFormat);
     }
 
     // 注意这边的生命周期
-    m_audioSink->start(m_ioDevice.get());
+    m_audioSink->start(m_audioBuffer.get());
 
     m_isStarted = true;
     return true;
@@ -94,10 +91,30 @@ void QAudioPlayer::update(const std::shared_ptr<IBoData> &boData) {
     }
 
     while (!m_isExit) {
-        if (m_ioDevice->bytesToWrite() >= boData->size()) {
-            m_ioDevice->writeData((char *)boData->data(), boData->size());
+        if (m_audioBuffer->bytesToWrite() >= boData->size()) {
+            m_audioBuffer->writeData((char *)boData->data(), boData->size());
             break;
         }
         boSleep(1);
     }
+}
+
+const QAudioDevice &QAudioPlayer::audioDevice() const
+{
+    return m_audioDevice;
+}
+
+void QAudioPlayer::setAudioDevice(const QAudioDevice &newAudioDevice)
+{
+    m_audioDevice = newAudioDevice;
+}
+
+const QAudioFormat &QAudioPlayer::audioOutFormat() const
+{
+    return m_audioOutFormat;
+}
+
+void QAudioPlayer::setAudioOutFormat(const QAudioFormat &newAudioOutFormat)
+{
+    m_audioOutFormat = newAudioOutFormat;
 }

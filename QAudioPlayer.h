@@ -12,17 +12,26 @@ class QAudioPlayer : public IAudioPlayer {
   public:
     QAudioPlayer();
 
+    QAudioPlayer(QAudioDevice audioDevice, QAudioFormat audioFormat);
+
     ~QAudioPlayer();
 
     virtual bool startPlay(BoParameter para) override;
 
     virtual void update(const std::shared_ptr<IBoData> &boData) override;
 
-  private:
+    const QAudioDevice &audioDevice() const;
+    void setAudioDevice(const QAudioDevice &newAudioDevice);
+
+    const QAudioFormat &audioOutFormat() const;
+    void setAudioOutFormat(const QAudioFormat &newAudioOutFormat);
+
+private:
     bool m_isStarted{false};
-    std::shared_ptr<AudioBuffer> m_ioDevice;
+    std::shared_ptr<AudioBuffer> m_audioBuffer;
     std::shared_ptr<QAudioSink> m_audioSink;
-    QAudioDevice m_defaultAudioDevice;
+    QAudioDevice m_audioDevice;
+    QAudioFormat m_audioOutFormat;
 };
 
 #endif // QAUDIOPLAYER_H
