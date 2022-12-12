@@ -3,9 +3,13 @@
 #include "BoLog.h"
 #include "FFDecoder.h"
 #include "FFDemux.h"
+#include "FFResampler.h"
 #include "OpenGLRender/Renderer/OpenGLQuadFactory.h"
 #include "OpenGLRender/Renderer/YUVRendererFactory.h"
+#include "QAudioPlayer.h"
+#include <QAudioDevice>
 #include <QFileDialog>
+#include <QMediaDevices>
 #include <QOpenGLContext>
 
 Widget::Widget(QWidget *parent) : QWidget(parent), ui(new Ui::Widget) {
@@ -25,13 +29,17 @@ Widget::Widget(QWidget *parent) : QWidget(parent), ui(new Ui::Widget) {
     m_videoDecoder = std::make_shared<FFDecoder>();
     m_audioDecoder = std::make_shared<FFDecoder>();
     m_frameDispatcher = std::make_shared<FrameDispatcher>();
-
     m_OpenGLRenderWidget =
         std::make_shared<OpenGLRender::OpenGLRenderWidget>(renderFactory, this);
+    m_resampler = std::make_shared<FFResampler>();
+    m_audioPlayer = std::make_shared<QAudioPlayer>();
+
     m_OpenGLRenderWidget->setGeometry(QRect(0, 0, 800, 600));
     m_demux->addObs(m_videoDecoder);
     m_demux->addObs(m_audioDecoder);
     m_videoDecoder->addStrongObs(m_frameDispatcher);
+    m_audioDecoder->addObs(m_resampler);
+    m_resampler->addObs(m_audioPlayer);
 
     connect(ui->pushButtonOpenFile, SIGNAL(clicked()), this, SLOT(openFile()));
     connect(ui->pushButtonCloseWindow, &QPushButton::clicked,
@@ -65,9 +73,17 @@ void Widget::openFile() {
     m_videoDecoder->open(m_demux->getVideoParameter());
     m_audioDecoder->open(m_demux->getAudioParameter());
 
+    auto defaultAudioOutput = QMediaDevices::defaultAudioOutput();
+    // auto audioFormat = defaultAudioOutput.preferredFormat();
+
+    // 先保持重采样后与原本一致
+    m_resampler->open(m_demux->getAudioParameter(),
+                      m_demux->getAudioParameter());
+
     m_demux->start();
     m_videoDecoder->start();
     m_audioDecoder->start();
+    m_audioPlayer->startPlay(m_demux->getAudioParameter());
 
     m_OpenGLRenderWidget->startThread();
 }

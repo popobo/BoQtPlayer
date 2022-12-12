@@ -9,7 +9,7 @@ class BoParameter {
   public:
     BoParameter();
 
-    const AVCodecParameters *getPara() const;
+    AVCodecParameters *getPara() const;
     void setPara(AVCodecParameters *newPara);
 
   private:

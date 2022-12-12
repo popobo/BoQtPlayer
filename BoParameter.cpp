@@ -2,6 +2,6 @@
 
 BoParameter::BoParameter() {}
 
-const AVCodecParameters *BoParameter::getPara() const { return para; }
+AVCodecParameters *BoParameter::getPara() const { return para; }
 
 void BoParameter::setPara(AVCodecParameters *newPara) { para = newPara; }

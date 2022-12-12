@@ -5,12 +5,19 @@ extern "C" {
 
 BoAVFrameData::BoAVFrameData() {}
 
-BoAVFrameData::~BoAVFrameData() {}
+BoAVFrameData::~BoAVFrameData() {
+    if (!this->structDataPtr()) {
+        return;
+    }
+
+    AVFrame *thisFrame = (AVFrame *)this->structDataPtr();
+    av_frame_free(&thisFrame);
+}
 
 BoAVFrameData::BoAVFrameData(const BoAVFrameData &dataIn) {
-    AVFrame *newFrame = nullptr;
+    AVFrame *newFrame = av_frame_alloc();
     av_frame_ref(newFrame, (AVFrame *)dataIn.structDataPtr());
-    this->setStructDataPtr((void *)newFrame);
+    this->m_structDataPtr = (void *)newFrame;
     this->setDatas(dataIn.datas());
 
     this->copyBasicAttributes(dataIn);
@@ -19,17 +26,15 @@ BoAVFrameData::BoAVFrameData(const BoAVFrameData &dataIn) {
 BoAVFrameData &BoAVFrameData::operator=(const BoAVFrameData &dataIn) {
     this->drop();
 
-    AVFrame *newFrame = nullptr;
+    AVFrame *newFrame = av_frame_alloc();
     av_frame_ref(newFrame, (AVFrame *)dataIn.structDataPtr());
-    this->setStructDataPtr((void *)newFrame);
+    this->m_structDataPtr = (void *)newFrame;
     this->setDatas(dataIn.datas());
 
     this->copyBasicAttributes(dataIn);
 
     return *this;
 }
-
-void BoAVFrameData::alloc() {}
 
 void BoAVFrameData::drop() {
     if (!this->structDataPtr()) {
@@ -40,4 +45,11 @@ void BoAVFrameData::drop() {
     av_frame_free(&thisFrame);
 
     this->setStructDataPtr(nullptr);
+}
+
+void BoAVFrameData::setStructDataPtr(void *newStructDataPtr) {
+    //必须要复制一份, 否则会导致AVBuffer计数出问题
+    AVFrame *newFrame = av_frame_alloc();
+    av_frame_ref(newFrame, (AVFrame *)newStructDataPtr);
+    m_structDataPtr = (void *)newFrame;
 }

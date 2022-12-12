@@ -12,7 +12,7 @@ class BoAVPacketData : public IBoData {
 
     BoAVPacketData &operator=(const BoAVPacketData &boData);
 
-    virtual void alloc() override;
-
     virtual void drop() override;
+
+    virtual void setStructDataPtr(void *newStructDataPtr) override;
 };

@@ -13,9 +13,9 @@ class BoAVFrameData : public IBoData {
 
     BoAVFrameData &operator=(const BoAVFrameData &boData);
 
-    virtual void alloc() override;
-
     virtual void drop() override;
+
+    virtual void setStructDataPtr(void *newStructDataPtr) override;
 };
 
 #endif // BOAVFRAMEDATA_H

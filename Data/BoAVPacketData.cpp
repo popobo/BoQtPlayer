@@ -15,29 +15,27 @@ BoAVPacketData::~BoAVPacketData() {
     AVPacket *thisAVPacket = (AVPacket *)this->structDataPtr();
     av_packet_free(&thisAVPacket);
 
-    this->setStructDataPtr(nullptr);
+    this->m_structDataPtr = nullptr;
 }
 
 BoAVPacketData::BoAVPacketData(const BoAVPacketData &dataIn) {
     // 浅拷贝，只增加AVBuffer的引用计数
-    AVPacket *newPkt = nullptr;
+    AVPacket *newPkt = av_packet_alloc();
     av_packet_ref(newPkt, (AVPacket *)dataIn.structDataPtr());
-    this->setStructDataPtr((void *)newPkt);
+    this->m_structDataPtr = (void *)newPkt;
 
     this->copyBasicAttributes(dataIn);
 }
 
 BoAVPacketData &BoAVPacketData::operator=(const BoAVPacketData &dataIn) {
     this->drop();
-    AVPacket *newPkt = nullptr;
+    AVPacket *newPkt = av_packet_alloc();
     av_packet_ref(newPkt, (AVPacket *)dataIn.structDataPtr());
-    this->setStructDataPtr((void *)newPkt);
+    this->m_structDataPtr = (void *)newPkt;
     this->copyBasicAttributes(dataIn);
 
     return *this;
 }
-
-void BoAVPacketData::alloc() {}
 
 void BoAVPacketData::drop() {
     if (!this->structDataPtr()) {
@@ -49,4 +47,11 @@ void BoAVPacketData::drop() {
     av_packet_free(&thisAVPacket);
 
     this->setStructDataPtr(nullptr);
+}
+
+void BoAVPacketData::setStructDataPtr(void *newStructDataPtr) {
+    //必须要复制一份, 否则会导致AVBuffer计数出问题
+    AVPacket *newPkt = av_packet_alloc();
+    av_packet_ref(newPkt, (AVPacket *)newStructDataPtr);
+    this->m_structDataPtr = (void *)newPkt;
 }

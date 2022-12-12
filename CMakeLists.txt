@@ -35,9 +35,12 @@ set(PROJECT_SOURCES
         FrameDispatcher.h FrameDispatcher.cpp
         IResampler.h IResampler.cpp
         FFResampler.h FFResampler.cpp
+        IAudioPlayer.h IAudioPlayer.cpp
+        QAudioPlayer.h QAudioPlayer.cpp
         Data/IBoData.h Data/IBoData.cpp
         Data/BoAVPacketData.h Data/BoAVPacketData.cpp
         Data/BoAVFrameData.h Data/BoAVFrameData.cpp
+        Data/BoAudioData.h Data/BoAudioData.cpp
         Dependency/OpenGL/glad/glad.c
         OpenGLRender/OpenGLMesh.h OpenGLRender/OpenGLMesh.cpp
         OpenGLRender/OpenGLRenderingThread.h OpenGLRender/OpenGLRenderingThread.cpp

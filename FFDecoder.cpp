@@ -54,8 +54,8 @@ bool FFDecoder::sendPacket(const std::shared_ptr<IBoData> &boData) {
         return false;
     }
 
-    int ret =
-        avcodec_send_packet(m_codecContext, (AVPacket *)boData->structDataPtr());
+    int ret = avcodec_send_packet(m_codecContext,
+                                  (AVPacket *)boData->structDataPtr());
     if (ret != 0) {
         PRINT_FFMPEG_ERROR(ret);
         return false;
@@ -76,7 +76,7 @@ std::shared_ptr<IBoData> FFDecoder::recvFrame() {
     //再次调用会复用上次空间，线程不安全
     int ret = avcodec_receive_frame(m_codecContext, m_frame);
     if (ret != 0) {
-        // sPRINT_FFMPEG_ERROR(ret);
+        // PRINT_FFMPEG_ERROR(ret);
         return nullptr;
     }
 
@@ -85,8 +85,8 @@ std::shared_ptr<IBoData> FFDecoder::recvFrame() {
     if (AVMEDIA_TYPE_VIDEO == m_codecContext->codec_type) {
         // yuv
         boData->setSize((m_frame->linesize[0] + m_frame->linesize[1] +
-                        m_frame->linesize[2]) *
-                       m_frame->height);
+                         m_frame->linesize[2]) *
+                        m_frame->height);
 
         boData->setWidth(m_frame->width);
         boData->setHeight(m_frame->height);
@@ -97,8 +97,9 @@ std::shared_ptr<IBoData> FFDecoder::recvFrame() {
             av_get_bytes_per_sample((AVSampleFormat)m_frame->format) *
             m_frame->nb_samples * m_frame->ch_layout.nb_channels);
     }
-    // m_frame->data什么时候回收, FFmpeg通过引用计数机制保证，使用需要保证相关方法调用正确
-    for(int i = 0; i < AV_NUM_DATA_POINTERS; ++i){
+    // m_frame->data什么时候回收,
+    // FFmpeg通过引用计数机制保证，使用需要保证相关方法调用正确
+    for (int i = 0; i < AV_NUM_DATA_POINTERS; ++i) {
         boData->addDatas(m_frame->data[i]);
     }
 

@@ -10,9 +10,9 @@ void IBoData::setStructDataPtr(void *newStructDataPtr) {
     m_structDataPtr = newStructDataPtr;
 }
 
-unsigned char *IBoData::data() const { return m_data; }
+uint8_t *IBoData::data() const { return m_data; }
 
-void IBoData::setData(unsigned char *newData) { m_data = newData; }
+void IBoData::setData(uint8_t *newData) { m_data = newData; }
 
 std::vector<uint8_t *> IBoData::datas() const { return m_datas; }
 
@@ -46,4 +46,9 @@ void IBoData::copyBasicAttributes(const IBoData &boData) {
     this->m_height = boData.m_height;
     this->m_format = boData.m_format;
     this->m_isAudio = boData.m_isAudio;
+    this->m_pts = boData.m_pts;
 }
+
+int IBoData::pts() const { return m_pts; }
+
+void IBoData::setPts(int newPts) { m_pts = newPts; }
