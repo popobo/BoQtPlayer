@@ -4,7 +4,7 @@
 
 BoThread::BoThread() {}
 
-void BoThread::start() {
+bool BoThread::start() {
     m_isExit = false;
     std::thread th(&BoThread::threadMain, this);
     //当前线程放弃对新建线程的控制, 防止对象被清空时, 新建线程出错

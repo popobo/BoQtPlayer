@@ -1,8 +1,9 @@
 #ifndef BOPARAMETER_H
 #define BOPARAMETER_H
 
-#include <QAudioFormat>
 #include <memory>
+// 这边依赖着ffmpeg,
+// 那所有的依赖BoParameter的接口也依赖FFmpeg，需要把BoParameter也抽象了
 extern "C" {
 #include "libavcodec/avcodec.h"
 }

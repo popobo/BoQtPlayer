@@ -5,6 +5,7 @@
 #include "IAudioPlayer.h"
 #include "IDecoder.h"
 #include "IDemux.h"
+#include "IPlayer.h"
 #include "IResampler.h"
 #include "OpenGLRender/OpenGLRenderWidget.h"
 #include <QWidget>
@@ -34,6 +35,8 @@ class Widget : public QWidget {
     std::shared_ptr<OpenGLRender::OpenGLRenderWidget> m_OpenGLRenderWidget;
     std::shared_ptr<IResampler> m_resampler;
     std::shared_ptr<IAudioPlayer> m_audioPlayer;
+
+    std::shared_ptr<IPlayer> m_player;
 
   private slots:
     void openFile();

@@ -7,7 +7,7 @@
 #include "ISubject.h"
 #include <list>
 
-class IAudioPlayer : public BoThread, public IObserver, public ISubject {
+class IAudioPlayer : public IObserver, public ISubject {
   public:
     IAudioPlayer();
 
@@ -16,7 +16,7 @@ class IAudioPlayer : public BoThread, public IObserver, public ISubject {
     // 缓冲满后阻塞
     virtual void update(const std::shared_ptr<IBoData> &boData) override;
 
-    virtual bool startPlay(BoParameter para) = 0;
+    virtual bool open() = 0;
 
     // 获取缓冲数据，如果没有则阻塞
     virtual std::shared_ptr<IBoData> getData();
@@ -29,12 +29,13 @@ class IAudioPlayer : public BoThread, public IObserver, public ISubject {
     bool isExist() const;
     void setIsExist(bool newIsExist);
 
-    virtual void setAudioOutputParameter(const BoParameter &paraIn) = 0;
+    virtual const AudioOutputFormat &audioOutFormat() const;
 
-  private:
+  protected:
     int m_pts{0};
     std::list<std::shared_ptr<IBoData>> m_frames;
     std::mutex m_framesMutex;
+    AudioOutputFormat m_audioOutFormat;
 };
 
 #endif // IAUDIOPLAY_H

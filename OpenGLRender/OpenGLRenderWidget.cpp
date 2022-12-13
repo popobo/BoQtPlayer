@@ -11,7 +11,7 @@ OpenGLRenderWidget::OpenGLRenderWidget(
     std::shared_ptr<IRendererFactory> rendererFactory, QWidget *widget)
     : QOpenGLWidget(widget), m_rendererFactory{rendererFactory} {}
 
-void OpenGLRenderWidget::startThread() {
+bool OpenGLRenderWidget::startThread() {
     if (m_renderingThread) {
         stopThread();
     }
@@ -30,11 +30,12 @@ void OpenGLRenderWidget::startThread() {
 
     if (!m_rendererFactory) {
         BO_ERROR("m_rendererFactory is nullptr");
-        return;
+        return false;
     }
     m_renderingThread->setRenderer(m_rendererFactory->createOpenGLRender());
 
     m_renderingThread->start();
+    return true;
 }
 
 void OpenGLRenderWidget::stopThread() {
@@ -93,5 +94,13 @@ void OpenGLRenderWidget::attachTextureToRenderer() {
         m_boDataQueue.pop();
     }
 }
+
+bool OpenGLRenderWidget::open() { return true; }
+
+bool OpenGLRenderWidget::start() { return startThread(); }
+
+void OpenGLRenderWidget::initView(void *win) {}
+
+void OpenGLRenderWidget::stop() { stopThread(); }
 
 } // namespace OpenGLRender

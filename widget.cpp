@@ -73,42 +73,13 @@ void Widget::openFile() {
     m_videoDecoder->open(m_demux->getVideoParameter());
     m_audioDecoder->open(m_demux->getAudioParameter());
 
-    auto defaultAudioOutput = QMediaDevices::defaultAudioOutput();
-    auto audioFormat = defaultAudioOutput.preferredFormat();
-
-    BoParameter audioOutputParameter;
-    AudioOutputFormat audioOutputFormat;
-    audioOutputFormat.sampleRate = audioFormat.sampleRate();
-    audioOutputFormat.sampleChannelCount = audioFormat.channelCount();
-    switch (audioFormat.sampleFormat()) {
-    case QAudioFormat::SampleFormat::UInt8:
-        audioOutputFormat.sampleBits = SampleBits::UInt8;
-        break;
-    case QAudioFormat::SampleFormat::Int16:
-        audioOutputFormat.sampleBits = SampleBits::Int16;
-        break;
-    case QAudioFormat::SampleFormat::Int32:
-        audioOutputFormat.sampleBits = SampleBits::Int32;
-        break;
-    case QAudioFormat::SampleFormat::Float:
-        audioOutputFormat.sampleBits = SampleBits::Float;
-        break;
-    default:
-        break;
-    }
-
-    audioOutputParameter.setAudioOutputFormat(audioOutputFormat);
-
-    m_audioPlayer->setAudioDevice(defaultAudioOutput);
-    m_audioPlayer->setAudioOutputParameter(audioOutputParameter);
-
-    // 先保持重采样后与原本一致
-    m_resampler->open(m_demux->getAudioParameter(), audioOutputParameter);
-
     m_demux->start();
     m_videoDecoder->start();
     m_audioDecoder->start();
-    m_audioPlayer->startPlay(m_demux->getAudioParameter());
+    // 启动顺序有要求
+    m_audioPlayer->open();
+    m_resampler->open(m_demux->getAudioParameter(),
+                      m_audioPlayer->audioOutFormat());
 
     m_OpenGLRenderWidget->startThread();
 }

@@ -30,6 +30,10 @@ set(PROJECT_SOURCES
         Interface/IDecoder.h Interface/IDecoder.cpp
         Interface/IResampler.h Interface/IResampler.cpp
         Interface/IAudioPlayer.h Interface/IAudioPlayer.cpp
+        Interface/IPlayer.h Interface/IPlayer.cpp
+        Interface/IVideoView.h Interface/IVideoView.cpp
+        Interface/IPlayerBuilder.h Interface/IPlayerBuilder.cpp
+        Interface/IFrameDispatcher.h Interface/IFrameDispatcher.cpp
 
         FFDemux.h FFDemux.cpp
         BoUtil.h BoUtil.cpp
@@ -38,6 +42,8 @@ set(PROJECT_SOURCES
         FFDecoder.h FFDecoder.cpp
         FrameDispatcher.h FrameDispatcher.cpp
         FFResampler.h FFResampler.cpp
+        FFQtFrameDispathcer.h FFQtFrameDispathcer.cpp
+        FFQtPlayerBuilder.h FFQtPlayerBuilder.cpp
 
         QAudioPlayer.h QAudioPlayer.cpp
         Data/IBoData.h Data/IBoData.cpp

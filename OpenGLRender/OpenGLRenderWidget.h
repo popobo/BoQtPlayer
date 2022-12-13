@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Data/IBoData.h"
+#include "IVideoView.h"
 #include "OpenGLRenderingThread.h"
 #include "OpenGLViewportTarget.h"
 #include "Renderer/IRendererFactory.h"
@@ -12,6 +13,7 @@ namespace OpenGLRender {
 
 class OpenGLRenderWidget
     : public QOpenGLWidget,
+      public IVideoView,
       public std::enable_shared_from_this<OpenGLRenderWidget> {
 
     Q_OBJECT
@@ -22,13 +24,21 @@ class OpenGLRenderWidget
     OpenGLRenderWidget(std::shared_ptr<IRendererFactory> rendererFactory,
                        QWidget *widget = nullptr);
 
-    void startThread();
+    bool startThread();
 
     void stopThread();
 
     std::shared_ptr<IRendererFactory> getRendererFactory();
 
     void receiveBoData(const std::shared_ptr<IBoData> &data);
+
+    virtual bool open() override;
+
+    virtual bool start() override;
+
+    virtual void initView(void *win) override;
+
+    virtual void stop() override;
 
   protected:
     void paintGL() override;

@@ -51,17 +51,12 @@ class AudioBuffer : public QIODevice {
 
 QAudioPlayer::QAudioPlayer() {}
 
-QAudioPlayer::QAudioPlayer(QAudioDevice audioDevice, QAudioFormat audioFormat) {
-    m_audioDevice = audioDevice;
-    m_audioOutFormat = audioFormat;
-}
-
 QAudioPlayer::~QAudioPlayer() {
     m_audioBuffer->close();
     m_audioSink->stop();
 }
 
-bool QAudioPlayer::startPlay(BoParameter para) {
+bool QAudioPlayer::open() {
     if (m_isStarted) {
         BO_INFO("QAudioPlayer has been start");
         return false;
@@ -71,11 +66,32 @@ bool QAudioPlayer::startPlay(BoParameter para) {
         m_audioBuffer = std::make_shared<AudioBuffer>();
     }
 
+    m_audioDevice = QMediaDevices::defaultAudioOutput();
+    m_qPreferedAudioFormat = m_audioDevice.preferredFormat();
+    switch (m_qPreferedAudioFormat.sampleFormat()) {
+    case QAudioFormat::SampleFormat::UInt8:
+        m_audioOutFormat.sampleBits = SampleBits::UInt8;
+        break;
+    case QAudioFormat::SampleFormat::Int16:
+        m_audioOutFormat.sampleBits = SampleBits::Int16;
+        break;
+    case QAudioFormat::SampleFormat::Int32:
+        m_audioOutFormat.sampleBits = SampleBits::Int32;
+        break;
+    case QAudioFormat::SampleFormat::Float:
+        m_audioOutFormat.sampleBits = SampleBits::Float;
+        break;
+    default:
+        break;
+    }
+    m_audioOutFormat.sampleChannelCount = m_qPreferedAudioFormat.channelCount();
+    m_audioOutFormat.sampleRate = m_qPreferedAudioFormat.sampleRate();
+
     m_audioBuffer->open(QIODevice::ReadWrite);
 
     if (!m_audioSink) {
         m_audioSink =
-            std::make_shared<QAudioSink>(m_audioDevice, m_audioOutFormat);
+            std::make_shared<QAudioSink>(m_audioDevice, m_qPreferedAudioFormat);
     }
 
     // 注意这边的生命周期
@@ -86,7 +102,7 @@ bool QAudioPlayer::startPlay(BoParameter para) {
 }
 
 void QAudioPlayer::update(const std::shared_ptr<IBoData> &boData) {
-    if (boData->size() <= 0 || !boData->data()) {
+    if (!boData || boData->size() <= 0 || !boData->data()) {
         return;
     }
 
@@ -97,32 +113,4 @@ void QAudioPlayer::update(const std::shared_ptr<IBoData> &boData) {
         }
         boSleep(1);
     }
-}
-
-void QAudioPlayer::setAudioOutputParameter(const BoParameter &paraIn) {
-    m_audioOutFormat.setSampleRate(paraIn.getAudioOutputFormat().sampleRate);
-    m_audioOutFormat.setChannelCount(
-        paraIn.getAudioOutputFormat().sampleChannelCount);
-    switch (paraIn.getAudioOutputFormat().sampleBits) {
-    case SampleBits::UInt8:
-        m_audioOutFormat.setSampleFormat(QAudioFormat::SampleFormat::UInt8);
-        break;
-    case SampleBits::Int16:
-        m_audioOutFormat.setSampleFormat(QAudioFormat::SampleFormat::Int16);
-        break;
-    case SampleBits::Int32:
-        m_audioOutFormat.setSampleFormat(QAudioFormat::SampleFormat::Int32);
-        break;
-    case SampleBits::Float:
-        m_audioOutFormat.setSampleFormat(QAudioFormat::SampleFormat::Float);
-        break;
-    default:
-        break;
-    }
-}
-
-const QAudioDevice &QAudioPlayer::audioDevice() const { return m_audioDevice; }
-
-void QAudioPlayer::setAudioDevice(const QAudioDevice &newAudioDevice) {
-    m_audioDevice = newAudioDevice;
 }

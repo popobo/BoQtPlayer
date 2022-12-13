@@ -11,7 +11,11 @@ class IResampler : public IObserver, public ISubject {
 
     ~IResampler();
 
-    virtual bool open(BoParameter parameterIn, BoParameter parameterOut) = 0;
+    virtual bool open(const BoParameter &parameterIn,
+                      const BoParameter &parameterOut) = 0;
+
+    virtual bool open(const BoParameter &parameterIn,
+                      const AudioOutputFormat &parameterOut) = 0;
 
     virtual std::shared_ptr<IBoData>
     resample(const std::shared_ptr<IBoData> &boDataIn) = 0;

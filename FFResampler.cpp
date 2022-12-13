@@ -10,7 +10,13 @@ FFResampler::~FFResampler() {
     }
 }
 
-bool FFResampler::open(BoParameter parameterIn, BoParameter parameterOut) {
+bool FFResampler::open(const BoParameter &parameterIn,
+                       const BoParameter &parameterOut) {
+    return open(parameterIn, parameterOut.getAudioOutputFormat());
+}
+
+bool FFResampler::open(const BoParameter &parameterIn,
+                       const AudioOutputFormat &audioOutputFormat) {
     std::unique_lock<std::mutex> locker(m_swrContextMutex);
     if (m_swrContext) {
         swr_free(&m_swrContext);
@@ -18,7 +24,6 @@ bool FFResampler::open(BoParameter parameterIn, BoParameter parameterOut) {
     m_swrContext = swr_alloc();
     auto paraIn = parameterIn.getPara();
 
-    auto audioOutputFormat = parameterOut.getAudioOutputFormat();
     AVSampleFormat sampleFormat = AV_SAMPLE_FMT_NONE;
     switch (audioOutputFormat.sampleBits) {
     case SampleBits::UInt8:
@@ -63,7 +68,7 @@ bool FFResampler::open(BoParameter parameterIn, BoParameter parameterOut) {
 
 std::shared_ptr<IBoData>
 FFResampler::resample(const std::shared_ptr<IBoData> &boDataIn) {
-    if (boDataIn->size() <= 0 || !boDataIn->structDataPtr()) {
+    if (!boDataIn || boDataIn->size() <= 0 || !boDataIn->structDataPtr()) {
         return nullptr;
     }
 
