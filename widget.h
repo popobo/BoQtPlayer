@@ -2,11 +2,11 @@
 #define WIDGET_H
 
 #include "FrameDispatcher.h"
+#include "IAudioPlayer.h"
 #include "IDecoder.h"
 #include "IDemux.h"
 #include "IResampler.h"
 #include "OpenGLRender/OpenGLRenderWidget.h"
-#include "QAudioPlayer.h"
 #include <QWidget>
 #include <memory>
 
@@ -33,7 +33,7 @@ class Widget : public QWidget {
     std::shared_ptr<FrameDispatcher> m_frameDispatcher;
     std::shared_ptr<OpenGLRender::OpenGLRenderWidget> m_OpenGLRenderWidget;
     std::shared_ptr<IResampler> m_resampler;
-    std::shared_ptr<QAudioPlayer> m_audioPlayer;
+    std::shared_ptr<IAudioPlayer> m_audioPlayer;
 
   private slots:
     void openFile();

@@ -29,6 +29,8 @@ class IAudioPlayer : public BoThread, public IObserver, public ISubject {
     bool isExist() const;
     void setIsExist(bool newIsExist);
 
+    virtual void setAudioOutputParameter(const BoParameter &paraIn) = 0;
+
   private:
     int m_pts{0};
     std::list<std::shared_ptr<IBoData>> m_frames;

@@ -20,13 +20,12 @@ class QAudioPlayer : public IAudioPlayer {
 
     virtual void update(const std::shared_ptr<IBoData> &boData) override;
 
+    virtual void setAudioOutputParameter(const BoParameter &paraIn) override;
+
     const QAudioDevice &audioDevice() const;
     void setAudioDevice(const QAudioDevice &newAudioDevice);
 
-    const QAudioFormat &audioOutFormat() const;
-    void setAudioOutFormat(const QAudioFormat &newAudioOutFormat);
-
-private:
+  private:
     bool m_isStarted{false};
     std::shared_ptr<AudioBuffer> m_audioBuffer;
     std::shared_ptr<QAudioSink> m_audioSink;

@@ -96,9 +96,11 @@ void Widget::openFile() {
     default:
         break;
     }
-    m_audioPlayer->setAudioDevice(defaultAudioOutput);
-    m_audioPlayer->setAudioOutFormat(audioFormat);
+
     audioOutputParameter.setAudioOutputFormat(audioOutputFormat);
+
+    m_audioPlayer->setAudioDevice(defaultAudioOutput);
+    m_audioPlayer->setAudioOutputParameter(audioOutputParameter);
 
     // 先保持重采样后与原本一致
     m_resampler->open(m_demux->getAudioParameter(), audioOutputParameter);

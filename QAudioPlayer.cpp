@@ -99,22 +99,30 @@ void QAudioPlayer::update(const std::shared_ptr<IBoData> &boData) {
     }
 }
 
-const QAudioDevice &QAudioPlayer::audioDevice() const
-{
-    return m_audioDevice;
+void QAudioPlayer::setAudioOutputParameter(const BoParameter &paraIn) {
+    m_audioOutFormat.setSampleRate(paraIn.getAudioOutputFormat().sampleRate);
+    m_audioOutFormat.setChannelCount(
+        paraIn.getAudioOutputFormat().sampleChannelCount);
+    switch (paraIn.getAudioOutputFormat().sampleBits) {
+    case SampleBits::UInt8:
+        m_audioOutFormat.setSampleFormat(QAudioFormat::SampleFormat::UInt8);
+        break;
+    case SampleBits::Int16:
+        m_audioOutFormat.setSampleFormat(QAudioFormat::SampleFormat::Int16);
+        break;
+    case SampleBits::Int32:
+        m_audioOutFormat.setSampleFormat(QAudioFormat::SampleFormat::Int32);
+        break;
+    case SampleBits::Float:
+        m_audioOutFormat.setSampleFormat(QAudioFormat::SampleFormat::Float);
+        break;
+    default:
+        break;
+    }
 }
 
-void QAudioPlayer::setAudioDevice(const QAudioDevice &newAudioDevice)
-{
+const QAudioDevice &QAudioPlayer::audioDevice() const { return m_audioDevice; }
+
+void QAudioPlayer::setAudioDevice(const QAudioDevice &newAudioDevice) {
     m_audioDevice = newAudioDevice;
-}
-
-const QAudioFormat &QAudioPlayer::audioOutFormat() const
-{
-    return m_audioOutFormat;
-}
-
-void QAudioPlayer::setAudioOutFormat(const QAudioFormat &newAudioOutFormat)
-{
-    m_audioOutFormat = newAudioOutFormat;
 }
