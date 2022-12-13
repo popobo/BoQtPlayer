@@ -23,25 +23,28 @@ set(PROJECT_SOURCES
         widget.h
         widget.ui
         BoLog.h BoLog.cpp
-        IDemux.h IDemux.cpp
+
+        Interface/IDemux.h Interface/IDemux.cpp
+        Interface/IObserver.h Interface/IObserver.cpp
+        Interface/ISubject.h Interface/ISubject.cpp
+        Interface/IDecoder.h Interface/IDecoder.cpp
+        Interface/IResampler.h Interface/IResampler.cpp
+        Interface/IAudioPlayer.h Interface/IAudioPlayer.cpp
+
         FFDemux.h FFDemux.cpp
         BoUtil.h BoUtil.cpp
         BoThread.h BoThread.cpp
-        IObserver.h IObserver.cpp
-        ISubject.h ISubject.cpp
         BoParameter.h BoParameter.cpp
-        IDecoder.h IDecoder.cpp
         FFDecoder.h FFDecoder.cpp
         FrameDispatcher.h FrameDispatcher.cpp
-        IResampler.h IResampler.cpp
         FFResampler.h FFResampler.cpp
-        IAudioPlayer.h IAudioPlayer.cpp
+
         QAudioPlayer.h QAudioPlayer.cpp
         Data/IBoData.h Data/IBoData.cpp
         Data/BoAVPacketData.h Data/BoAVPacketData.cpp
         Data/BoAVFrameData.h Data/BoAVFrameData.cpp
         Data/BoAudioData.h Data/BoAudioData.cpp
-        Dependency/OpenGL/glad/glad.c
+
         OpenGLRender/OpenGLMesh.h OpenGLRender/OpenGLMesh.cpp
         OpenGLRender/OpenGLRenderingThread.h OpenGLRender/OpenGLRenderingThread.cpp
         OpenGLRender/OpenGLRenderWidget.h OpenGLRender/OpenGLRenderWidget.cpp
@@ -54,6 +57,8 @@ set(PROJECT_SOURCES
         OpenGLRender/Renderer/OpenGLQuadFactory.h OpenGLRender/Renderer/OpenGLQuadFactory.cpp
         OpenGLRender/Renderer/YUVRenderer.h OpenGLRender/Renderer/YUVRenderer.cpp
         OpenGLRender/Renderer/YUVRendererFactory.h OpenGLRender/Renderer/YUVRendererFactory.cpp
+
+        Dependency/OpenGL/glad/glad.c
     )
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
@@ -83,7 +88,8 @@ target_include_directories(BoPlayer PUBLIC Dependency/ffmpeg/include
                                            Dependency/spdlog/include
                                            Dependency/OpenGL/glad/include
                                            Dependency/OpenGL/glm
-                                           OpenGLRender/  )
+                                           OpenGLRender
+                                           Interface)
 
 target_link_directories(BoPlayer PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/Dependency/ffmpeg/lib)
 
