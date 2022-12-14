@@ -25,10 +25,6 @@ class IVideoView : public IObserver {
     virtual bool start() = 0;
 
     virtual void stop() = 0;
-
-    virtual void initView(void *win) = 0;
-
-    virtual void update(const std::shared_ptr<IBoData> &boData) override {}
 };
 
 #endif // IVIDEOVIEW_H

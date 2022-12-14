@@ -33,16 +33,13 @@ set(PROJECT_SOURCES
         Interface/IPlayer.h Interface/IPlayer.cpp
         Interface/IVideoView.h Interface/IVideoView.cpp
         Interface/IPlayerBuilder.h Interface/IPlayerBuilder.cpp
-        Interface/IFrameDispatcher.h Interface/IFrameDispatcher.cpp
 
         FFDemux.h FFDemux.cpp
         BoUtil.h BoUtil.cpp
         BoThread.h BoThread.cpp
         BoParameter.h BoParameter.cpp
         FFDecoder.h FFDecoder.cpp
-        FrameDispatcher.h FrameDispatcher.cpp
         FFResampler.h FFResampler.cpp
-        FFQtFrameDispathcer.h FFQtFrameDispathcer.cpp
         FFQtPlayerBuilder.h FFQtPlayerBuilder.cpp
 
         QAudioPlayer.h QAudioPlayer.cpp

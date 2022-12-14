@@ -1,13 +1,9 @@
 #include "widget.h"
 #include "./ui_widget.h"
 #include "BoLog.h"
-#include "FFDecoder.h"
-#include "FFDemux.h"
 #include "FFQtPlayerBuilder.h"
-#include "FFResampler.h"
-#include "OpenGLRender/Renderer/OpenGLQuadFactory.h"
 #include "OpenGLRender/Renderer/YUVRendererFactory.h"
-#include "QAudioPlayer.h"
+
 #include <QAudioDevice>
 #include <QFileDialog>
 #include <QMediaDevices>
@@ -59,21 +55,25 @@ Widget::Widget(QWidget *parent) : QWidget(parent), ui(new Ui::Widget) {
         std::make_shared<FFQtPlayerBuilder>();
     m_player = playerBuild->buildPlayer();
 
+    // setVideoView
     std::shared_ptr<OpenGLRender::IRendererFactory> renderFactory =
         std::make_shared<OpenGLRender::YUVRendererFactory>();
-
     m_OpenGLRenderWidget =
         std::make_shared<OpenGLRender::OpenGLRenderWidget>(renderFactory, this);
-
+    m_OpenGLRenderWidget->setGeometry(QRect(0, 0, 800, 600));
     m_player->setVideoView(m_OpenGLRenderWidget);
+
+    // setAudioPlayer
+    m_audioPlayer = std::make_shared<QAudioPlayer>();
+    m_player->setAudioPlayer(m_audioPlayer);
+
+    connect(ui->pushButtonOpenFile, SIGNAL(clicked()), this, SLOT(openFile()));
 }
 
 Widget::~Widget() { delete ui; }
 
 void Widget::closeWidget() {
-    m_demux->stop();
-    m_videoDecoder->stop();
-    m_audioDecoder->stop();
+    m_player->stop();
 
     QWidget::close();
 }
@@ -82,21 +82,6 @@ void Widget::openFile() {
     // 测试用代码
     QString filename = QFileDialog::getOpenFileName(nullptr, "oepn file");
     std::string stdFilename = filename.toStdString();
-
-    //   m_demux->open(stdFilename.c_str());
-
-    //    m_videoDecoder->open(m_demux->getVideoParameter());
-    //    m_audioDecoder->open(m_demux->getAudioParameter());
-
-    //    m_demux->start();
-    //    m_videoDecoder->start();
-    //    m_audioDecoder->start();
-    //    // 启动顺序有要求
-    //    m_audioPlayer->open();
-    //    m_resampler->open(m_demux->getAudioParameter(),
-    //                      m_audioPlayer->audioOutFormat());
-
-    //    m_OpenGLRenderWidget->startThread();
 
     m_player->open(stdFilename.c_str());
     m_player->start();

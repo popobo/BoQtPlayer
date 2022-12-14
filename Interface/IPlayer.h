@@ -5,7 +5,6 @@
 #include "IAudioPlayer.h"
 #include "IDecoder.h"
 #include "IDemux.h"
-#include "IFrameDispatcher.h"
 #include "IResampler.h"
 #include "IVideoView.h"
 
@@ -23,15 +22,14 @@ class IPlayer : public BoThread {
 
     virtual void stop() override;
 
-    virtual const std::shared_ptr<IVideoView> &videoView() const;
-
     void setVideoView(const std::shared_ptr<IVideoView> &newVideoView);
+
+    void setAudioPlayer(const std::shared_ptr<IAudioPlayer> &newAudioPlayer);
 
   public:
     std::shared_ptr<IDemux> m_demux;
     std::shared_ptr<IDecoder> m_videoDecoder;
     std::shared_ptr<IDecoder> m_audioDecoder;
-    std::shared_ptr<IFrameDispatcher> m_frameDispatcher;
     std::shared_ptr<IVideoView> m_videoView;
     std::shared_ptr<IResampler> m_resampler;
     std::shared_ptr<IAudioPlayer> m_audioPlayer;

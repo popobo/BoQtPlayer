@@ -30,15 +30,17 @@ class OpenGLRenderWidget
 
     std::shared_ptr<IRendererFactory> getRendererFactory();
 
-    void receiveBoData(const std::shared_ptr<IBoData> &data);
-
+    // IVideoView Interface
     virtual bool open() override;
 
     virtual bool start() override;
 
-    virtual void initView(void *win) override;
-
     virtual void stop() override;
+
+    // IObserver interface
+    virtual void update(const std::shared_ptr<IBoData> &boData) override;
+
+    const static int BUFFER_MAX_LEN = 100;
 
   protected:
     void paintGL() override;
@@ -54,7 +56,9 @@ class OpenGLRenderWidget
     std::shared_ptr<IRendererFactory> m_rendererFactory;
     std::shared_ptr<RenderingThread> m_renderingThread;
     std::shared_ptr<ViewportTarget> m_viewportTarget;
+
     std::queue<std::shared_ptr<IBoData>> m_boDataQueue;
+    std::mutex m_boDataQueueMutex;
 };
 
 } // namespace OpenGLRender

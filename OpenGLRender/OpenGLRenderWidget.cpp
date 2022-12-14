@@ -1,5 +1,6 @@
 #include "OpenGLRenderWidget.h"
 #include "BoLog.h"
+#include "BoThread.h"
 #include "OpenGLViewportTarget.h"
 
 namespace OpenGLRender {
@@ -51,10 +52,6 @@ std::shared_ptr<IRendererFactory> OpenGLRenderWidget::getRendererFactory() {
     return m_rendererFactory;
 }
 
-void OpenGLRenderWidget::receiveBoData(const std::shared_ptr<IBoData> &data) {
-    m_boDataQueue.push(data);
-}
-
 void OpenGLRenderWidget::paintGL() {
     if (!m_renderingThread || !m_renderingThread->isInitialized()) {
         return;
@@ -78,6 +75,8 @@ void OpenGLRenderWidget::paintGL() {
 void OpenGLRenderWidget::closeEvent(QCloseEvent *e) { stopThread(); }
 
 void OpenGLRenderWidget::attachTextureToRenderer() {
+    std::unique_lock<std::mutex> locker{m_boDataQueueMutex};
+
     if (!m_boDataQueue.empty() &&
         m_renderingThread->getTextureTupleSize() == 0) {
         auto boData = m_boDataQueue.front();
@@ -99,8 +98,19 @@ bool OpenGLRenderWidget::open() { return true; }
 
 bool OpenGLRenderWidget::start() { return startThread(); }
 
-void OpenGLRenderWidget::initView(void *win) {}
-
 void OpenGLRenderWidget::stop() { stopThread(); }
+
+void OpenGLRenderWidget::update(const std::shared_ptr<IBoData> &boData) {
+    std::unique_lock<std::mutex> locker{m_boDataQueueMutex};
+
+    while (m_renderingThread->isRunning()) {
+        if (m_boDataQueue.size() < BUFFER_MAX_LEN) {
+            m_boDataQueue.push(boData);
+            break;
+        } else {
+            boSleep(1);
+        }
+    }
+}
 
 } // namespace OpenGLRender

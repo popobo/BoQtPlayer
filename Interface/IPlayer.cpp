@@ -75,6 +75,8 @@ bool IPlayer::start() {
 }
 
 void IPlayer::stop() {
+    std::unique_lock<std::mutex> locker(m_playerMutex);
+
     if (m_demux) {
         m_demux->stop();
     }
@@ -96,10 +98,14 @@ void IPlayer::stop() {
     }
 }
 
-const std::shared_ptr<IVideoView> &IPlayer::videoView() const {
-    return m_videoView;
-}
-
+// 这两者时是依赖平台的，有调用者传入
 void IPlayer::setVideoView(const std::shared_ptr<IVideoView> &newVideoView) {
     m_videoView = newVideoView;
+    m_videoDecoder->addObs(m_videoView);
+}
+
+void IPlayer::setAudioPlayer(
+    const std::shared_ptr<IAudioPlayer> &newAudioPlayer) {
+    m_audioPlayer = newAudioPlayer;
+    m_resampler->addObs(m_audioPlayer);
 }
