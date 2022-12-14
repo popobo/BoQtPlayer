@@ -68,6 +68,9 @@ Widget::Widget(QWidget *parent) : QWidget(parent), ui(new Ui::Widget) {
     m_player->setAudioPlayer(m_audioPlayer);
 
     connect(ui->pushButtonOpenFile, SIGNAL(clicked()), this, SLOT(openFile()));
+    connect(m_OpenGLRenderWidget.get(),
+            &OpenGLRender::OpenGLRenderWidget::threadStopped, this,
+            &Widget::closeWidget);
 }
 
 Widget::~Widget() { delete ui; }

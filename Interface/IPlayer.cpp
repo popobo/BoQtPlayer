@@ -22,19 +22,9 @@ bool IPlayer::open(const char *url) {
         return false;
     }
 
-    if (!m_audioPlayer || m_audioPlayer->open()) {
-        BO_ERROR("m_audioPlayer failed to open");
-        return false;
-    }
-
-    if (!m_resampler || m_resampler->open(m_demux->getVideoParameter(),
+    if (!m_resampler || m_resampler->open(m_demux->getAudioParameter(),
                                           m_audioPlayer->audioOutFormat())) {
         BO_ERROR("m_resampler failed to open");
-        return false;
-    }
-
-    if (!m_videoView || !m_videoView->open()) {
-        BO_ERROR("m_videoView failed to open");
         return false;
     }
 
@@ -49,6 +39,11 @@ bool IPlayer::start() {
         return false;
     }
 
+    if (!m_audioPlayer || !m_audioPlayer->start()) {
+        BO_ERROR("m_demux failed to start");
+        return false;
+    }
+
     if (!m_videoDecoder || !m_videoDecoder->start()) {
         BO_ERROR("m_videoDecoder failed to start");
         return false;
@@ -60,11 +55,6 @@ bool IPlayer::start() {
     }
 
     if (!m_demux || !m_demux->start()) {
-        BO_ERROR("m_demux failed to start");
-        return false;
-    }
-
-    if (!m_audioPlayer || !m_audioPlayer->start()) {
         BO_ERROR("m_demux failed to start");
         return false;
     }
@@ -101,11 +91,13 @@ void IPlayer::stop() {
 // 这两者时是依赖平台的，有调用者传入
 void IPlayer::setVideoView(const std::shared_ptr<IVideoView> &newVideoView) {
     m_videoView = newVideoView;
+    m_videoView->open();
     m_videoDecoder->addObs(m_videoView);
 }
 
 void IPlayer::setAudioPlayer(
     const std::shared_ptr<IAudioPlayer> &newAudioPlayer) {
     m_audioPlayer = newAudioPlayer;
+    m_audioPlayer->open();
     m_resampler->addObs(m_audioPlayer);
 }

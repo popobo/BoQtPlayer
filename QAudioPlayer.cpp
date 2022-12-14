@@ -94,9 +94,6 @@ bool QAudioPlayer::open() {
             std::make_shared<QAudioSink>(m_audioDevice, m_qPreferedAudioFormat);
     }
 
-    // 注意这边的生命周期
-    m_audioSink->start(m_audioBuffer.get());
-
     m_isStarted = true;
     return true;
 }
@@ -114,3 +111,14 @@ void QAudioPlayer::update(const std::shared_ptr<IBoData> &boData) {
         boSleep(1);
     }
 }
+
+bool QAudioPlayer::start() {
+    // 注意这边的生命周期
+    if (!m_audioSink) {
+        return false;
+    }
+    m_audioSink->start(m_audioBuffer.get());
+    return true;
+}
+
+void QAudioPlayer::stop() {}
