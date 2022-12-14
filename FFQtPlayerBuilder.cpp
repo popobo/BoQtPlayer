@@ -27,7 +27,8 @@ std::shared_ptr<IResampler> FFQtPlayerBuilder::createResampler() {
 }
 
 std::shared_ptr<IVideoView> FFQtPlayerBuilder::createVideoView() {
-    return std::make_shared<OpenGLRender::OpenGLRenderWidget>();
+    return std::make_shared<OpenGLRender::OpenGLRenderWidget>(
+        (QWidget *)m_window);
 }
 
 std::shared_ptr<IAudioPlayer> FFQtPlayerBuilder::createAudioPlayer() {

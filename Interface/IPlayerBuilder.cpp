@@ -8,7 +8,6 @@ std::shared_ptr<IPlayer> IPlayerBuilder::buildPlayer() {
     std::shared_ptr<IDecoder> audioDecoder = createDecoder();
     std::shared_ptr<IFrameDispatcher> frameDispatcher = createFrameDispathcer();
     std::shared_ptr<IResampler> resampler = createResampler();
-    std::shared_ptr<IVideoView> videoView = createVideoView();
     std::shared_ptr<IAudioPlayer> audioPlayer = createAudioPlayer();
     std::shared_ptr<IPlayer> player = createPlayer();
 

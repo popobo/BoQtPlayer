@@ -21,11 +21,15 @@ void IAudioPlayer::update(const std::shared_ptr<IBoData> &boData) {
     }
 }
 
+bool IAudioPlayer::start() {
+    m_isExit = false;
+    return true;
+}
+
+void IAudioPlayer::stop() { m_isExit = true; }
+
 std::shared_ptr<IBoData> IAudioPlayer::getData() {
-    //因为IAudioPlay没启用线程, 所以m_isRuning没有置true,
-    //按照XThread::stop()逻辑, m_isExit无法置为true
     //没有数据的时候阻塞
-    m_isRunning = true;
     while (!m_isExit) {
         std::unique_lock<std::mutex> locker(m_framesMutex);
         if (!m_frames.empty()) {
@@ -38,7 +42,6 @@ std::shared_ptr<IBoData> IAudioPlayer::getData() {
         locker.unlock();
         boSleep(1);
     }
-    m_isRunning = false;
 
     return nullptr;
 }

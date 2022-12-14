@@ -3,6 +3,17 @@
 
 #include "IObserver.h"
 
+// struct ViewRect {
+//     ViewRect(unsigned int posXIn, unsigned int posYIn, unsigned int widthIn,
+//              unsigned int heightIn)
+//         : posX(posXIn), posY(posYIn), width(widthIn), height(heightIn) {}
+
+//    unsigned int posX = 0;
+//    unsigned int posY = 0;
+//    unsigned int width = 0;
+//    unsigned int height = 0;
+//};
+
 class IVideoView : public IObserver {
   public:
     IVideoView();

@@ -3,6 +3,7 @@
 
 #include "IObserver.h"
 #include "ISubject.h"
+#include "IVideoView.h"
 
 class IFrameDispatcher : public IObserver, public ISubject {
   public:

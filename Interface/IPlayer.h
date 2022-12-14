@@ -21,6 +21,12 @@ class IPlayer : public BoThread {
 
     virtual bool start() override;
 
+    virtual void stop() override;
+
+    virtual const std::shared_ptr<IVideoView> &videoView() const;
+
+    void setVideoView(const std::shared_ptr<IVideoView> &newVideoView);
+
   public:
     std::shared_ptr<IDemux> m_demux;
     std::shared_ptr<IDecoder> m_videoDecoder;

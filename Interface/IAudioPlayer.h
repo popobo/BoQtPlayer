@@ -18,6 +18,10 @@ class IAudioPlayer : public IObserver, public ISubject {
 
     virtual bool open() = 0;
 
+    virtual bool start();
+
+    virtual void stop();
+
     // 获取缓冲数据，如果没有则阻塞
     virtual std::shared_ptr<IBoData> getData();
 
@@ -26,9 +30,6 @@ class IAudioPlayer : public IObserver, public ISubject {
     int getPts() const;
     void setPts(int newPts);
 
-    bool isExist() const;
-    void setIsExist(bool newIsExist);
-
     virtual const AudioOutputFormat &audioOutFormat() const;
 
   protected:
@@ -36,6 +37,7 @@ class IAudioPlayer : public IObserver, public ISubject {
     std::list<std::shared_ptr<IBoData>> m_frames;
     std::mutex m_framesMutex;
     AudioOutputFormat m_audioOutFormat;
+    bool m_isExit{false};
 };
 
 #endif // IAUDIOPLAY_H

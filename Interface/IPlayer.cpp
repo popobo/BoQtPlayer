@@ -58,7 +58,13 @@ bool IPlayer::start() {
         BO_ERROR("m_audioDecoder failed to start");
         return false;
     }
+
     if (!m_demux || !m_demux->start()) {
+        BO_ERROR("m_demux failed to start");
+        return false;
+    }
+
+    if (!m_audioPlayer || !m_audioPlayer->start()) {
         BO_ERROR("m_demux failed to start");
         return false;
     }
@@ -66,4 +72,34 @@ bool IPlayer::start() {
     locker.unlock();
     BoThread::start();
     return true;
+}
+
+void IPlayer::stop() {
+    if (m_demux) {
+        m_demux->stop();
+    }
+
+    if (m_videoDecoder) {
+        m_videoDecoder->stop();
+    }
+
+    if (m_audioDecoder) {
+        m_audioDecoder->stop();
+    }
+
+    if (m_videoView) {
+        m_videoView->stop();
+    }
+
+    if (m_audioPlayer) {
+        m_audioPlayer->stop();
+    }
+}
+
+const std::shared_ptr<IVideoView> &IPlayer::videoView() const {
+    return m_videoView;
+}
+
+void IPlayer::setVideoView(const std::shared_ptr<IVideoView> &newVideoView) {
+    m_videoView = newVideoView;
 }

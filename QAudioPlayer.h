@@ -14,7 +14,7 @@ class QAudioPlayer : public IAudioPlayer {
 
     ~QAudioPlayer();
 
-    virtual bool startPlay(BoParameter para) override;
+    virtual bool open() override;
 
     virtual void update(const std::shared_ptr<IBoData> &boData) override;
 

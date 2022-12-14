@@ -16,7 +16,6 @@ class IPlayerBuilder {
     virtual std::shared_ptr<IDecoder> createDecoder() = 0;
     virtual std::shared_ptr<IFrameDispatcher> createFrameDispathcer() = 0;
     virtual std::shared_ptr<IResampler> createResampler() = 0;
-    virtual std::shared_ptr<IVideoView> createVideoView() = 0;
     virtual std::shared_ptr<IAudioPlayer> createAudioPlayer() = 0;
     virtual std::shared_ptr<IPlayer> createPlayer() = 0;
 };
