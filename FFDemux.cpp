@@ -80,36 +80,36 @@ std::shared_ptr<IBoData> FFDemux::read() {
 
 int64_t FFDemux::getTotalTime() { return totalMs; }
 
-BoParameter FFDemux::getVideoParameter() {
+FFParameter FFDemux::getVideoParameter() {
     if (!ic) {
         BO_ERROR("ic is nullptr");
-        return BoParameter();
+        return FFParameter();
     }
     //获取视频流索引
     int ret = av_find_best_stream(ic, AVMEDIA_TYPE_VIDEO, -1, -1, nullptr, 0);
     if (ret < 0) {
         BO_ERROR("av_find_best_stream failed");
-        return BoParameter();
+        return FFParameter();
     }
     m_videoStream = ret;
-    BoParameter parameter;
+    FFParameter parameter;
     parameter.setPara(ic->streams[ret]->codecpar);
     return parameter;
 }
 
-BoParameter FFDemux::getAudioParameter() {
+FFParameter FFDemux::getAudioParameter() {
     if (!ic) {
         BO_ERROR("ic is nullptr");
-        return BoParameter();
+        return FFParameter();
     }
     //获取视频流索引
     int ret = av_find_best_stream(ic, AVMEDIA_TYPE_AUDIO, -1, -1, nullptr, 0);
     if (ret < 0) {
         BO_ERROR("av_find_best_stream failed");
-        return BoParameter();
+        return FFParameter();
     }
     m_audioStream = ret;
-    BoParameter parameter;
+    FFParameter parameter;
     parameter.setPara(ic->streams[ret]->codecpar);
     return parameter;
 }

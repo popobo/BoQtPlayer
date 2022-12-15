@@ -17,8 +17,8 @@ class FFDemux : public IDemux {
     virtual std::shared_ptr<IBoData> read() override;
     virtual int64_t getTotalTime() override;
 
-    virtual BoParameter getVideoParameter() override;
-    virtual BoParameter getAudioParameter() override;
+    virtual FFParameter getVideoParameter() override;
+    virtual FFParameter getAudioParameter() override;
 
   private:
     AVFormatContext *ic = nullptr;

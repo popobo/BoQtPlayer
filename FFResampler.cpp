@@ -1,6 +1,9 @@
 #include "FFResampler.h"
 #include "BoLog.h"
 #include "Data/BoAudioData.h"
+extern "C" {
+#include "libavcodec/avcodec.h"
+}
 
 FFResampler::FFResampler() {}
 
@@ -10,19 +13,19 @@ FFResampler::~FFResampler() {
     }
 }
 
-bool FFResampler::open(const BoParameter &parameterIn,
-                       const BoParameter &parameterOut) {
+bool FFResampler::open(const FFParameter &parameterIn,
+                       const FFParameter &parameterOut) {
     return open(parameterIn, parameterOut.getAudioOutputFormat());
 }
 
-bool FFResampler::open(const BoParameter &parameterIn,
+bool FFResampler::open(const FFParameter &parameterIn,
                        const AudioOutputFormat &audioOutputFormat) {
     std::unique_lock<std::mutex> locker(m_swrContextMutex);
     if (m_swrContext) {
         swr_free(&m_swrContext);
     }
     m_swrContext = swr_alloc();
-    auto paraIn = parameterIn.getPara();
+    auto paraIn = (AVCodecParameters *)parameterIn.getPara();
 
     AVSampleFormat sampleFormat = AV_SAMPLE_FMT_NONE;
     switch (audioOutputFormat.sampleBits) {
