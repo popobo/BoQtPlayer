@@ -10,6 +10,7 @@ extern "C" {
 class AudioBuffer : public QIODevice {
   public:
     qint64 readData(char *data, qint64 len) override {
+        // 这边不阻塞好像会有问题
         std::unique_lock<std::mutex> locker;
         if (len >= m_sizeOfUsed) {
             int readLen = m_sizeOfUsed;
