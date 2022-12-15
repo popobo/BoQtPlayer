@@ -21,12 +21,12 @@ class IParameter {
 
     ~IParameter() {}
 
-    void *getPara() const;
-    void setPara(void *newPara);
+    virtual void *getPara() const = 0;
+    virtual void setPara(void *newPara) = 0;
 
-    void setAudioOutputFormat(AudioOutputFormat newAudioOutFormat);
+    virtual void setAudioOutputFormat(AudioOutputFormat newAudioOutFormat) = 0;
 
-    AudioOutputFormat getAudioOutputFormat() const;
+    virtual AudioOutputFormat getAudioOutputFormat() const = 0;
 
   private:
     void *m_aVCodecParameters = nullptr;

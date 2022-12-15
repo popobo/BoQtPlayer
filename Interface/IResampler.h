@@ -1,7 +1,7 @@
 #ifndef IRESAMPLER_H
 #define IRESAMPLER_H
 
-#include "FFParameter.h"
+#include "IParameter.h"
 #include "IObserver.h"
 #include "ISubject.h"
 
@@ -11,10 +11,10 @@ class IResampler : public IObserver, public ISubject {
 
     ~IResampler();
 
-    virtual bool open(const FFParameter &parameterIn,
-                      const FFParameter &parameterOut) = 0;
+    virtual bool open(const std::shared_ptr<IParameter> &parameterIn,
+                      const std::shared_ptr<IParameter> &parameterOut) = 0;
 
-    virtual bool open(const FFParameter &parameterIn,
+    virtual bool open(const std::shared_ptr<IParameter> &parameterIn,
                       const AudioOutputFormat &parameterOut) = 0;
 
     virtual std::shared_ptr<IBoData>

@@ -11,11 +11,11 @@ FFDecoder::FFDecoder() {}
 
 FFDecoder::~FFDecoder() {}
 
-bool FFDecoder::open(const FFParameter &parameter) {
-    if (!parameter.getPara()) {
+bool FFDecoder::open(const std::shared_ptr<IParameter> &parameter) {
+    if (!parameter->getPara()) {
         return false;
     }
-    auto para = (AVCodecParameters *)parameter.getPara();
+    auto para = (AVCodecParameters *)parameter->getPara();
     // 1.查找解码器
     const AVCodec *avc = avcodec_find_decoder(para->codec_id);
     if (!avc) {

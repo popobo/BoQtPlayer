@@ -14,12 +14,13 @@ class FFParameter : public IParameter {
 
     FFParameter &operator=(const FFParameter &FFParameter);
 
-    void *getPara() const;
-    void setPara(void *newPara);
+    virtual void *getPara() const override;
+    virtual void setPara(void *newPara) override;
 
-    void setAudioOutputFormat(AudioOutputFormat newAudioOutFormat);
+    virtual void
+    setAudioOutputFormat(AudioOutputFormat newAudioOutFormat) override;
 
-    AudioOutputFormat getAudioOutputFormat() const;
+    virtual AudioOutputFormat getAudioOutputFormat() const override;
 
   private:
     void *m_aVCodecParameters = nullptr;

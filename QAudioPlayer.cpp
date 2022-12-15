@@ -122,4 +122,4 @@ bool QAudioPlayer::start() {
     return true;
 }
 
-void QAudioPlayer::stop() {}
+void QAudioPlayer::stop() { m_isExit = true; }

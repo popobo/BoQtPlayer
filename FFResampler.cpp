@@ -13,19 +13,19 @@ FFResampler::~FFResampler() {
     }
 }
 
-bool FFResampler::open(const FFParameter &parameterIn,
-                       const FFParameter &parameterOut) {
-    return open(parameterIn, parameterOut.getAudioOutputFormat());
+bool FFResampler::open(const std::shared_ptr<IParameter> &parameterIn,
+                       const std::shared_ptr<IParameter> &parameterOut) {
+    return open(parameterIn, parameterOut->getAudioOutputFormat());
 }
 
-bool FFResampler::open(const FFParameter &parameterIn,
+bool FFResampler::open(const std::shared_ptr<IParameter> &parameterIn,
                        const AudioOutputFormat &audioOutputFormat) {
     std::unique_lock<std::mutex> locker(m_swrContextMutex);
     if (m_swrContext) {
         swr_free(&m_swrContext);
     }
     m_swrContext = swr_alloc();
-    auto paraIn = (AVCodecParameters *)parameterIn.getPara();
+    auto paraIn = (AVCodecParameters *)parameterIn->getPara();
 
     AVSampleFormat sampleFormat = AV_SAMPLE_FMT_NONE;
     switch (audioOutputFormat.sampleBits) {
