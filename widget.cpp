@@ -3,7 +3,6 @@
 #include "BoLog.h"
 #include "FFQtPlayerBuilder.h"
 #include "OpenGLRender/Renderer/YUVRendererFactory.h"
-
 #include <QAudioDevice>
 #include <QFileDialog>
 #include <QMediaDevices>
@@ -18,38 +17,6 @@ Widget::Widget(QWidget *parent) : QWidget(parent), ui(new Ui::Widget) {
         BO_INFO("Threaded OpenGL is not supported");
         return;
     }
-
-    //    std::shared_ptr<OpenGLRender::IRendererFactory> renderFactory =
-    //        std::make_shared<OpenGLRender::YUVRendererFactory>();
-
-    //    m_demux = std::make_shared<FFDemux>();
-    //    m_videoDecoder = std::make_shared<FFDecoder>();
-    //    m_audioDecoder = std::make_shared<FFDecoder>();
-    //    m_frameDispatcher = std::make_shared<FrameDispatcher>();
-    //    m_OpenGLRenderWidget =
-    //        std::make_shared<OpenGLRender::OpenGLRenderWidget>(renderFactory,
-    //        this);
-    //    m_resampler = std::make_shared<FFResampler>();
-    //    m_audioPlayer = std::make_shared<QAudioPlayer>();
-
-    //    m_OpenGLRenderWidget->setGeometry(QRect(0, 0, 800, 600));
-    //    m_demux->addObs(m_videoDecoder);
-    //    m_demux->addObs(m_audioDecoder);
-    //    m_videoDecoder->addStrongObs(m_frameDispatcher);
-    //    m_audioDecoder->addObs(m_resampler);
-    //    m_resampler->addObs(m_audioPlayer);
-
-    //    connect(ui->pushButtonOpenFile, SIGNAL(clicked()), this,
-    //    SLOT(openFile())); connect(ui->pushButtonCloseWindow,
-    //    &QPushButton::clicked,
-    //            m_OpenGLRenderWidget.get(),
-    //            &OpenGLRender::OpenGLRenderWidget::stopThread);
-    //    connect(m_OpenGLRenderWidget.get(),
-    //            &OpenGLRender::OpenGLRenderWidget::threadStopped, this,
-    //            &Widget::closeWidget);
-    //    connect(m_frameDispatcher.get(), &FrameDispatcher::sendData,
-    //            m_OpenGLRenderWidget.get(),
-    //            &OpenGLRender::OpenGLRenderWidget::receiveBoData);
 
     std::shared_ptr<IPlayerBuilder> playerBuild =
         std::make_shared<FFQtPlayerBuilder>();
