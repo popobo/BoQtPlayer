@@ -1,4 +1,5 @@
 #include "IDecoder.h"
+#include "BoLog.h"
 
 bool IDecoder::isAudio() const { return m_isAudio; }
 
@@ -32,6 +33,9 @@ void IDecoder::main() {
                 if (!frame) {
                     break;
                 }
+                if (!m_isAudio) {
+                    BO_INFO("video notify(frame)");
+                }
                 //发送数据给观察者
                 notify(frame);
             }
@@ -52,6 +56,7 @@ void IDecoder::update(const std::shared_ptr<IBoData> &boData) {
             m_boDataList.push_back(boData);
             break;
         }
+        BO_INFO(m_isAudio ? "audio" : "video", "block");
         lock.unlock();
         boSleep(1);
     }

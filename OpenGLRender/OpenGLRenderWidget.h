@@ -40,7 +40,7 @@ class OpenGLRenderWidget
     // IObserver interface
     virtual void update(const std::shared_ptr<IBoData> &boData) override;
 
-    const static int BUFFER_MAX_LEN = 100;
+    const static int BUFFER_MAX_LEN = 1024;
 
   protected:
     void paintGL() override;

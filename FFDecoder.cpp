@@ -3,6 +3,7 @@
 #include "BoUtil.h"
 #include "Data/BoAVFrameData.h"
 extern "C" {
+#include "libavutil/imgutils.h"
 #include "libswscale/swscale.h"
 }
 #include <QImage>
@@ -91,6 +92,31 @@ std::shared_ptr<IBoData> FFDecoder::recvFrame() {
 
         boData->setWidth(m_frame->width);
         boData->setHeight(m_frame->height);
+
+        //        struct SwsContext *swsContext =
+        //            sws_getContext(m_codecContext->width,
+        //            m_codecContext->height,
+        //                           m_codecContext->pix_fmt,
+        //                           m_codecContext->width,
+        //                           m_codecContext->height, AV_PIX_FMT_RGB24,
+        //                           SWS_BILINEAR, NULL, NULL, NULL);
+
+        //        static int index = 0;
+        //        int linesize[8] = {m_frame->linesize[0] * 3};
+        //        int num_bytes = av_image_get_buffer_size(
+        //            AV_PIX_FMT_BGR24, m_frame->width, m_frame->height, 1);
+        //        uint8_t *p_global_bgr_buffer =
+        //            (uint8_t *)malloc(num_bytes * sizeof(uint8_t));
+        //        uint8_t *bgr_buffer[8] = {p_global_bgr_buffer};
+
+        //        sws_scale(swsContext, m_frame->data, m_frame->linesize, 0,
+        //                  m_frame->height, bgr_buffer, linesize);
+
+        //        QImage image((uchar *)bgr_buffer[0], m_frame->width,
+        //        m_frame->height,
+        //                     QImage::Format::Format_RGB888);
+        //        std::string test = "test" + std::to_string(++index) + ".png";
+        //        image.save(test.c_str(), "PNG");
 
     } else if (AVMEDIA_TYPE_AUDIO == m_codecContext->codec_type) {
         //样本字节数 * 单通道样本数 * 通道数

@@ -2,6 +2,8 @@
 #include "BoLog.h"
 #include "BoUtil.h"
 
+#include <qDebug>
+
 namespace OpenGLRender {
 
 namespace {

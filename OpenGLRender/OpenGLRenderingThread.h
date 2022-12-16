@@ -46,7 +46,7 @@ class RenderingThread : public QThread {
     void addTextureData(TextureIndex index, int width, int height,
                         unsigned char *data);
 
-    int getTextureTupleSize();
+    size_t getTextureTupleSize();
 
   protected:
     void run() override;

@@ -56,12 +56,12 @@ void RenderingThread::renderFrame() {
         glm::translate(glm::mat4(1.0f), glm::vec3(0.0, 0.0, -5.0f));
 
     // Clear closr buffer
-    GLCall(glClearColor(0.0f, 0.0f, 0.2f, 1.0f));
-    GLCall(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));
+    // GLCall(glClearColor(0.0f, 0.0f, 0.2f, 1.0f));
+    // GLCall(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));
 
     // Set rendering attributes
-    GLCall(glEnable(GL_DEPTH_TEST));
-    GLCall(glDisable(GL_CULL_FACE));
+    // GLCall(glEnable(GL_DEPTH_TEST));
+    // GLCall(glDisable(GL_CULL_FACE));
 
     // Render the quad
     if (!m_renderer) {
@@ -85,6 +85,16 @@ void RenderingThread::renderFrame() {
     m_renderFramebufferObject->release();
     // Take the current framebuffer texture Id
     m_framebufferTextureId = m_renderFramebufferObject->texture();
+
+    // static int i = 0;
+
+    //    std::string test("test_");
+    //    test += std::to_string(i++) += ".png";
+    //    if (i % 2 == 0) {
+    //        auto image = m_renderFramebufferObject->toImage();
+    //        image.save(test.c_str(), "PNG");
+    //    }
+
     // Swap the framebuffers for double-buffering
     std::swap(m_renderFramebufferObject, m_displayFramebufferObject);
 }
@@ -136,7 +146,7 @@ void RenderingThread::addTextureData(TextureIndex index, int width, int height,
     m_textureTuples.push_back({index, width, height, data});
 }
 
-int RenderingThread::getTextureTupleSize() { return m_textureTuples.size(); }
+size_t RenderingThread::getTextureTupleSize() { return m_textureTuples.size(); }
 
 GLuint RenderingThread::framebufferTexture() const {
     return m_framebufferTextureId;

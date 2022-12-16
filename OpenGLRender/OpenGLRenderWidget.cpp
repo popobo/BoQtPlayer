@@ -101,13 +101,18 @@ bool OpenGLRenderWidget::start() { return startThread(); }
 void OpenGLRenderWidget::stop() { stopThread(); }
 
 void OpenGLRenderWidget::update(const std::shared_ptr<IBoData> &boData) {
-    std::unique_lock<std::mutex> locker{m_boDataQueueMutex};
 
     while (m_renderingThread->isRunning()) {
+        //解决死锁问题
+
+        std::unique_lock<std::mutex> locker{m_boDataQueueMutex};
+        BO_INFO("update m_boDataQueue.size() = {0}", m_boDataQueue.size());
         if (m_boDataQueue.size() < BUFFER_MAX_LEN) {
             m_boDataQueue.push(boData);
             break;
         } else {
+            BO_INFO("block");
+            locker.unlock();
             boSleep(1);
         }
     }

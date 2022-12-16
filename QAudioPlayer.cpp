@@ -11,6 +11,7 @@ class AudioBuffer : public QIODevice {
   public:
     qint64 readData(char *data, qint64 len) override {
         // 这边不阻塞好像会有问题
+        BO_INFO("AudioBuffer readData");
         std::unique_lock<std::mutex> locker;
         if (len >= m_sizeOfUsed) {
             int readLen = m_sizeOfUsed;
@@ -28,6 +29,7 @@ class AudioBuffer : public QIODevice {
     }
 
     qint64 writeData(const char *data, qint64 len) override {
+        BO_INFO("AudioBuffer writeData");
         std::unique_lock<std::mutex> locker;
         len =
             len > (BUFFER_LEN - m_sizeOfUsed) ? BUFFER_LEN - m_sizeOfUsed : len;
@@ -109,6 +111,7 @@ void QAudioPlayer::update(const std::shared_ptr<IBoData> &boData) {
             m_audioBuffer->writeData((char *)boData->data(), boData->size());
             break;
         }
+
         boSleep(1);
     }
 }
