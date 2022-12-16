@@ -3,7 +3,6 @@
 #include "BoUtil.h"
 #include "ElapsedTimer.h"
 #include "glm/gtx/transform.hpp"
-
 #include <QImage>
 
 namespace OpenGLRender {
@@ -46,23 +45,6 @@ void RenderingThread::renderFrame() {
     const QSize size = m_framebufferSize;
     GLCall(glViewport(0, 0, size.width(), size.height()));
 
-    const float aspect = float(size.width()) / float(size.height());
-    // Perspective projection matrix
-    const glm::mat4 projection =
-        glm::perspective(glm::radians(45.0f), aspect, 0.1f, 10.0f);
-
-    // View matrix
-    const glm::mat4 view =
-        glm::translate(glm::mat4(1.0f), glm::vec3(0.0, 0.0, -5.0f));
-
-    // Clear closr buffer
-    GLCall(glClearColor(0.0f, 0.0f, 0.2f, 1.0f));
-    GLCall(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));
-
-    // Set rendering attributes
-    GLCall(glEnable(GL_DEPTH_TEST));
-    GLCall(glDisable(GL_CULL_FACE));
-
     // Render the quad
     if (!m_renderer) {
         BO_ERROR("m_renderer is nullptr");
@@ -70,13 +52,7 @@ void RenderingThread::renderFrame() {
     }
     m_renderer->update(m_timer.elapsed());
 
-    for (const auto &textureData : m_textureTuples) {
-        m_renderer->attachTextureData(textureData);
-    }
-
-    m_renderer->render(view, projection);
-
-    m_textureTuples.clear();
+    m_renderer->render();
 
     // flush the pipeline
     GLCall(glFlush());
@@ -122,6 +98,9 @@ RenderingThread::RenderingThread() {}
 void RenderingThread::stop() {
     lock();
     m_exiting = true;
+    if (m_renderer) {
+        m_renderer->stop();
+    }
     unlock();
 }
 
@@ -131,12 +110,9 @@ void RenderingThread::unlock() { m_mutex.unlock(); }
 
 bool RenderingThread::isInitialized() { return m_initialized; }
 
-void RenderingThread::addTextureData(TextureIndex index, int width, int height,
-                                     unsigned char *data) {
-    m_textureTuples.push_back({index, width, height, data});
+void RenderingThread::addBoData(const std::shared_ptr<IBoData> &newBoData) {
+    m_renderer->addBoData(newBoData);
 }
-
-int RenderingThread::getTextureTupleSize() { return m_textureTuples.size(); }
 
 GLuint RenderingThread::framebufferTexture() const {
     return m_framebufferTextureId;
@@ -181,8 +157,6 @@ void RenderingThread::run() {
         if (m_triggerPaintGLFunc) {
             m_triggerPaintGLFunc();
         }
-
-        QThread::msleep(25);
     }
 }
 

@@ -1,9 +1,9 @@
 #ifndef IDEMUX_H
 #define IDEMUX_H
 
-#include "BoParameter.h"
 #include "BoThread.h"
 #include "Data/IBoData.h"
+#include "IParameter.h"
 #include "ISubject.h"
 
 //解封装接口类
@@ -20,16 +20,16 @@ class IDemux : public BoThread, public ISubject {
     //总时间 ms
     virtual int64_t getTotalTime() = 0;
 
-    virtual BoParameter getVideoParameter() = 0;
+    virtual std::shared_ptr<IParameter> getVideoParameter() = 0;
 
-    virtual BoParameter getAudioParameter() = 0;
+    virtual std::shared_ptr<IParameter> getAudioParameter() = 0;
 
   protected:
     //不要让用户访问
     virtual void main();
 
   protected:
-    int64_t totalMs = 0;
+    int64_t m_totalMs = 0;
 };
 
 #endif // IDEMUX_H

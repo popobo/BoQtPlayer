@@ -22,8 +22,8 @@ bool IPlayer::open(const char *url) {
         return false;
     }
 
-    if (!m_resampler || m_resampler->open(m_demux->getAudioParameter(),
-                                          m_audioPlayer->audioOutFormat())) {
+    if (!m_resampler || !m_resampler->open(m_demux->getAudioParameter(),
+                                           m_audioPlayer->audioOutFormat())) {
         BO_ERROR("m_resampler failed to open");
         return false;
     }
@@ -67,8 +67,13 @@ bool IPlayer::start() {
 void IPlayer::stop() {
     std::unique_lock<std::mutex> locker(m_playerMutex);
 
-    if (m_demux) {
-        m_demux->stop();
+    // （消费者）观察者先于（生产者）通知者停止，否则可能会因为有阻塞操作，导致线程退出超时
+    if (m_audioPlayer) {
+        m_audioPlayer->stop();
+    }
+
+    if (m_videoView) {
+        m_videoView->stop();
     }
 
     if (m_videoDecoder) {
@@ -79,12 +84,8 @@ void IPlayer::stop() {
         m_audioDecoder->stop();
     }
 
-    if (m_videoView) {
-        m_videoView->stop();
-    }
-
-    if (m_audioPlayer) {
-        m_audioPlayer->stop();
+    if (m_demux) {
+        m_demux->stop();
     }
 }
 

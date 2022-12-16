@@ -28,9 +28,6 @@ void Quad::render(const glm::mat4 &view, const glm::mat4 &projection) {
     m_mesh->release();
 }
 
-void Quad::attachTextureData(
-    std::tuple<TextureIndex, int, int, unsigned char *> textureData) {}
-
 Quad::~Quad() {}
 
 void Quad::init() {

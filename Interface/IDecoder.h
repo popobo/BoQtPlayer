@@ -2,7 +2,7 @@
 #define IDECODER_H
 
 #include "Data/IBoData.h"
-#include "BoParameter.h"
+#include "IParameter.h"
 #include "BoThread.h"
 #include "IObserver.h"
 #include "ISubject.h"
@@ -15,7 +15,7 @@ class IDecoder : public IObserver, public BoThread, public ISubject {
     virtual ~IDecoder() {}
 
     //打开解码器
-    virtual bool open(const BoParameter &parameter) = 0;
+    virtual bool open(const std::shared_ptr<IParameter> &parameter) = 0;
 
     // feature模型，发送数据到线程解码
     virtual bool sendPacket(const std::shared_ptr<IBoData> &boData) = 0;

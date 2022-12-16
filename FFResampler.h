@@ -13,10 +13,10 @@ class FFResampler : public IResampler {
 
     ~FFResampler();
 
-    virtual bool open(const BoParameter &parameterIn,
-                      const BoParameter &parameterOut) override;
+    virtual bool open(const std::shared_ptr<IParameter> &parameterIn,
+                      const std::shared_ptr<IParameter> &parameterOut) override;
 
-    virtual bool open(const BoParameter &parameterIn,
+    virtual bool open(const std::shared_ptr<IParameter> &parameterIn,
                       const AudioOutputFormat &audioOutputFormat) override;
 
     virtual std::shared_ptr<IBoData>

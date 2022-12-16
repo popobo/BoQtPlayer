@@ -3,6 +3,8 @@
 #include "IOpenGLRenderer.h"
 #include "OpenGLMesh.h"
 #include "OpenGLShader.h"
+#include <queue>
+
 namespace OpenGLRender {
 
 class YUVRenderer : public IOpenGLRenderer {
@@ -10,17 +12,15 @@ class YUVRenderer : public IOpenGLRenderer {
     YUVRenderer();
 
     virtual void init() override;
-    virtual void update(float elapsed) override;
-    virtual void render(const glm::mat4 &view,
-                        const glm::mat4 &projection) override;
+    virtual void render() override;
 
-    virtual void attachTextureData(
-        std::tuple<TextureIndex, int, int, unsigned char *> textureData)
-        override;
+    virtual int textureNumber() override;
 
-  private:
-    void attachTextureData(TextureIndex index, int width, int height,
-                           unsigned char *data);
+    const static int TEXTURE_NUMBER = 3;
+
+    virtual void addBoData(const std::shared_ptr<IBoData> &newBoData) override;
+
+    virtual void stop() override;
 
   private:
     std::shared_ptr<Mesh> m_mesh;
@@ -28,8 +28,10 @@ class YUVRenderer : public IOpenGLRenderer {
     GLuint m_yTextureId = 0;
     GLuint m_uTextureId = 0;
     GLuint m_vTextureId = 0;
-    std::vector<std::tuple<TextureIndex, int, int, unsigned char *>>
-        m_textureDatas;
+
+    const static int MAX_LENGTH = 100;
+    std::queue<std::shared_ptr<IBoData>> m_boDataQueue;
+    bool m_stopReceiveData = false;
 };
 
 } // namespace OpenGLRender

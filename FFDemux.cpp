@@ -2,6 +2,7 @@
 #include "BoLog.h"
 #include "BoUtil.h"
 #include "Data/BoAVPacketData.h"
+#include "FFParameter.h"
 extern "C" {
 #include "libavformat/avformat.h"
 }
@@ -19,6 +20,8 @@ FFDemux::FFDemux() {
         avformat_network_init();
         BO_INFO("ffmepg init");
     }
+    m_videoParameter = std::make_shared<FFParameter>();
+    m_audioParameter = std::make_shared<FFParameter>();
 }
 
 FFDemux::~FFDemux() { avformat_close_input(&ic); }
@@ -40,11 +43,23 @@ bool FFDemux::open(const char *url) {
     }
     // duration时间计数单位，一秒计数1000000次，这个数值不一定有，
     // 因为可能信息在流里，不在封装的文件头中
-    this->totalMs = ic->duration / AV_TIME_BASE * 1000;
-    BO_INFO("total ms = {0}", totalMs);
+    m_totalMs = ic->duration / AV_TIME_BASE * 1000;
+    BO_INFO("total ms = {0}", m_totalMs);
 
-    getVideoParameter();
-    getAudioParameter();
+    ret = av_find_best_stream(ic, AVMEDIA_TYPE_VIDEO, -1, -1, nullptr, 0);
+    if (ret < 0) {
+        BO_ERROR("av_find_best_stream failed");
+    }
+    m_videoStream = ret;
+    m_videoParameter->setPara(ic->streams[ret]->codecpar);
+
+    //获取音频流索引
+    ret = av_find_best_stream(ic, AVMEDIA_TYPE_AUDIO, -1, -1, nullptr, 0);
+    if (ret < 0) {
+        BO_ERROR("av_find_best_stream failed");
+    }
+    m_audioStream = ret;
+    m_audioParameter->setPara(ic->streams[ret]->codecpar);
 
     return true;
 }
@@ -78,38 +93,12 @@ std::shared_ptr<IBoData> FFDemux::read() {
     return boData;
 }
 
-int64_t FFDemux::getTotalTime() { return totalMs; }
+int64_t FFDemux::getTotalTime() { return m_totalMs; }
 
-BoParameter FFDemux::getVideoParameter() {
-    if (!ic) {
-        BO_ERROR("ic is nullptr");
-        return BoParameter();
-    }
-    //获取视频流索引
-    int ret = av_find_best_stream(ic, AVMEDIA_TYPE_VIDEO, -1, -1, nullptr, 0);
-    if (ret < 0) {
-        BO_ERROR("av_find_best_stream failed");
-        return BoParameter();
-    }
-    m_videoStream = ret;
-    BoParameter parameter;
-    parameter.setPara(ic->streams[ret]->codecpar);
-    return parameter;
+std::shared_ptr<IParameter> FFDemux::getVideoParameter() {
+    return m_videoParameter;
 }
 
-BoParameter FFDemux::getAudioParameter() {
-    if (!ic) {
-        BO_ERROR("ic is nullptr");
-        return BoParameter();
-    }
-    //获取视频流索引
-    int ret = av_find_best_stream(ic, AVMEDIA_TYPE_AUDIO, -1, -1, nullptr, 0);
-    if (ret < 0) {
-        BO_ERROR("av_find_best_stream failed");
-        return BoParameter();
-    }
-    m_audioStream = ret;
-    BoParameter parameter;
-    parameter.setPara(ic->streams[ret]->codecpar);
-    return parameter;
+std::shared_ptr<IParameter> FFDemux::getAudioParameter() {
+    return m_audioParameter;
 }

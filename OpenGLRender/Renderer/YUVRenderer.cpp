@@ -2,6 +2,8 @@
 #include "BoLog.h"
 #include "BoUtil.h"
 
+#include <QThread>
+
 namespace OpenGLRender {
 
 namespace {
@@ -102,13 +104,31 @@ void YUVRenderer::init() {
     m_shader->link();
 }
 
-void YUVRenderer::update(float elapsed) {}
-
-void YUVRenderer::render(const glm::mat4 &view, const glm::mat4 &projection) {
-    for (const auto &texdata : m_textureDatas) {
-        auto [index, width, height, data] = texdata;
-        attachTextureData(index, width, height, data);
+void YUVRenderer::render() {
+    if (m_boDataQueue.empty()) {
+        return;
     }
+
+    auto boData = m_boDataQueue.front();
+    auto boDataDatas = boData->datas();
+    auto width = boData->width();
+    auto height = boData->height();
+    GLCall(glActiveTexture(GL_TEXTURE0));
+    GLCall(glBindTexture(GL_TEXTURE_2D, m_yTextureId));
+    GLCall(glTexImage2D(GL_TEXTURE_2D, 0, GL_R8, width, height, 0, GL_RED,
+                        GL_UNSIGNED_BYTE, boDataDatas[0]));
+
+    GLCall(glActiveTexture(GL_TEXTURE0 + 1));
+    GLCall(glBindTexture(GL_TEXTURE_2D, m_uTextureId));
+    GLCall(glTexImage2D(GL_TEXTURE_2D, 0, GL_R8, width / 2, height / 2, 0,
+                        GL_RED, GL_UNSIGNED_BYTE, boDataDatas[1]));
+
+    GLCall(glActiveTexture(GL_TEXTURE0 + 2));
+    GLCall(glBindTexture(GL_TEXTURE_2D, m_vTextureId));
+    GLCall(glTexImage2D(GL_TEXTURE_2D, 0, GL_R8, width / 2, height / 2, 0,
+                        GL_RED, GL_UNSIGNED_BYTE, boDataDatas[2]));
+
+    m_boDataQueue.pop();
 
     m_mesh->bind();
     m_shader->bind();
@@ -122,38 +142,23 @@ void YUVRenderer::render(const glm::mat4 &view, const glm::mat4 &projection) {
 
     GLCall(glBindVertexArray(0));
     GLCall(glBindTexture(GL_TEXTURE_2D, 0));
-    m_textureDatas.clear();
 }
 
-void YUVRenderer::attachTextureData(TextureIndex index, int width, int height,
-                                    unsigned char *data) {
-    switch (index) {
-    case TextureIndex::index_0:
-        GLCall(glActiveTexture(GL_TEXTURE0));
-        GLCall(glBindTexture(GL_TEXTURE_2D, m_yTextureId));
-        GLCall(glTexImage2D(GL_TEXTURE_2D, 0, GL_R8, width, height, 0, GL_RED,
-                            GL_UNSIGNED_BYTE, data));
-        break;
-    case TextureIndex::index_1:
-        GLCall(glActiveTexture(GL_TEXTURE0 + 1));
-        GLCall(glBindTexture(GL_TEXTURE_2D, m_uTextureId));
-        GLCall(glTexImage2D(GL_TEXTURE_2D, 0, GL_R8, width, height, 0, GL_RED,
-                            GL_UNSIGNED_BYTE, data));
-        break;
-    case TextureIndex::index_2:
-        GLCall(glActiveTexture(GL_TEXTURE0 + 2));
-        GLCall(glBindTexture(GL_TEXTURE_2D, m_vTextureId));
-        GLCall(glTexImage2D(GL_TEXTURE_2D, 0, GL_R8, width, height, 0, GL_RED,
-                            GL_UNSIGNED_BYTE, data));
-        break;
-    default:
-        break;
+int YUVRenderer::textureNumber() { return TEXTURE_NUMBER; }
+
+void YUVRenderer::addBoData(const std::shared_ptr<IBoData> &newBoData) {
+    // 有阻塞
+    while (!m_stopReceiveData) {
+        if (m_boDataQueue.size() < MAX_LENGTH) {
+            m_boDataQueue.push(newBoData);
+            break;
+        } else {
+            BO_INFO("lock");
+            QThread::msleep(1);
+        }
     }
 }
 
-void YUVRenderer::attachTextureData(
-    std::tuple<TextureIndex, int, int, unsigned char *> textureData) {
-    m_textureDatas.push_back(textureData);
-}
+void YUVRenderer::stop() { m_stopReceiveData = true; }
 
 } // namespace OpenGLRender

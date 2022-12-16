@@ -1,7 +1,9 @@
 #pragma once
 
+#include "Data/IBoData.h"
 #include "glm/mat4x4.hpp"
 
+#include <memory>
 #include <tuple>
 
 namespace OpenGLRender {
@@ -15,18 +17,23 @@ enum class TextureIndex : unsigned int {
 
 class IOpenGLRenderer {
   public:
-    IOpenGLRenderer(){};
+    IOpenGLRenderer() {}
 
-    virtual void init() = 0;
+    ~IOpenGLRenderer() {}
 
-    virtual void update(float elapsed) = 0;
+    virtual void init() {}
 
-    virtual void render(const glm::mat4 &view, const glm::mat4 &projection) = 0;
+    virtual void update(float elapsed) {}
 
-    virtual void attachTextureData(
-        std::tuple<TextureIndex, int, int, unsigned char *> textureData) = 0;
+    virtual void render(const glm::mat4 &view, const glm::mat4 &projection) {}
 
-    ~IOpenGLRenderer(){};
+    virtual void render() {}
+
+    virtual int textureNumber() { return 0; }
+
+    virtual void addBoData(const std::shared_ptr<IBoData> &newBoData) {}
+
+    virtual void stop(){};
 };
 
 } // namespace OpenGLRender
