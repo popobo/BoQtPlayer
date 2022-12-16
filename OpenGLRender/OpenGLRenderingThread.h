@@ -45,11 +45,6 @@ class RenderingThread : public QThread {
 
     bool isInitialized();
 
-    void addTextureData(TextureIndex index, int width, int height,
-                        unsigned char *data);
-
-    int getTextureTupleSize();
-
     void addBoData(const std::shared_ptr<IBoData> &newBoData);
 
   protected:
@@ -65,8 +60,6 @@ class RenderingThread : public QThread {
     std::shared_ptr<IOpenGLRenderer> m_renderer;
     std::shared_ptr<QOpenGLFramebufferObject> m_renderFramebufferObject;
     std::shared_ptr<QOpenGLFramebufferObject> m_displayFramebufferObject;
-    std::vector<std::tuple<TextureIndex, int, int, unsigned char *>>
-        m_textureTuples;
 
     QSize m_framebufferSize;
     QMutex m_mutex;
@@ -78,9 +71,6 @@ class RenderingThread : public QThread {
     bool m_isCurrentFramePainted = true;
 
     std::function<void()> m_triggerPaintGLFunc;
-
-    std::queue<std::shared_ptr<IBoData>> m_boDataQueue;
-    std::mutex m_boDataQueueMutex;
 };
 
 } // namespace OpenGLRender

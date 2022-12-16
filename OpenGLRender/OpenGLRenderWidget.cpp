@@ -1,6 +1,5 @@
 #include "OpenGLRenderWidget.h"
 #include "BoLog.h"
-#include "BoThread.h"
 #include "OpenGLViewportTarget.h"
 
 namespace OpenGLRender {
@@ -72,28 +71,6 @@ void OpenGLRenderWidget::paintGL() {
 }
 
 void OpenGLRenderWidget::closeEvent(QCloseEvent *e) { stopThread(); }
-
-bool OpenGLRenderWidget::attachTextureToRenderer() {
-    BO_INFO("OpenGLRenderWidget::attachTextureToRenderer");
-    std::unique_lock<std::mutex> locker{m_boDataQueueMutex};
-    if (!m_boDataQueue.empty() &&
-        m_renderingThread->getTextureTupleSize() == 0) {
-        auto boData = m_boDataQueue.front();
-        auto boDataDatas = boData->datas();
-        m_renderingThread->addTextureData(TextureIndex::index_0,
-                                          boData->width(), boData->height(),
-                                          boDataDatas[0]);
-        m_renderingThread->addTextureData(TextureIndex::index_1,
-                                          boData->width() / 2,
-                                          boData->height() / 2, boDataDatas[1]);
-        m_renderingThread->addTextureData(TextureIndex::index_2,
-                                          boData->width() / 2,
-                                          boData->height() / 2, boDataDatas[2]);
-        m_boDataQueue.pop();
-        return true;
-    }
-    return false;
-}
 
 bool OpenGLRenderWidget::open() { return true; }
 

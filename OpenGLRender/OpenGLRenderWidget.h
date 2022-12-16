@@ -46,8 +46,6 @@ class OpenGLRenderWidget
     void paintGL() override;
     void closeEvent(QCloseEvent *e) override;
 
-  private:
-    bool attachTextureToRenderer();
   signals:
     void threadStopped();
 

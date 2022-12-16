@@ -3,7 +3,6 @@
 #include "BoUtil.h"
 #include "ElapsedTimer.h"
 #include "glm/gtx/transform.hpp"
-
 #include <QImage>
 
 namespace OpenGLRender {
@@ -53,36 +52,17 @@ void RenderingThread::renderFrame() {
     }
     m_renderer->update(m_timer.elapsed());
 
-    std::unique_lock<std::mutex> locker{m_boDataQueueMutex};
-    if (!m_boDataQueue.empty()) {
-        auto boData = m_boDataQueue.front();
-        auto boDataDatas = boData->datas();
-        m_renderer->attachTextureData({TextureIndex::index_0, boData->width(),
-                                       boData->height(), boDataDatas[0]});
-        m_renderer->attachTextureData({TextureIndex::index_1,
-                                       boData->width() / 2,
-                                       boData->height() / 2, boDataDatas[1]});
-        m_renderer->attachTextureData({TextureIndex::index_2,
-                                       boData->width() / 2,
-                                       boData->height() / 2, boDataDatas[2]});
-        m_boDataQueue.pop();
+    m_renderer->render();
 
-        locker.unlock();
+    // flush the pipeline
+    GLCall(glFlush());
 
-        m_renderer->render();
-
-        m_textureTuples.clear();
-
-        // flush the pipeline
-        GLCall(glFlush());
-
-        // Release the framebuffer
-        m_renderFramebufferObject->release();
-        // Take the current framebuffer texture Id
-        m_framebufferTextureId = m_renderFramebufferObject->texture();
-        // Swap the framebuffers for double-buffering
-        std::swap(m_renderFramebufferObject, m_displayFramebufferObject);
-    }
+    // Release the framebuffer
+    m_renderFramebufferObject->release();
+    // Take the current framebuffer texture Id
+    m_framebufferTextureId = m_renderFramebufferObject->texture();
+    // Swap the framebuffers for double-buffering
+    std::swap(m_renderFramebufferObject, m_displayFramebufferObject);
 }
 
 void RenderingThread::setTriggerPaintFunc(const std::function<void()> &func) {
@@ -118,6 +98,9 @@ RenderingThread::RenderingThread() {}
 void RenderingThread::stop() {
     lock();
     m_exiting = true;
+    if (m_renderer) {
+        m_renderer->stop();
+    }
     unlock();
 }
 
@@ -127,16 +110,8 @@ void RenderingThread::unlock() { m_mutex.unlock(); }
 
 bool RenderingThread::isInitialized() { return m_initialized; }
 
-void RenderingThread::addTextureData(TextureIndex index, int width, int height,
-                                     unsigned char *data) {
-    m_textureTuples.push_back({index, width, height, data});
-}
-
-int RenderingThread::getTextureTupleSize() { return m_textureTuples.size(); }
-
 void RenderingThread::addBoData(const std::shared_ptr<IBoData> &newBoData) {
-    std::unique_lock<std::mutex> locker{m_boDataQueueMutex};
-    m_boDataQueue.push(newBoData);
+    m_renderer->addBoData(newBoData);
 }
 
 GLuint RenderingThread::framebufferTexture() const {
@@ -182,8 +157,6 @@ void RenderingThread::run() {
         if (m_triggerPaintGLFunc) {
             m_triggerPaintGLFunc();
         }
-
-        // QThread::msleep(25);
     }
 }
 
