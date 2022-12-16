@@ -101,9 +101,9 @@ bool OpenGLRenderWidget::start() { return startThread(); }
 void OpenGLRenderWidget::stop() { stopThread(); }
 
 void OpenGLRenderWidget::update(const std::shared_ptr<IBoData> &boData) {
-    std::unique_lock<std::mutex> locker{m_boDataQueueMutex};
 
     while (m_renderingThread->isRunning()) {
+        std::unique_lock<std::mutex> locker{m_boDataQueueMutex};
         if (m_boDataQueue.size() < BUFFER_MAX_LEN) {
             m_boDataQueue.push(boData);
             break;
