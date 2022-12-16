@@ -18,6 +18,10 @@ class YUVRenderer : public IOpenGLRenderer {
         std::tuple<TextureIndex, int, int, unsigned char *> textureData)
         override;
 
+    virtual int textureNumber() override;
+
+    const static int TEXTURE_NUMBER = 3;
+
   private:
     void attachTextureData(TextureIndex index, int width, int height,
                            unsigned char *data);

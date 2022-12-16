@@ -23,6 +23,8 @@ class Quad : public IOpenGLRenderer {
         std::tuple<TextureIndex, int, int, unsigned char *> textureData)
         override;
 
+    virtual int textureNumber() override;
+
     ~Quad();
 
   private:

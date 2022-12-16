@@ -46,23 +46,6 @@ void RenderingThread::renderFrame() {
     const QSize size = m_framebufferSize;
     GLCall(glViewport(0, 0, size.width(), size.height()));
 
-    const float aspect = float(size.width()) / float(size.height());
-    // Perspective projection matrix
-    const glm::mat4 projection =
-        glm::perspective(glm::radians(45.0f), aspect, 0.1f, 10.0f);
-
-    // View matrix
-    const glm::mat4 view =
-        glm::translate(glm::mat4(1.0f), glm::vec3(0.0, 0.0, -5.0f));
-
-    // Clear closr buffer
-    GLCall(glClearColor(0.0f, 0.0f, 0.2f, 1.0f));
-    GLCall(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));
-
-    // Set rendering attributes
-    GLCall(glEnable(GL_DEPTH_TEST));
-    GLCall(glDisable(GL_CULL_FACE));
-
     // Render the quad
     if (!m_renderer) {
         BO_ERROR("m_renderer is nullptr");
@@ -70,23 +53,36 @@ void RenderingThread::renderFrame() {
     }
     m_renderer->update(m_timer.elapsed());
 
-    for (const auto &textureData : m_textureTuples) {
-        m_renderer->attachTextureData(textureData);
+    std::unique_lock<std::mutex> locker{m_boDataQueueMutex};
+    if (!m_boDataQueue.empty()) {
+        auto boData = m_boDataQueue.front();
+        auto boDataDatas = boData->datas();
+        m_renderer->attachTextureData({TextureIndex::index_0, boData->width(),
+                                       boData->height(), boDataDatas[0]});
+        m_renderer->attachTextureData({TextureIndex::index_1,
+                                       boData->width() / 2,
+                                       boData->height() / 2, boDataDatas[1]});
+        m_renderer->attachTextureData({TextureIndex::index_2,
+                                       boData->width() / 2,
+                                       boData->height() / 2, boDataDatas[2]});
+        m_boDataQueue.pop();
+
+        locker.unlock();
+
+        m_renderer->render();
+
+        m_textureTuples.clear();
+
+        // flush the pipeline
+        GLCall(glFlush());
+
+        // Release the framebuffer
+        m_renderFramebufferObject->release();
+        // Take the current framebuffer texture Id
+        m_framebufferTextureId = m_renderFramebufferObject->texture();
+        // Swap the framebuffers for double-buffering
+        std::swap(m_renderFramebufferObject, m_displayFramebufferObject);
     }
-
-    m_renderer->render(view, projection);
-
-    m_textureTuples.clear();
-
-    // flush the pipeline
-    GLCall(glFlush());
-
-    // Release the framebuffer
-    m_renderFramebufferObject->release();
-    // Take the current framebuffer texture Id
-    m_framebufferTextureId = m_renderFramebufferObject->texture();
-    // Swap the framebuffers for double-buffering
-    std::swap(m_renderFramebufferObject, m_displayFramebufferObject);
 }
 
 void RenderingThread::setTriggerPaintFunc(const std::function<void()> &func) {
@@ -138,6 +134,11 @@ void RenderingThread::addTextureData(TextureIndex index, int width, int height,
 
 int RenderingThread::getTextureTupleSize() { return m_textureTuples.size(); }
 
+void RenderingThread::addBoData(const std::shared_ptr<IBoData> &newBoData) {
+    std::unique_lock<std::mutex> locker{m_boDataQueueMutex};
+    m_boDataQueue.push(newBoData);
+}
+
 GLuint RenderingThread::framebufferTexture() const {
     return m_framebufferTextureId;
 }
@@ -182,7 +183,7 @@ void RenderingThread::run() {
             m_triggerPaintGLFunc();
         }
 
-        QThread::msleep(25);
+        // QThread::msleep(25);
     }
 }
 

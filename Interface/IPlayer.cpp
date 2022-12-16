@@ -22,8 +22,8 @@ bool IPlayer::open(const char *url) {
         return false;
     }
 
-    if (!m_resampler || m_resampler->open(m_demux->getAudioParameter(),
-                                          m_audioPlayer->audioOutFormat())) {
+    if (!m_resampler || !m_resampler->open(m_demux->getAudioParameter(),
+                                           m_audioPlayer->audioOutFormat())) {
         BO_ERROR("m_resampler failed to open");
         return false;
     }

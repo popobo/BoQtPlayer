@@ -31,6 +31,8 @@ void Quad::render(const glm::mat4 &view, const glm::mat4 &projection) {
 void Quad::attachTextureData(
     std::tuple<TextureIndex, int, int, unsigned char *> textureData) {}
 
+int Quad::textureNumber() { return 0; }
+
 Quad::~Quad() {}
 
 void Quad::init() {

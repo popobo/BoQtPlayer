@@ -156,4 +156,6 @@ void YUVRenderer::attachTextureData(
     m_textureDatas.push_back(textureData);
 }
 
+int YUVRenderer::textureNumber() { return TEXTURE_NUMBER; }
+
 } // namespace OpenGLRender

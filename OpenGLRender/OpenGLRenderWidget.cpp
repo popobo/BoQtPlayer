@@ -64,7 +64,6 @@ void OpenGLRenderWidget::paintGL() {
     // 主线程
     m_renderingThread->lock();
 
-    attachTextureToRenderer();
     const GLuint textureId = m_renderingThread->framebufferTexture();
     m_viewportTarget->render(textureId);
     m_renderingThread->setCurrentFramePainted(true);
@@ -74,9 +73,9 @@ void OpenGLRenderWidget::paintGL() {
 
 void OpenGLRenderWidget::closeEvent(QCloseEvent *e) { stopThread(); }
 
-void OpenGLRenderWidget::attachTextureToRenderer() {
+bool OpenGLRenderWidget::attachTextureToRenderer() {
+    BO_INFO("OpenGLRenderWidget::attachTextureToRenderer");
     std::unique_lock<std::mutex> locker{m_boDataQueueMutex};
-
     if (!m_boDataQueue.empty() &&
         m_renderingThread->getTextureTupleSize() == 0) {
         auto boData = m_boDataQueue.front();
@@ -91,7 +90,9 @@ void OpenGLRenderWidget::attachTextureToRenderer() {
                                           boData->width() / 2,
                                           boData->height() / 2, boDataDatas[2]);
         m_boDataQueue.pop();
+        return true;
     }
+    return false;
 }
 
 bool OpenGLRenderWidget::open() { return true; }
@@ -101,16 +102,7 @@ bool OpenGLRenderWidget::start() { return startThread(); }
 void OpenGLRenderWidget::stop() { stopThread(); }
 
 void OpenGLRenderWidget::update(const std::shared_ptr<IBoData> &boData) {
-
-    while (m_renderingThread->isRunning()) {
-        std::unique_lock<std::mutex> locker{m_boDataQueueMutex};
-        if (m_boDataQueue.size() < BUFFER_MAX_LEN) {
-            m_boDataQueue.push(boData);
-            break;
-        } else {
-            boSleep(1);
-        }
-    }
+    m_renderingThread->addBoData(boData);
 }
 
 } // namespace OpenGLRender

@@ -21,7 +21,10 @@ class IOpenGLRenderer {
 
     virtual void update(float elapsed) = 0;
 
-    virtual void render(const glm::mat4 &view, const glm::mat4 &projection) = 0;
+    virtual void render(const glm::mat4 &view = glm::mat4(1.0),
+                        const glm::mat4 &projection = glm::mat4(1.0)) = 0;
+
+    virtual int textureNumber() = 0;
 
     virtual void attachTextureData(
         std::tuple<TextureIndex, int, int, unsigned char *> textureData) = 0;

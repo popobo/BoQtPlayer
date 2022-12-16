@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Data/IBoData.h"
 #include "ElapsedTimer.h"
 #include "Renderer/IOpenGLRenderer.h"
 // 不include "glad/glad.h"会一直报OpenGL header already included, remove this
@@ -12,6 +13,7 @@
 #include <QOpenGLFramebufferObject>
 #include <QThread>
 #include <memory>
+#include <queue>
 
 namespace OpenGLRender {
 
@@ -48,6 +50,8 @@ class RenderingThread : public QThread {
 
     int getTextureTupleSize();
 
+    void addBoData(const std::shared_ptr<IBoData> &newBoData);
+
   protected:
     void run() override;
     // this method should be called between
@@ -74,6 +78,9 @@ class RenderingThread : public QThread {
     bool m_isCurrentFramePainted = true;
 
     std::function<void()> m_triggerPaintGLFunc;
+
+    std::queue<std::shared_ptr<IBoData>> m_boDataQueue;
+    std::mutex m_boDataQueueMutex;
 };
 
 } // namespace OpenGLRender
