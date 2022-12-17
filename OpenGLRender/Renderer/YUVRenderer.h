@@ -12,7 +12,7 @@ class YUVRenderer : public IOpenGLRenderer {
     YUVRenderer();
 
     virtual void init() override;
-    virtual void render() override;
+    virtual bool render() override;
 
     virtual int textureNumber() override;
 

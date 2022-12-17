@@ -104,9 +104,9 @@ void YUVRenderer::init() {
     m_shader->link();
 }
 
-void YUVRenderer::render() {
+bool YUVRenderer::render() {
     if (m_boDataQueue.empty()) {
-        return;
+        return false;
     }
 
     auto boData = m_boDataQueue.front();
@@ -142,6 +142,8 @@ void YUVRenderer::render() {
 
     GLCall(glBindVertexArray(0));
     GLCall(glBindTexture(GL_TEXTURE_2D, 0));
+
+    return true;
 }
 
 int YUVRenderer::textureNumber() { return TEXTURE_NUMBER; }
@@ -153,7 +155,6 @@ void YUVRenderer::addBoData(const std::shared_ptr<IBoData> &newBoData) {
             m_boDataQueue.push(newBoData);
             break;
         } else {
-            BO_INFO("lock");
             QThread::msleep(1);
         }
     }

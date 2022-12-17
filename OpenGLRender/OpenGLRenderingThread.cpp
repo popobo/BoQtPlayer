@@ -37,7 +37,7 @@ void RenderingThread::initialize() {
 }
 
 // 只能再run()中调用，且注意线程安全
-void RenderingThread::renderFrame() {
+bool RenderingThread::renderFrame() {
     // bind the framebuffer for rendering
     m_renderFramebufferObject->bind();
 
@@ -48,11 +48,13 @@ void RenderingThread::renderFrame() {
     // Render the quad
     if (!m_renderer) {
         BO_ERROR("m_renderer is nullptr");
-        return;
+        return false;
     }
     m_renderer->update(m_timer.elapsed());
 
-    m_renderer->render();
+    if (!m_renderer->render()) {
+        return false;
+    }
 
     // flush the pipeline
     GLCall(glFlush());
@@ -63,6 +65,7 @@ void RenderingThread::renderFrame() {
     m_framebufferTextureId = m_renderFramebufferObject->texture();
     // Swap the framebuffers for double-buffering
     std::swap(m_renderFramebufferObject, m_displayFramebufferObject);
+    return true;
 }
 
 void RenderingThread::setTriggerPaintFunc(const std::function<void()> &func) {
@@ -146,17 +149,19 @@ void RenderingThread::run() {
         }
 
         QMutexLocker locker(&m_mutex);
-        renderFrame();
-        // 保证双缓冲机制正常运行
-        setCurrentFramePainted(false);
+        bool renderResult = renderFrame();
+        if (renderResult) {
+            setCurrentFramePainted(false);
+        }
         locker.unlock();
 
         m_context->doneCurrent();
 
         // Notify UI about new frame.
-        if (m_triggerPaintGLFunc) {
+        if (renderResult && m_triggerPaintGLFunc) {
             m_triggerPaintGLFunc();
         }
+        QThread::msleep(1);
     }
 }
 

@@ -16,7 +16,7 @@ class Quad : public IOpenGLRenderer {
 
     virtual void update(float elapsed) override;
 
-    virtual void render(const glm::mat4 &view,
+    virtual bool render(const glm::mat4 &view,
                         const glm::mat4 &projection) override;
 
     ~Quad();

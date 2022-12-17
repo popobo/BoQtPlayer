@@ -25,9 +25,11 @@ class IOpenGLRenderer {
 
     virtual void update(float elapsed) {}
 
-    virtual void render(const glm::mat4 &view, const glm::mat4 &projection) {}
+    virtual bool render(const glm::mat4 &view, const glm::mat4 &projection) {
+        return true;
+    }
 
-    virtual void render() {}
+    virtual bool render() { return true; }
 
     virtual int textureNumber() { return 0; }
 

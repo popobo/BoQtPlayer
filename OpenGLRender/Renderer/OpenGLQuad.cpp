@@ -17,7 +17,7 @@ void Quad::update(float elapsed) {
                           glm::vec3(0.0f, 1.0f, 0.0f));
 }
 
-void Quad::render(const glm::mat4 &view, const glm::mat4 &projection) {
+bool Quad::render(const glm::mat4 &view, const glm::mat4 &projection) {
     const glm::mat4 cameraMatrix = projection * view * m_model;
 
     m_mesh->bind();
@@ -26,6 +26,8 @@ void Quad::render(const glm::mat4 &view, const glm::mat4 &projection) {
     m_mesh->render(GL_TRIANGLES);
     m_shader->release();
     m_mesh->release();
+
+    return true;
 }
 
 Quad::~Quad() {}

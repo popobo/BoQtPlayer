@@ -33,7 +33,7 @@ class RenderingThread : public QThread {
 
     void setCurrentFramePainted(bool rendered);
 
-    void renderFrame();
+    bool renderFrame();
 
     void setTriggerPaintFunc(const std::function<void()> &func);
 
