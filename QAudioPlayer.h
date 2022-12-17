@@ -18,6 +18,8 @@ class QAudioPlayer : public IAudioPlayer {
 
     virtual void update(const std::shared_ptr<IBoData> &boData) override;
 
+    virtual std::shared_ptr<IBoData> getData() override;
+
     // IAudioPlayer interface
     virtual bool start() override;
     virtual void stop() override;

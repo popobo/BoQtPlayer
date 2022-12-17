@@ -15,6 +15,7 @@ class FFQtPlayerBuilder : public IPlayerBuilder {
     virtual std::shared_ptr<IDecoder> createDecoder() override;
     virtual std::shared_ptr<IResampler> createResampler() override;
     virtual std::shared_ptr<IPlayer> createPlayer() override;
+    virtual std::shared_ptr<IFrameDispatcher> createFrameDispatcher() override;
 };
 
 #endif // FFQTPLAYERBUILDER_H

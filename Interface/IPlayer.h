@@ -5,6 +5,7 @@
 #include "IAudioPlayer.h"
 #include "IDecoder.h"
 #include "IDemux.h"
+#include "IFrameDispatcher.h"
 #include "IResampler.h"
 #include "IVideoView.h"
 
@@ -33,6 +34,7 @@ class IPlayer : public BoThread {
     std::shared_ptr<IVideoView> m_videoView;
     std::shared_ptr<IResampler> m_resampler;
     std::shared_ptr<IAudioPlayer> m_audioPlayer;
+    std::shared_ptr<IFrameDispatcher> m_frameDispatcher;
     std::mutex m_playerMutex;
 };
 

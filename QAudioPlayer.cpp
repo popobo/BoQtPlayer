@@ -96,6 +96,8 @@ void QAudioPlayer::update(const std::shared_ptr<IBoData> &boData) {
     }
 }
 
+std::shared_ptr<IBoData> QAudioPlayer::getData() { return nullptr; }
+
 bool QAudioPlayer::start() {
     // 注意这边的生命周期
     if (!m_audioSink) {

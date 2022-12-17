@@ -52,6 +52,17 @@ bool FFDemux::open(const char *url) {
     }
     m_videoStream = ret;
     m_videoParameter->setPara(ic->streams[ret]->codecpar);
+    auto videoTimeBase = ic->streams[ret]->time_base;
+    auto test = videoTimeBase.den == 0
+                    ? 0.0
+                    : (static_cast<double>(videoTimeBase.num) /
+                       static_cast<double>(videoTimeBase.den)) *
+                          1000.0;
+    m_videoParameter->setTimeBase(
+        videoTimeBase.den == 0 ? 0.0
+                               : (static_cast<double>(videoTimeBase.num) /
+                                  static_cast<double>(videoTimeBase.den)) *
+                                     1000.0);
 
     //获取音频流索引
     ret = av_find_best_stream(ic, AVMEDIA_TYPE_AUDIO, -1, -1, nullptr, 0);
@@ -60,6 +71,12 @@ bool FFDemux::open(const char *url) {
     }
     m_audioStream = ret;
     m_audioParameter->setPara(ic->streams[ret]->codecpar);
+    auto audioTimeBase = ic->streams[ret]->time_base;
+    m_audioParameter->setTimeBase(
+        videoTimeBase.den == 0 ? 0.0
+                               : (static_cast<double>(audioTimeBase.num) /
+                                  static_cast<double>(audioTimeBase.den)) *
+                                     1000.0);
 
     return true;
 }

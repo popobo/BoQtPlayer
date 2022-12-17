@@ -28,9 +28,14 @@ class IParameter {
 
     virtual AudioOutputFormat getAudioOutputFormat() const = 0;
 
+    double timeBase() const;
+    void setTimeBase(double newTimeBase);
+
   private:
     void *m_aVCodecParameters = nullptr;
     AudioOutputFormat m_outAudioFormat;
+    // 单位为 ms
+    double m_timeBase = 0.0;
 };
 
 #endif // IPARAMETER_H

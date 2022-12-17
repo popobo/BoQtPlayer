@@ -22,9 +22,17 @@ bool IPlayer::open(const char *url) {
         return false;
     }
 
-    if (!m_resampler || !m_resampler->open(m_demux->getAudioParameter(),
-                                           m_audioPlayer->audioOutFormat())) {
-        BO_ERROR("m_resampler failed to open");
+    //    if (!m_resampler || !m_resampler->open(m_demux->getAudioParameter(),
+    //                                           m_audioPlayer->audioOutFormat()))
+    //                                           {
+    //        BO_ERROR("m_resampler failed to open");
+    //        return false;
+    //    }
+
+    if (!m_frameDispatcher ||
+        !m_frameDispatcher->open(m_demux->getVideoParameter(),
+                                 m_demux->getAudioParameter())) {
+        BO_ERROR("m_frameDispatcher failed to open");
         return false;
     }
 
@@ -34,14 +42,17 @@ bool IPlayer::open(const char *url) {
 bool IPlayer::start() {
     std::unique_lock<std::mutex> locker(m_playerMutex);
 
-    if (!m_videoView || !m_videoView->start()) {
-        BO_ERROR("m_videoView failed to start");
-        return false;
-    }
+    //    if (!m_videoView || !m_videoView->start()) {
+    //        BO_ERROR("m_videoView failed to start");
+    //        return false;
+    //    }
 
-    if (!m_audioPlayer || !m_audioPlayer->start()) {
-        BO_ERROR("m_demux failed to start");
-        return false;
+    //    if (!m_audioPlayer || !m_audioPlayer->start()) {
+    //        BO_ERROR("m_demux failed to start");
+    //        return false;
+    //    }
+
+    if (!m_frameDispatcher || !m_frameDispatcher->start()) {
     }
 
     if (!m_videoDecoder || !m_videoDecoder->start()) {

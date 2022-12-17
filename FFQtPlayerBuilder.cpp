@@ -2,8 +2,6 @@
 #include "FFDecoder.h"
 #include "FFDemux.h"
 #include "FFResampler.h"
-#include "OpenGLRenderWidget.h"
-#include "QAudioPlayer.h"
 
 FFQtPlayerBuilder::FFQtPlayerBuilder() {}
 
@@ -23,4 +21,8 @@ std::shared_ptr<IResampler> FFQtPlayerBuilder::createResampler() {
 
 std::shared_ptr<IPlayer> FFQtPlayerBuilder::createPlayer() {
     return std::make_shared<IPlayer>();
+}
+
+std::shared_ptr<IFrameDispatcher> FFQtPlayerBuilder::createFrameDispatcher() {
+    return std::make_shared<IFrameDispatcher>();
 }

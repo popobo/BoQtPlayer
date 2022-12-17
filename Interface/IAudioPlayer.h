@@ -1,7 +1,6 @@
 #ifndef IAUDIOPLAY_H
 #define IAUDIOPLAY_H
 
-#include "BoThread.h"
 #include "IObserver.h"
 #include "IParameter.h"
 #include "ISubject.h"

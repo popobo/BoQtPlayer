@@ -1,4 +1,5 @@
 #include "IAudioPlayer.h"
+#include "BoThread.h"
 
 IAudioPlayer::IAudioPlayer() {}
 

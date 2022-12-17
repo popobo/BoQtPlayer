@@ -23,20 +23,21 @@ Widget::Widget(QWidget *parent) : QWidget(parent), ui(new Ui::Widget) {
     m_player = playerBuild->buildPlayer();
 
     // setVideoView
-    std::shared_ptr<OpenGLRender::IRendererFactory> renderFactory =
-        std::make_shared<OpenGLRender::YUVRendererFactory>();
-    m_OpenGLRenderWidget =
-        std::make_shared<OpenGLRender::OpenGLRenderWidget>(renderFactory, this);
-    m_OpenGLRenderWidget->setGeometry(QRect(0, 0, 800, 600));
-    m_player->setVideoView(m_OpenGLRenderWidget);
+    //    std::shared_ptr<OpenGLRender::IRendererFactory> renderFactory =
+    //        std::make_shared<OpenGLRender::YUVRendererFactory>();
+    //    m_OpenGLRenderWidget =
+    //        std::make_shared<OpenGLRender::OpenGLRenderWidget>(renderFactory,
+    //        this);
+    //    m_OpenGLRenderWidget->setGeometry(QRect(0, 0, 800, 600));
+    //    m_player->setVideoView(m_OpenGLRenderWidget);
 
-    // setAudioPlayer
-    m_audioPlayer = std::make_shared<QAudioPlayer>();
-    m_player->setAudioPlayer(m_audioPlayer);
+    //    // setAudioPlayer
+    //    m_audioPlayer = std::make_shared<QAudioPlayer>();
+    //    m_player->setAudioPlayer(m_audioPlayer);
 
     connect(ui->pushButtonOpenFile, SIGNAL(clicked()), this, SLOT(openFile()));
-    connect(ui->pushButtonCloseWindow, &QPushButton::clicked, this,
-            &Widget::closeWidget);
+    //    connect(ui->pushButtonCloseWindow, &QPushButton::clicked, this,
+    //            &Widget::closeWidget);
 }
 
 Widget::~Widget() { delete ui; }

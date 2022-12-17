@@ -34,6 +34,7 @@ set(PROJECT_SOURCES
         Interface/IVideoView.h Interface/IVideoView.cpp
         Interface/IPlayerBuilder.h Interface/IPlayerBuilder.cpp
         Interface/IParameter.h Interface/IParameter.cpp
+        Interface/IFrameDispatcher.h Interface/IFrameDispatcher.cpp
 
         FFDemux.h FFDemux.cpp
         BoUtil.h BoUtil.cpp
