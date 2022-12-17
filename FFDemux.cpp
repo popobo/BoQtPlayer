@@ -63,6 +63,12 @@ bool FFDemux::open(const char *url) {
     }
     m_videoStream = ret;
     m_videoParameter->setPara(ic->streams[ret]->codecpar);
+    auto videoTimeBase = ic->streams[ret]->time_base;
+    auto doubleVideoTimeBase = videoTimeBase.den == 0
+                                   ? 0.0
+                                   : static_cast<double>(videoTimeBase.num) /
+                                         static_cast<double>(videoTimeBase.den);
+    m_videoParameter->setTimeBase(doubleVideoTimeBase * 1000);
 
     //获取音频流索引
     ret = av_find_best_stream(ic, AVMEDIA_TYPE_AUDIO, -1, -1, nullptr, 0);
@@ -71,6 +77,12 @@ bool FFDemux::open(const char *url) {
     }
     m_audioStream = ret;
     m_audioParameter->setPara(ic->streams[ret]->codecpar);
+    auto audioTimeBase = ic->streams[ret]->time_base;
+    auto doubleAudioTimeBase = audioTimeBase.den == 0
+                                   ? 0.0
+                                   : static_cast<double>(audioTimeBase.num) /
+                                         static_cast<double>(audioTimeBase.den);
+    m_audioParameter->setTimeBase(doubleAudioTimeBase * 1000);
 
     return true;
 }
@@ -100,15 +112,6 @@ std::shared_ptr<IBoData> FFDemux::read() {
         av_packet_free(&pkt);
         return boData;
     }
-
-    //    pkt->pts =
-    //        pkt->pts * (r2d(ic->streams[pkt->stream_index]->time_base)) *
-    //        1000;
-    //    pkt->dts =
-    //        pkt->dts * (r2d(ic->streams[pkt->stream_index]->time_base)) *
-    //        1000;
-
-    //    boData->setPts(static_cast<int>(pkt->pts));
 
     return boData;
 }

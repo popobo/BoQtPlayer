@@ -18,13 +18,6 @@ class AudioBuffer : public QIODevice {
         }
         qint64 readLen = 0;
 
-        if (!m_boDataQueue.empty()) {
-            if (auto player = m_player.lock()) {
-                player->setPts(m_boDataQueue.front()->pts());
-                BO_INFO("player->getPts():{0}", player->getPts());
-            }
-        }
-
         while (!m_boDataQueue.empty()) {
             auto boData = m_boDataQueue.front();
             if (readLen + boData->size() > len) {
@@ -44,20 +37,15 @@ class AudioBuffer : public QIODevice {
 
     qint64 writeData(const char *data, qint64 len) override { return 0; }
 
-    void setQAudioPlayer(const std::shared_ptr<QAudioPlayer> &player) {
-        m_player = player;
-    }
-
   private:
     std::queue<std::shared_ptr<IBoData>> m_boDataQueue;
-    std::weak_ptr<QAudioPlayer> m_player;
 };
 
 QAudioPlayer::QAudioPlayer() {}
 
 QAudioPlayer::~QAudioPlayer() {}
 
-bool QAudioPlayer::open() {
+bool QAudioPlayer::open(const std::shared_ptr<IParameter> &parameter) {
     if (m_isStarted) {
         BO_INFO("QAudioPlayer has been start");
         return false;
@@ -89,12 +77,12 @@ bool QAudioPlayer::open() {
     m_audioOutFormat.sampleRate = m_qPreferedAudioFormat.sampleRate();
 
     m_audioBuffer->open(QIODevice::ReadWrite);
-    m_audioBuffer->setQAudioPlayer(shared_from_this());
 
     if (!m_audioSink) {
         m_audioSink =
             std::make_shared<QAudioSink>(m_audioDevice, m_qPreferedAudioFormat);
     }
+    m_timeBase = parameter->timeBase();
 
     m_isStarted = true;
     return true;
@@ -115,11 +103,23 @@ bool QAudioPlayer::start() {
         return false;
     }
     m_audioSink->start(m_audioBuffer.get());
+    BoThread::start();
     return true;
 }
 
 void QAudioPlayer::stop() {
     m_audioSink->stop();
     m_audioBuffer->close();
+    BoThread::stop();
     m_isExit = true;
+}
+
+std::shared_ptr<IBoData> QAudioPlayer::getData() { return nullptr; }
+
+void QAudioPlayer::main() {
+    while (!m_isExit) {
+        m_pts = m_audioSink->processedUSecs() / 1000;
+        // BO_INFO("m_pts: {0}", m_pts);
+        boSleep(1);
+    }
 }

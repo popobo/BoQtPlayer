@@ -9,8 +9,9 @@ int IDecoder::synPts() const { return m_synPts; }
 
 void IDecoder::setSynPts(int newSynPts) {
     m_synPts = newSynPts;
-    BO_INFO("m_isAudio:{0}, m_synPts:{1}, newSynPts:{2}", m_isAudio, m_synPts,
-            newSynPts);
+    //    BO_INFO("m_isAudio:{0}, m_synPts:{1}, newSynPts:{2}", m_isAudio,
+    //    m_synPts,
+    //            newSynPts);
 }
 
 int IDecoder::pts() const { return m_pts; }
@@ -23,7 +24,7 @@ void IDecoder::main() {
         // 判断音视频同步
         if (!m_isAudio && m_synPts > 0) {
             //当音频时间小于视频时间，等音频
-            BO_INFO("m_synPts:{1}, m_pts{1}", m_synPts, m_pts);
+            // BO_INFO("m_synPts:{1}, m_pts{1}", m_synPts, m_pts);
             if (m_synPts < m_pts) {
                 lock.unlock();
                 boSleep(1);
@@ -57,7 +58,11 @@ void IDecoder::main() {
                     break;
                 }
 
-                m_pts = frame->pts();
+                if (!m_isAudio) {
+                    m_pts = frame->pts() * m_videoTimeBase;
+                    // BO_INFO("m_pts: {0}", m_pts);
+                }
+
                 //发送数据给观察者
                 notify(frame);
             }

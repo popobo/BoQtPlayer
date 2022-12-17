@@ -7,23 +7,16 @@
 #include "ISubject.h"
 #include <list>
 
-class IAudioPlayer : public IObserver, public ISubject {
+class IAudioPlayer : public IObserver, public ISubject, public BoThread {
   public:
     IAudioPlayer();
 
     ~IAudioPlayer();
 
-    // 缓冲满后阻塞
-    virtual void update(const std::shared_ptr<IBoData> &boData) override;
-
-    virtual bool open() = 0;
-
-    virtual bool start();
-
-    virtual void stop();
+    virtual bool open(const std::shared_ptr<IParameter> &parameter) = 0;
 
     // 获取缓冲数据，如果没有则阻塞
-    virtual std::shared_ptr<IBoData> getData();
+    virtual std::shared_ptr<IBoData> getData() = 0;
 
     static const int MAX_FRAME_COUNT = 100;
 
@@ -37,7 +30,6 @@ class IAudioPlayer : public IObserver, public ISubject {
     std::list<std::shared_ptr<IBoData>> m_frames;
     std::mutex m_framesMutex;
     AudioOutputFormat m_audioOutFormat;
-    bool m_isExit{false};
 };
 
 #endif // IAUDIOPLAY_H

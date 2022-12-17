@@ -54,6 +54,9 @@ class IDecoder : public IObserver, public BoThread, public ISubject {
 
     int m_synPts = 0;
     int m_pts = 0;
+
+    double m_audioTimeBase = 0.0;
+    double m_videoTimeBase = 0.0;
 };
 
 #endif // IDECODER_H

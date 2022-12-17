@@ -99,7 +99,7 @@ void IPlayer::setVideoView(const std::shared_ptr<IVideoView> &newVideoView) {
 void IPlayer::setAudioPlayer(
     const std::shared_ptr<IAudioPlayer> &newAudioPlayer) {
     m_audioPlayer = newAudioPlayer;
-    m_audioPlayer->open();
+    m_audioPlayer->open(m_demux->getAudioParameter());
     m_resampler->addObs(m_audioPlayer);
 }
 
