@@ -104,6 +104,9 @@ std::shared_ptr<IBoData> FFDecoder::recvFrame() {
         boData->addDatas(m_frame->data[i]);
     }
 
+    BO_INFO("m_isAudio: {0}, m_frame->pts: {1}", m_isAudio, m_frame->pts);
+    boData->setPts(static_cast<int>(m_frame->pts));
+
     return boData;
 }
 

@@ -8,7 +8,8 @@
 
 class AudioBuffer;
 
-class QAudioPlayer : public IAudioPlayer {
+class QAudioPlayer : public IAudioPlayer,
+                     public std::enable_shared_from_this<QAudioPlayer> {
   public:
     QAudioPlayer();
 

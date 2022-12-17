@@ -100,5 +100,7 @@ FFResampler::resample(const std::shared_ptr<IBoData> &boDataIn) {
         return nullptr;
     }
 
+    boDataOut->setPts(boDataIn->pts());
+
     return boDataOut;
 }

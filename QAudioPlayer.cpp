@@ -17,6 +17,14 @@ class AudioBuffer : public QIODevice {
             return 0;
         }
         qint64 readLen = 0;
+
+        if (!m_boDataQueue.empty()) {
+            if (auto player = m_player.lock()) {
+                player->setPts(m_boDataQueue.front()->pts());
+                BO_INFO("player->getPts():{0}", player->getPts());
+            }
+        }
+
         while (!m_boDataQueue.empty()) {
             auto boData = m_boDataQueue.front();
             if (readLen + boData->size() > len) {
@@ -36,9 +44,13 @@ class AudioBuffer : public QIODevice {
 
     qint64 writeData(const char *data, qint64 len) override { return 0; }
 
+    void setQAudioPlayer(const std::shared_ptr<QAudioPlayer> &player) {
+        m_player = player;
+    }
+
   private:
     std::queue<std::shared_ptr<IBoData>> m_boDataQueue;
-    std::mutex m_bufferMutex;
+    std::weak_ptr<QAudioPlayer> m_player;
 };
 
 QAudioPlayer::QAudioPlayer() {}
@@ -77,6 +89,7 @@ bool QAudioPlayer::open() {
     m_audioOutFormat.sampleRate = m_qPreferedAudioFormat.sampleRate();
 
     m_audioBuffer->open(QIODevice::ReadWrite);
+    m_audioBuffer->setQAudioPlayer(shared_from_this());
 
     if (!m_audioSink) {
         m_audioSink =
