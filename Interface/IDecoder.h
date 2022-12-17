@@ -1,10 +1,10 @@
 #ifndef IDECODER_H
 #define IDECODER_H
 
-#include "Data/IBoData.h"
-#include "IParameter.h"
 #include "BoThread.h"
+#include "Data/IBoData.h"
 #include "IObserver.h"
+#include "IParameter.h"
 #include "ISubject.h"
 #include <list>
 
@@ -39,12 +39,21 @@ class IDecoder : public IObserver, public BoThread, public ISubject {
   public:
     const int MAX_LIST = 100;
 
+    int synPts() const;
+    void setSynPts(int newSynPts);
+
+    int pts() const;
+    void setPts(int newPts);
+
   protected:
     bool m_isAudio = false;
 
     //读取缓冲
     std::list<std::shared_ptr<IBoData>> m_boDataList;
     std::mutex m_boDataListMutex;
+
+    int m_synPts = 0;
+    int m_pts = 0;
 };
 
 #endif // IDECODER_H

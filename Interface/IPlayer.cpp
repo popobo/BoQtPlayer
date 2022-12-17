@@ -102,3 +102,19 @@ void IPlayer::setAudioPlayer(
     m_audioPlayer->open();
     m_resampler->addObs(m_audioPlayer);
 }
+
+void IPlayer::main() {
+    while (!m_isExit) {
+        std::unique_lock<std::mutex> locker(m_playerMutex);
+        if (!m_audioPlayer || !m_videoDecoder) {
+            locker.unlock();
+            boSleep(1);
+            continue;
+        }
+
+        m_videoDecoder->setSynPts(m_audioPlayer->getPts());
+
+        locker.unlock();
+        boSleep(1);
+    }
+}

@@ -33,6 +33,9 @@ class IPlayer : public BoThread {
     std::shared_ptr<IVideoView> m_videoView;
     std::shared_ptr<IResampler> m_resampler;
     std::shared_ptr<IAudioPlayer> m_audioPlayer;
+
+  protected:
+    void main() override;
     std::mutex m_playerMutex;
 };
 
