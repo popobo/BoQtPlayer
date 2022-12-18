@@ -104,15 +104,16 @@ void YUVRenderer::init() {
     m_shader->link();
 }
 
-bool YUVRenderer::render() {
+long YUVRenderer::renderBoData() {
     if (m_boDataQueue.empty()) {
-        return false;
+        return -1;
     }
 
     auto boData = m_boDataQueue.front();
     auto boDataDatas = boData->datas();
     auto width = boData->width();
     auto height = boData->height();
+    long pts = boData->pts() * boData->timeBase();
     GLCall(glActiveTexture(GL_TEXTURE0));
     GLCall(glBindTexture(GL_TEXTURE_2D, m_yTextureId));
     GLCall(glTexImage2D(GL_TEXTURE_2D, 0, GL_R8, width, height, 0, GL_RED,
@@ -143,7 +144,7 @@ bool YUVRenderer::render() {
     GLCall(glBindVertexArray(0));
     GLCall(glBindTexture(GL_TEXTURE_2D, 0));
 
-    return true;
+    return pts;
 }
 
 int YUVRenderer::textureNumber() { return TEXTURE_NUMBER; }

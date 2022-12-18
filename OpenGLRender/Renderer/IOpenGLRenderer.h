@@ -31,6 +31,8 @@ class IOpenGLRenderer {
 
     virtual bool render() { return true; }
 
+    virtual long renderBoData() { return 0; }
+
     virtual int textureNumber() { return 0; }
 
     virtual void addBoData(const std::shared_ptr<IBoData> &newBoData) {}

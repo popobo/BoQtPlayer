@@ -68,9 +68,14 @@ void OpenGLRenderWidget::paintGL() {
     m_renderingThread->setCurrentFramePainted(true);
 
     m_renderingThread->unlock();
+    BO_INFO("m_timer.elapsed(): {0}", m_timer.elapsed());
 }
 
 void OpenGLRenderWidget::closeEvent(QCloseEvent *e) { stopThread(); }
+
+void OpenGLRenderWidget::setSyncAudioPts(long newSyncAudioPts) {
+    m_renderingThread->setSyncAudioPts(newSyncAudioPts);
+}
 
 bool OpenGLRenderWidget::open() { return true; }
 

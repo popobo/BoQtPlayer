@@ -112,7 +112,7 @@ void IPlayer::main() {
             continue;
         }
 
-        m_videoDecoder->setSynPts(m_audioPlayer->getPts());
+        m_videoView->setSyncAudioPts(m_audioPlayer->getPts());
 
         locker.unlock();
         boSleep(1);

@@ -2,6 +2,14 @@
 
 IParameter::IParameter() {}
 
-double IParameter::timeBase() const { return m_timeBase; }
+double IParameter::audioTimeBase() const { return m_audioTimeBase; }
 
-void IParameter::setTimeBase(double newTimeBase) { m_timeBase = newTimeBase; }
+void IParameter::setAudioTimeBase(double newAudioTimeBase) {
+    m_audioTimeBase = newAudioTimeBase;
+}
+
+double IParameter::videoTimeBase() const { return m_videoTimeBase; }
+
+void IParameter::setVideoTimeBase(double newVideoTimeBase) {
+    m_videoTimeBase = newVideoTimeBase;
+}

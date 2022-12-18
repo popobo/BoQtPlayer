@@ -38,10 +38,10 @@ bool FFDecoder::open(const std::shared_ptr<IParameter> &parameter) {
 
     if (AVMEDIA_TYPE_VIDEO == m_codecContext->codec_type) {
         m_isAudio = false;
-        m_videoTimeBase = parameter->timeBase();
+        m_videoTimeBase = parameter->videoTimeBase();
     } else if (AVMEDIA_TYPE_AUDIO == m_codecContext->codec_type) {
         m_isAudio = true;
-        m_audioTimeBase = parameter->timeBase();
+        m_audioTimeBase = parameter->audioTimeBase();
     }
 
     return true;
@@ -93,12 +93,16 @@ std::shared_ptr<IBoData> FFDecoder::recvFrame() {
 
         boData->setWidth(m_frame->width);
         boData->setHeight(m_frame->height);
+        boData->setIsAudio(false);
+        boData->setTimeBase(m_videoTimeBase);
 
     } else if (AVMEDIA_TYPE_AUDIO == m_codecContext->codec_type) {
         //样本字节数 * 单通道样本数 * 通道数
         boData->setSize(
             av_get_bytes_per_sample((AVSampleFormat)m_frame->format) *
             m_frame->nb_samples * m_frame->ch_layout.nb_channels);
+        boData->setIsAudio(true);
+        boData->setTimeBase(m_audioTimeBase);
     }
     // m_frame->data什么时候回收,
     // FFmpeg通过引用计数机制保证，使用需要保证相关方法调用正确

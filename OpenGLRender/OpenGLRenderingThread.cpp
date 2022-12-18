@@ -36,6 +36,10 @@ void RenderingThread::initialize() {
         m_framebufferSize, framebufferFormat);
 }
 
+void RenderingThread::setSyncAudioPts(long newSyncAudioPts) {
+    m_syncAudioPts = newSyncAudioPts;
+}
+
 // 只能再run()中调用，且注意线程安全
 bool RenderingThread::renderFrame() {
     // bind the framebuffer for rendering
@@ -52,7 +56,8 @@ bool RenderingThread::renderFrame() {
     }
     m_renderer->update(m_timer.elapsed());
 
-    if (!m_renderer->render()) {
+    m_currenRenderFramePts = m_renderer->renderBoData();
+    if (m_currenRenderFramePts < 0) {
         return false;
     }
 
@@ -157,11 +162,15 @@ void RenderingThread::run() {
 
         m_context->doneCurrent();
 
+        // 单位ms
+        while (!m_exiting && m_currenRenderFramePts - m_syncAudioPts > 0) {
+            QThread::msleep(1);
+        }
+
         // Notify UI about new frame.
         if (renderResult && m_triggerPaintGLFunc) {
             m_triggerPaintGLFunc();
         }
-        QThread::msleep(1);
     }
 }
 

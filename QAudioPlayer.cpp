@@ -82,7 +82,6 @@ bool QAudioPlayer::open(const std::shared_ptr<IParameter> &parameter) {
         m_audioSink =
             std::make_shared<QAudioSink>(m_audioDevice, m_qPreferedAudioFormat);
     }
-    m_timeBase = parameter->timeBase();
 
     m_isStarted = true;
     return true;
@@ -114,22 +113,39 @@ void QAudioPlayer::stop() {
     m_isExit = true;
 }
 
+namespace {
+qint64 lastProcessedUSecs = 0;
+qint64 currentProcessedUSecs = 0;
+} // namespace
+
+long QAudioPlayer::getPts() {
+    // 单位ms
+    currentProcessedUSecs = m_audioSink->processedUSecs() / 1000;
+    if (currentProcessedUSecs != lastProcessedUSecs) {
+        m_timer.elapsed();
+        m_pts = currentProcessedUSecs;
+        lastProcessedUSecs = currentProcessedUSecs;
+    } else {
+        m_pts += m_timer.elapsed();
+    }
+    return m_pts;
+}
+
 std::shared_ptr<IBoData> QAudioPlayer::getData() { return nullptr; }
 
 void QAudioPlayer::main() {
     // 这两个单位 ms
-    qint64 lastProcessedUSecs = 0;
-    qint64 currentProcessedUSecs = 0;
-    while (!m_isExit) {
-        currentProcessedUSecs = m_audioSink->processedUSecs() / 1000;
-        if (currentProcessedUSecs != lastProcessedUSecs) {
-            m_timer.elapsed();
-            m_pts = currentProcessedUSecs;
-            lastProcessedUSecs = currentProcessedUSecs;
-        } else {
-            m_pts += m_timer.elapsed();
-        }
 
-        boSleep(1);
-    }
+    //    while (!m_isExit) {
+    //        currentProcessedUSecs = m_audioSink->processedUSecs() / 1000;
+    //        if (currentProcessedUSecs != lastProcessedUSecs) {
+    //            m_timer.elapsed();
+    //            m_pts = currentProcessedUSecs;
+    //            lastProcessedUSecs = currentProcessedUSecs;
+    //        } else {
+    //            m_pts += m_timer.elapsed();
+    //        }
+
+    //        boSleep(1);
+    //    }
 }

@@ -40,8 +40,11 @@ class IBoData {
 
     virtual void copyBasicAttributes(const IBoData &boData);
 
-    int pts() const;
-    void setPts(int newPts);
+    long pts() const;
+    void setPts(long newPts);
+
+    double timeBase() const;
+    void setTimeBase(double newTimeBase);
 
   protected:
     // 存储(char*)AVPacket, (char*)AVFrame等结构体数据的指针
@@ -57,7 +60,8 @@ class IBoData {
     int m_width{0};
     int m_height{0};
     int m_format{0};
-    int m_pts{0};
+    long m_pts{0};
+    double m_timeBase{0};
     bool m_isAudio{false};
 };
 

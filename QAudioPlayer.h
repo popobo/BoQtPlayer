@@ -25,6 +25,8 @@ class QAudioPlayer : public IAudioPlayer,
     virtual bool start() override;
     virtual void stop() override;
 
+    virtual long getPts() override;
+
     virtual std::shared_ptr<IBoData> getData() override;
 
   protected:

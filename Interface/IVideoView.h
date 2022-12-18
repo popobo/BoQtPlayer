@@ -14,6 +14,8 @@ class IVideoView : public IObserver {
     virtual bool start() = 0;
 
     virtual void stop() = 0;
+
+    virtual void setSyncAudioPts(long newSyncAudioPts) = 0;
 };
 
 #endif // IVIDEOVIEW_H

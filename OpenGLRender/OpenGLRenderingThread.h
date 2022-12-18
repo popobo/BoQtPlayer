@@ -47,6 +47,8 @@ class RenderingThread : public QThread {
 
     void addBoData(const std::shared_ptr<IBoData> &newBoData);
 
+    void setSyncAudioPts(long newSyncAudioPts);
+
   protected:
     void run() override;
     // this method should be called between
@@ -71,6 +73,9 @@ class RenderingThread : public QThread {
     bool m_isCurrentFramePainted = true;
 
     std::function<void()> m_triggerPaintGLFunc;
+
+    std::atomic<long> m_syncAudioPts = 0;
+    long m_currenRenderFramePts = 0;
 };
 
 } // namespace OpenGLRender

@@ -20,13 +20,12 @@ class IAudioPlayer : public IObserver, public ISubject, public BoThread {
 
     static const int MAX_FRAME_COUNT = 100;
 
-    int getPts() const;
-    void setPts(int newPts);
+    virtual long getPts() = 0;
 
     virtual const AudioOutputFormat &audioOutFormat() const;
 
   protected:
-    int m_pts{0};
+    long m_pts{0};
     std::list<std::shared_ptr<IBoData>> m_frames;
     std::mutex m_framesMutex;
     AudioOutputFormat m_audioOutFormat;

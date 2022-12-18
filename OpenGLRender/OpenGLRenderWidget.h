@@ -40,6 +40,8 @@ class OpenGLRenderWidget
     // IObserver interface
     virtual void update(const std::shared_ptr<IBoData> &boData) override;
 
+    virtual void setSyncAudioPts(long newSyncAudioPts) override;
+
     const static int BUFFER_MAX_LEN = 1024;
 
   protected:
@@ -57,6 +59,8 @@ class OpenGLRenderWidget
 
     std::queue<std::shared_ptr<IBoData>> m_boDataQueue;
     std::mutex m_boDataQueueMutex;
+
+    ElapsedTimer m_timer;
 };
 
 } // namespace OpenGLRender

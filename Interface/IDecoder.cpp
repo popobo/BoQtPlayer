@@ -17,14 +17,14 @@ void IDecoder::main() {
     while (!m_isExit) {
         std::unique_lock<std::mutex> lock(m_boDataListMutex);
         // 判断音视频同步
-        if (!m_isAudio && m_synPts > 0) {
-            //当音频时间小于视频时间，等音频
-            if (m_synPts < m_pts) {
-                lock.unlock();
-                boSleep(1);
-                continue;
-            }
-        }
+        //        if (!m_isAudio && m_synPts > 0) {
+        //            //当音频时间小于视频时间，等音频
+        //            if (m_synPts < m_pts) {
+        //                lock.unlock();
+        //                boSleep(1);
+        //                continue;
+        //            }
+        //        }
 
         if (m_boDataList.empty()) {
             lock.unlock();
@@ -52,9 +52,9 @@ void IDecoder::main() {
                     break;
                 }
 
-                if (!m_isAudio) {
-                    m_pts = frame->pts() * m_videoTimeBase;
-                }
+                //                if (!m_isAudio) {
+                //                    m_pts = frame->pts() * m_videoTimeBase;
+                //                }
 
                 //发送数据给观察者
                 notify(frame);
