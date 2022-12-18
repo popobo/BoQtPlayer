@@ -29,9 +29,6 @@ class QAudioPlayer : public IAudioPlayer,
 
     virtual std::shared_ptr<IBoData> getData() override;
 
-  protected:
-    virtual void main() override;
-
   private:
     bool m_isStarted{false};
     std::shared_ptr<AudioBuffer> m_audioBuffer;

@@ -39,21 +39,12 @@ class IDecoder : public IObserver, public BoThread, public ISubject {
   public:
     const int MAX_LIST = 100;
 
-    int synPts() const;
-    void setSynPts(int newSynPts);
-
-    int pts() const;
-    void setPts(int newPts);
-
   protected:
     bool m_isAudio = false;
 
     //读取缓冲
     std::list<std::shared_ptr<IBoData>> m_boDataList;
     std::mutex m_boDataListMutex;
-
-    int m_synPts = 0;
-    int m_pts = 0;
 
     double m_audioTimeBase = 0.0;
     double m_videoTimeBase = 0.0;

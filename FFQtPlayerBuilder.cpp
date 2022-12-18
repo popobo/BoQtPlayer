@@ -3,7 +3,6 @@
 #include "FFDemux.h"
 #include "FFResampler.h"
 #include "OpenGLRenderWidget.h"
-#include "QAudioPlayer.h"
 
 FFQtPlayerBuilder::FFQtPlayerBuilder() {}
 

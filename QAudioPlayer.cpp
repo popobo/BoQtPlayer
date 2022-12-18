@@ -132,20 +132,3 @@ long QAudioPlayer::getPts() {
 }
 
 std::shared_ptr<IBoData> QAudioPlayer::getData() { return nullptr; }
-
-void QAudioPlayer::main() {
-    // 这两个单位 ms
-
-    //    while (!m_isExit) {
-    //        currentProcessedUSecs = m_audioSink->processedUSecs() / 1000;
-    //        if (currentProcessedUSecs != lastProcessedUSecs) {
-    //            m_timer.elapsed();
-    //            m_pts = currentProcessedUSecs;
-    //            lastProcessedUSecs = currentProcessedUSecs;
-    //        } else {
-    //            m_pts += m_timer.elapsed();
-    //        }
-
-    //        boSleep(1);
-    //    }
-}

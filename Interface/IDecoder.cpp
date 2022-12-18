@@ -5,26 +5,9 @@ bool IDecoder::isAudio() const { return m_isAudio; }
 
 void IDecoder::setIsAudio(bool newIsAudio) { m_isAudio = newIsAudio; }
 
-int IDecoder::synPts() const { return m_synPts; }
-
-void IDecoder::setSynPts(int newSynPts) { m_synPts = newSynPts; }
-
-int IDecoder::pts() const { return m_pts; }
-
-void IDecoder::setPts(int newPts) { m_pts = newPts; }
-
 void IDecoder::main() {
     while (!m_isExit) {
         std::unique_lock<std::mutex> lock(m_boDataListMutex);
-        // 判断音视频同步
-        //        if (!m_isAudio && m_synPts > 0) {
-        //            //当音频时间小于视频时间，等音频
-        //            if (m_synPts < m_pts) {
-        //                lock.unlock();
-        //                boSleep(1);
-        //                continue;
-        //            }
-        //        }
 
         if (m_boDataList.empty()) {
             lock.unlock();
@@ -52,15 +35,11 @@ void IDecoder::main() {
                     break;
                 }
 
-                //                if (!m_isAudio) {
-                //                    m_pts = frame->pts() * m_videoTimeBase;
-                //                }
-
                 //发送数据给观察者
                 notify(frame);
             }
         }
-        //消费者负责清理
+        //消费者负责清理, 采用智能指针管理
     }
 }
 
