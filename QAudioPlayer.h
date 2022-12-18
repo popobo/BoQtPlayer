@@ -2,6 +2,7 @@
 #define QAUDIOPLAYER_H
 
 #include "BoThread.h"
+#include "ElapsedTimer.h"
 #include "IAudioPlayer.h"
 #include <QAudioDevice>
 #include <QAudioSink>
@@ -36,6 +37,7 @@ class QAudioPlayer : public IAudioPlayer,
     QAudioDevice m_audioDevice;
     QAudioFormat m_qPreferedAudioFormat;
     double m_timeBase = 0.0;
+    ElapsedTimer m_timer;
 };
 
 #endif // QAUDIOPLAYER_H

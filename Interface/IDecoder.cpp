@@ -54,7 +54,6 @@ void IDecoder::main() {
 
                 if (!m_isAudio) {
                     m_pts = frame->pts() * m_videoTimeBase;
-                    // BO_INFO("m_pts: {0}", m_pts);
                 }
 
                 //发送数据给观察者

@@ -117,9 +117,19 @@ void QAudioPlayer::stop() {
 std::shared_ptr<IBoData> QAudioPlayer::getData() { return nullptr; }
 
 void QAudioPlayer::main() {
+    // 这两个单位 ms
+    qint64 lastProcessedUSecs = 0;
+    qint64 currentProcessedUSecs = 0;
     while (!m_isExit) {
-        m_pts = m_audioSink->processedUSecs() / 1000;
-        // BO_INFO("m_pts: {0}", m_pts);
+        currentProcessedUSecs = m_audioSink->processedUSecs() / 1000;
+        if (currentProcessedUSecs != lastProcessedUSecs) {
+            m_timer.elapsed();
+            m_pts = currentProcessedUSecs;
+            lastProcessedUSecs = currentProcessedUSecs;
+        } else {
+            m_pts += m_timer.elapsed();
+        }
+
         boSleep(1);
     }
 }
