@@ -10,6 +10,7 @@ set(CMAKE_AUTORCC ON)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_PREFIX_PATH D:/Software/Qt_6_4/6.3.2/msvc2019_64)
 
 find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Widgets)
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets)
@@ -101,14 +102,14 @@ target_link_libraries(BoPlayer PRIVATE Qt${QT_VERSION_MAJOR}::Widgets
                                PRIVATE Qt6::OpenGL
                                PRIVATE Qt6::OpenGLWidgets
                                PRIVATE Qt6::Multimedia
-                               avformat
-                               swscale
-                               swresample
-                               postproc
-                               avutil
-                               avfilter
-                               avdevice
-                               avcodec)
+                               libavformatd
+                               libswscaled
+                               libswresampled
+                               libpostprocd
+                               libavutild
+                               libavfilterd
+                               libavdeviced
+                               libavcodecd)
 
 set_target_properties(BoPlayer PROPERTIES
     MACOSX_BUNDLE_GUI_IDENTIFIER my.example.com

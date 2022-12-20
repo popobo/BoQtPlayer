@@ -47,6 +47,7 @@ bool FFResampler::open(const std::shared_ptr<IParameter> &parameterIn,
 
     AVChannelLayout channelLayout;
     channelLayout.nb_channels = audioOutputFormat.sampleChannelCount;
+    channelLayout.order = AV_CHANNEL_ORDER_UNSPEC;
 
     int ret = swr_alloc_set_opts2(
         &m_swrContext, &channelLayout, sampleFormat,

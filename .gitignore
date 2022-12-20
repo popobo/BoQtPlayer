@@ -1,5 +1,15 @@
+/build/.qt
+/build/.vs
+
 
 /out
 /.vs
 
 CMakeSettings.json
+/build/BoPlayer.dir/Debug
+/build/BoPlayer_autogen
+/build/CMakeFiles
+/build/Debug
+/build/x64/Debug
+/CppProperties.json
+*.user
