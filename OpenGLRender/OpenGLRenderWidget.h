@@ -57,9 +57,6 @@ class OpenGLRenderWidget
     std::shared_ptr<RenderingThread> m_renderingThread;
     std::shared_ptr<ViewportTarget> m_viewportTarget;
 
-    std::queue<std::shared_ptr<IBoData>> m_boDataQueue;
-    std::mutex m_boDataQueueMutex;
-
     ElapsedTimer m_timer;
 };
 

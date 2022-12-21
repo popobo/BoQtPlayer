@@ -4,6 +4,7 @@
 #include "OpenGLMesh.h"
 #include "OpenGLShader.h"
 #include <queue>
+#include <mutex>
 
 namespace OpenGLRender {
 
@@ -31,6 +32,8 @@ class YUVRenderer : public IOpenGLRenderer {
 
     const static int MAX_LENGTH = 100;
     std::queue<std::shared_ptr<IBoData>> m_boDataQueue;
+    std::mutex m_boDataQueueMutex;
+
     bool m_stopReceiveData = false;
 };
 

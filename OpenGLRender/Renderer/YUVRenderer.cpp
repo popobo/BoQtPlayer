@@ -105,11 +105,14 @@ void YUVRenderer::init() {
 }
 
 long YUVRenderer::renderBoData() {
+    std::unique_lock<std::mutex> locker{ m_boDataQueueMutex };
     if (m_boDataQueue.empty()) {
         return -1;
     }
 
     auto boData = m_boDataQueue.front();
+    m_boDataQueue.pop();
+    locker.unlock();
     auto boDataDatas = boData->datas();
     auto width = boData->width();
     auto height = boData->height();
@@ -129,7 +132,6 @@ long YUVRenderer::renderBoData() {
     GLCall(glTexImage2D(GL_TEXTURE_2D, 0, GL_R8, width / 2, height / 2, 0,
                         GL_RED, GL_UNSIGNED_BYTE, boDataDatas[2]));
 
-    m_boDataQueue.pop();
 
     m_mesh->bind();
     m_shader->bind();
@@ -152,10 +154,12 @@ int YUVRenderer::textureNumber() { return TEXTURE_NUMBER; }
 void YUVRenderer::addBoData(const std::shared_ptr<IBoData> &newBoData) {
     // 有阻塞
     while (!m_stopReceiveData) {
+        std::unique_lock<std::mutex> locker{ m_boDataQueueMutex };
         if (m_boDataQueue.size() < MAX_LENGTH) {
             m_boDataQueue.push(newBoData);
             break;
         } else {
+            locker.unlock();
             QThread::msleep(1);
         }
     }
