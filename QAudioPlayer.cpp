@@ -5,6 +5,7 @@
 #include <QMediaDevices>
 #include <QThread>
 #include <queue>
+#include <mutex>
 extern "C" {
 #include "libswresample/swresample.h"
 }
@@ -13,25 +14,30 @@ class AudioBuffer : public QIODevice {
   public:
     qint64 readData(char *data, qint64 len) override {
         // 一般len远大于boData->size()
+        std::unique_lock<std::mutex> locker{ m_boDataQueueMutex };
         if (m_boDataQueue.empty()) {
             return 0;
         }
         qint64 readLen = 0;
+        locker.unlock();
 
         while (!m_boDataQueue.empty()) {
+            locker.lock();
             auto boData = m_boDataQueue.front();
             if (readLen + boData->size() > len) {
                 break;
             }
+            m_boDataQueue.pop();
+            locker.unlock();
             memcpy(data + readLen, boData->data(), boData->size());
             readLen += boData->size();
-            m_boDataQueue.pop();
         }
 
         return readLen;
     }
 
     void addBoData(const std::shared_ptr<IBoData> &newBoData) {
+        std::unique_lock<std::mutex> locker{ m_boDataQueueMutex };
         m_boDataQueue.push(newBoData);
     }
 
@@ -39,6 +45,7 @@ class AudioBuffer : public QIODevice {
 
   private:
     std::queue<std::shared_ptr<IBoData>> m_boDataQueue;
+    std::mutex m_boDataQueueMutex;
 };
 
 QAudioPlayer::QAudioPlayer() {}

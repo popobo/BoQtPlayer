@@ -47,7 +47,7 @@ void IDecoder::update(const std::shared_ptr<IBoData> &boData) {
     if (boData->isAudio() != m_isAudio) {
         return;
     }
-    // why循环
+
     // 循环是为了阻塞住FFDemux让其不要读取数据了
     while (!m_isExit) {
         std::unique_lock<std::mutex> lock(m_boDataListMutex);
