@@ -89,6 +89,31 @@ void IPlayer::stop() {
     }
 }
 
+void IPlayer::pause()
+{
+    std::unique_lock<std::mutex> locker(m_playerMutex);
+    if (m_audioPlayer) {
+        m_audioPlayer->pause();
+    }
+
+    if (m_videoView) {
+        m_videoView->pause();
+    }
+}
+
+void IPlayer::resume()
+{
+    std::unique_lock<std::mutex> locker(m_playerMutex);
+    if (m_audioPlayer) {
+        m_audioPlayer->resume();
+    }
+
+    if (m_videoView) {
+        m_videoView->resume();
+    }
+}
+
+
 // 这两者时是依赖平台的，有调用者传入
 void IPlayer::setVideoView(const std::shared_ptr<IVideoView> &newVideoView) {
     m_videoView = newVideoView;

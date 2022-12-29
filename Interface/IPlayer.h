@@ -22,6 +22,10 @@ class IPlayer : public BoThread {
 
     virtual void stop() override;
 
+    virtual void pause();
+
+    virtual void resume();
+
     void setVideoView(const std::shared_ptr<IVideoView> &newVideoView);
 
     void setAudioPlayer(const std::shared_ptr<IAudioPlayer> &newAudioPlayer);

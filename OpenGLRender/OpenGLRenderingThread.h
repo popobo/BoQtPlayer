@@ -49,6 +49,10 @@ class RenderingThread : public QThread {
 
     void setSyncAudioPts(long newSyncAudioPts);
 
+    void pause();
+
+    void resume();
+
   protected:
     void run() override;
     // this method should be called between
@@ -70,7 +74,8 @@ class RenderingThread : public QThread {
 
     bool m_exiting = false;
     bool m_initialized = false;
-    bool m_isCurrentFramePainted = true;
+    std::atomic<bool> m_isCurrentFramePainted = true;
+    std::atomic<bool> m_isPaused{ false };
 
     std::function<void()> m_triggerPaintGLFunc;
 

@@ -6,6 +6,7 @@ BoThread::BoThread() {}
 
 bool BoThread::start() {
     m_isExit = false;
+    m_isPaused = false;
     std::thread th(&BoThread::threadMain, this);
     //当前线程放弃对新建线程的控制, 防止对象被清空时, 新建线程出错
     th.detach();
@@ -23,6 +24,21 @@ void BoThread::stop() {
         boSleep(1);
     }
     BO_INFO("stop thread time out");
+}
+
+bool BoThread::isPaused()
+{
+    return m_isPaused;
+}
+
+void BoThread::pause()
+{
+    m_isPaused = true;
+}
+
+void BoThread::resume()
+{
+    m_isPaused = false;
 }
 
 void BoThread::threadMain() {

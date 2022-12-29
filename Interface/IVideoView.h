@@ -15,6 +15,10 @@ class IVideoView : public IObserver {
 
     virtual void stop() = 0;
 
+    virtual void pause() = 0;
+    
+    virtual void resume() = 0;
+
     virtual void setSyncAudioPts(long newSyncAudioPts) = 0;
 };
 

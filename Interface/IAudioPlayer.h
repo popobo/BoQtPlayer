@@ -24,6 +24,10 @@ class IAudioPlayer : public IObserver, public ISubject, public BoThread {
 
     virtual const AudioOutputFormat &audioOutFormat() const;
 
+    virtual void pause() = 0;
+
+    virtual void resume() = 0;
+
   protected:
     long m_pts{0};
     std::list<std::shared_ptr<IBoData>> m_frames;

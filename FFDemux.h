@@ -16,6 +16,7 @@ class FFDemux : public IDemux {
     virtual bool open(const char *url) override;
     virtual std::shared_ptr<IBoData> read() override;
     virtual int64_t getTotalTime() override;
+    virtual bool seek(double pos) override;
 
     virtual std::shared_ptr<IParameter> getVideoParameter() override;
     virtual std::shared_ptr<IParameter> getAudioParameter() override;

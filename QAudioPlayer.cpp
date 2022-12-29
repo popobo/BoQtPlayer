@@ -109,14 +109,13 @@ bool QAudioPlayer::start() {
         return false;
     }
     m_audioSink->start(m_audioBuffer.get());
-    BoThread::start();
+    m_isPaused = false;
     return true;
 }
 
 void QAudioPlayer::stop() {
     m_audioSink->stop();
     m_audioBuffer->close();
-    BoThread::stop();
     m_isExit = true;
 }
 
@@ -128,6 +127,10 @@ qint64 currentProcessedUSecs = 0;
 long QAudioPlayer::getPts() {
     // 单位ms
     currentProcessedUSecs = m_audioSink->processedUSecs() / 1000;
+    if (m_isPaused) {
+        return currentProcessedUSecs;
+    }
+
     if (currentProcessedUSecs != lastProcessedUSecs) {
         m_timer.elapsed();
         m_pts = currentProcessedUSecs;
@@ -139,3 +142,15 @@ long QAudioPlayer::getPts() {
 }
 
 std::shared_ptr<IBoData> QAudioPlayer::getData() { return nullptr; }
+
+void QAudioPlayer::pause()
+{
+    m_isPaused = true;
+    m_audioSink->suspend();
+}
+
+void QAudioPlayer::resume()
+{
+    m_isPaused = false;
+    m_audioSink->resume();
+}

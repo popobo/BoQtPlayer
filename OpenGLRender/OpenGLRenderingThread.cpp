@@ -40,6 +40,16 @@ void RenderingThread::setSyncAudioPts(long newSyncAudioPts) {
     m_syncAudioPts = newSyncAudioPts;
 }
 
+void RenderingThread::pause()
+{
+    m_isPaused = true;
+}
+
+void RenderingThread::resume()
+{
+    m_isPaused = false;
+}
+
 // 只能再run()中调用，且注意线程安全
 bool RenderingThread::renderFrame() {
     // bind the framebuffer for rendering
@@ -140,7 +150,12 @@ void RenderingThread::run() {
             break;
         }
 
-        if (!isCurrentFramePainted()) {
+        if (!m_isCurrentFramePainted) {
+            QThread::msleep(1);
+            continue;
+        }
+
+        if (m_isPaused) {
             QThread::msleep(1);
             continue;
         }

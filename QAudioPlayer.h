@@ -1,4 +1,4 @@
-#ifndef QAUDIOPLAYER_H
+﻿#ifndef QAUDIOPLAYER_H
 #define QAUDIOPLAYER_H
 
 #include "BoThread.h"
@@ -10,8 +10,7 @@
 
 class AudioBuffer;
 
-class QAudioPlayer : public IAudioPlayer,
-                     public std::enable_shared_from_this<QAudioPlayer> {
+class QAudioPlayer : public IAudioPlayer {
   public:
     QAudioPlayer();
 
@@ -29,6 +28,10 @@ class QAudioPlayer : public IAudioPlayer,
 
     virtual std::shared_ptr<IBoData> getData() override;
 
+    virtual void pause() override;
+
+    virtual void resume() override;
+
   private:
     bool m_isStarted{false};
     std::shared_ptr<AudioBuffer> m_audioBuffer;
@@ -37,6 +40,8 @@ class QAudioPlayer : public IAudioPlayer,
     QAudioFormat m_qPreferedAudioFormat;
     double m_timeBase = 0.0;
     ElapsedTimer m_timer;
+    std::atomic<bool> m_isPaused{ false };
+
 };
 
 #endif // QAUDIOPLAYER_H

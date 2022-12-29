@@ -7,17 +7,6 @@ extern "C" {
 #include "libavformat/avformat.h"
 }
 
-namespace {
-
-double r2d(AVRational ration) {
-    return ration.num == 0 || ration.den == 0
-               ? 0.0
-               : static_cast<double>(ration.num) /
-                     static_cast<double>(ration.den);
-}
-
-} // namespace
-
 FFDemux::FFDemux() {
     // this is not thraed safe, do not create these together
     // need a check, it seems that this is safe in C++11
@@ -128,4 +117,9 @@ std::shared_ptr<IParameter> FFDemux::getVideoParameter() {
 
 std::shared_ptr<IParameter> FFDemux::getAudioParameter() {
     return m_audioParameter;
+}
+
+bool FFDemux::seek(double pos)
+{
+    return false;
 }

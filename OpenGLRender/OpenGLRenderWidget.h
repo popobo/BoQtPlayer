@@ -37,6 +37,10 @@ class OpenGLRenderWidget
 
     virtual void stop() override;
 
+    virtual void pause() override;
+
+    virtual void resume() override;
+
     // IObserver interface
     virtual void update(const std::shared_ptr<IBoData> &boData) override;
 

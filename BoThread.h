@@ -1,6 +1,8 @@
 #ifndef BOTHREAD_H
 #define BOTHREAD_H
 
+#include <memory>
+
 void boSleep(int ms);
 
 class BoThread {
@@ -19,9 +21,16 @@ class BoThread {
     //入口主函数
     virtual void main(){};
 
+    virtual bool isPaused();
+
+    virtual void pause();
+
+    virtual void resume();
+
   protected:
     bool m_isExit = false;
     bool m_isRunning = false;
+    bool m_isPaused{false};
 
   private:
     void threadMain();

@@ -32,5 +32,7 @@ class Widget : public QWidget {
 
   private slots:
     void openFile();
+    void pause();
+    void resume();
 };
 #endif // WIDGET_H

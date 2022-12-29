@@ -39,6 +39,32 @@
     <string>X</string>
    </property>
   </widget>
+  <widget class="QPushButton" name="pushButtonPause">
+   <property name="geometry">
+    <rect>
+     <x>720</x>
+     <y>700</y>
+     <width>80</width>
+     <height>24</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Pause</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="pushButtonResume">
+   <property name="geometry">
+    <rect>
+     <x>720</x>
+     <y>700</y>
+     <width>80</width>
+     <height>24</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Resume</string>
+   </property>
+  </widget>
  </widget>
  <resources/>
  <connections/>

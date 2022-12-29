@@ -73,6 +73,16 @@ void OpenGLRenderWidget::paintGL() {
 
 void OpenGLRenderWidget::closeEvent(QCloseEvent *e) { stopThread(); }
 
+void OpenGLRenderWidget::pause()
+{
+    m_renderingThread->pause();
+}
+
+void OpenGLRenderWidget::resume()
+{
+    m_renderingThread->resume();
+}
+
 void OpenGLRenderWidget::setSyncAudioPts(long newSyncAudioPts) {
     m_renderingThread->setSyncAudioPts(newSyncAudioPts);
 }

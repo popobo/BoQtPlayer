@@ -17,6 +17,8 @@ class IDemux : public BoThread, public ISubject {
     //读取一帧数据。数据由调用者清理
     virtual std::shared_ptr<IBoData> read() = 0;
 
+    virtual bool seek(double pos) = 0;
+
     //总时间 ms
     virtual int64_t getTotalTime() = 0;
 

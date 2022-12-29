@@ -33,10 +33,15 @@ Widget::Widget(QWidget *parent) : QWidget(parent), ui(new Ui::Widget) {
     // setAudioPlayer
     m_audioPlayer = std::make_shared<QAudioPlayer>();
     m_player->setAudioPlayer(m_audioPlayer);
+    
+    ui->pushButtonResume->hide();
 
     connect(ui->pushButtonOpenFile, SIGNAL(clicked()), this, SLOT(openFile()));
     connect(ui->pushButtonCloseWindow, &QPushButton::clicked, this,
             &Widget::closeWidget);
+
+    connect(ui->pushButtonPause, SIGNAL(clicked()), this, SLOT(pause()));
+    connect(ui->pushButtonResume, SIGNAL(clicked()), this, SLOT(resume()));
 }
 
 Widget::~Widget() { delete ui; }
@@ -45,6 +50,24 @@ void Widget::closeWidget() {
     m_player->stop();
 
     QWidget::close();
+}
+
+void Widget::pause()
+{
+    if (m_player) {
+        m_player->pause();
+        ui->pushButtonPause->hide();
+        ui->pushButtonResume->show();
+    }
+}
+
+void Widget::resume()
+{
+    if (m_player) {
+        m_player->resume();
+        ui->pushButtonPause->show();
+        ui->pushButtonResume->hide();
+    }
 }
 
 void Widget::openFile() {
