@@ -19,9 +19,10 @@ bool FFDecoder::open(const std::shared_ptr<IParameter> &parameter) {
     // 1.查找解码器
     const AVCodec *avc = avcodec_find_decoder(para->codec_id);
     if (!avc) {
-        BO_INFO("avcodec_find_decoder %d failed!", para->codec_id);
+        BO_INFO("avcodec_find_decoder %d failed!", (int)para->codec_id);
     }
     BO_INFO("avcodec_find_decoder {0} successfully!", para->codec_id);
+    std::unique_lock<std::mutex> locker{ m_codecContextMutex };
     // 2.创建解码器上下文，并复制参数
     m_codecContext = avcodec_alloc_context3(avc);
     avcodec_parameters_to_context(m_codecContext, para);
@@ -52,6 +53,7 @@ bool FFDecoder::sendPacket(const std::shared_ptr<IBoData> &boData) {
         return false;
     }
 
+    std::unique_lock<std::mutex> locker{ m_codecContextMutex };
     if (!m_codecContext) {
         return false;
     }
@@ -67,6 +69,7 @@ bool FFDecoder::sendPacket(const std::shared_ptr<IBoData> &boData) {
 
 std::shared_ptr<IBoData> FFDecoder::recvFrame() {
     auto boData = std::make_shared<BoAVFrameData>();
+    std::unique_lock<std::mutex> locker{ m_codecContextMutex };
     if (!m_codecContext) {
         return nullptr;
     }
@@ -116,4 +119,24 @@ std::shared_ptr<IBoData> FFDecoder::recvFrame() {
     return boData;
 }
 
-void FFDecoder::close() {}
+void FFDecoder::close() {
+    //清除解码缓冲
+    IDecoder::clear();
+    std::unique_lock<std::mutex> locker{ m_codecContextMutex };
+    if (m_frame) {
+        av_frame_free(&m_frame);
+    }
+    if (m_codecContext) {
+        avcodec_close(m_codecContext);
+        avcodec_free_context(&m_codecContext);
+    }
+}
+
+void FFDecoder::clear()
+{
+    IDecoder::clear();
+    std::unique_lock<std::mutex> locker{ m_codecContextMutex };
+    if (m_codecContext) {
+        avcodec_flush_buffers(m_codecContext);
+    }
+}

@@ -23,6 +23,8 @@ class YUVRenderer : public IOpenGLRenderer {
 
     virtual void stop() override;
 
+    virtual void clear() override;
+
   private:
     std::shared_ptr<Mesh> m_mesh;
     std::shared_ptr<Shader> m_shader;

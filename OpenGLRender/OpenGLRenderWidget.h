@@ -46,6 +46,8 @@ class OpenGLRenderWidget
 
     virtual void setSyncAudioPts(long newSyncAudioPts) override;
 
+    virtual void clear() override;
+
     const static int BUFFER_MAX_LEN = 1024;
 
   protected:

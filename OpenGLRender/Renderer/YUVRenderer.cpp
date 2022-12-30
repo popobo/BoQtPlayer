@@ -167,4 +167,10 @@ void YUVRenderer::addBoData(const std::shared_ptr<IBoData> &newBoData) {
 
 void YUVRenderer::stop() { m_stopReceiveData = true; }
 
+void YUVRenderer::clear()
+{
+    std::unique_lock<std::mutex> locker{ m_boDataQueueMutex };
+    m_boDataQueue = {};
+}
+
 } // namespace OpenGLRender

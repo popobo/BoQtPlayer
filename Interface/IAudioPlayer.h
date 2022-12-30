@@ -5,7 +5,7 @@
 #include "IObserver.h"
 #include "IParameter.h"
 #include "ISubject.h"
-#include <list>
+#include <queue>
 
 class IAudioPlayer : public IObserver, public ISubject, public BoThread {
   public:
@@ -27,10 +27,12 @@ class IAudioPlayer : public IObserver, public ISubject, public BoThread {
     virtual void pause() = 0;
 
     virtual void resume() = 0;
+    
+    virtual void clear();
 
   protected:
     long m_pts{0};
-    std::list<std::shared_ptr<IBoData>> m_frames;
+    std::queue<std::shared_ptr<IBoData>> m_frames;
     std::mutex m_framesMutex;
     AudioOutputFormat m_audioOutFormat;
 };

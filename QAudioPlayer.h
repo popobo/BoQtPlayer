@@ -32,6 +32,8 @@ class QAudioPlayer : public IAudioPlayer {
 
     virtual void resume() override;
 
+    virtual void clear() override;
+
   private:
     bool m_isStarted{false};
     std::shared_ptr<AudioBuffer> m_audioBuffer;

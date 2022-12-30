@@ -50,6 +50,13 @@ void RenderingThread::resume()
     m_isPaused = false;
 }
 
+void RenderingThread::clear()
+{
+    if (m_renderer) {
+        m_renderer->clear();
+    }
+}
+
 // 只能再run()中调用，且注意线程安全
 bool RenderingThread::renderFrame() {
     // bind the framebuffer for rendering

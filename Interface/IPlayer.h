@@ -22,13 +22,16 @@ class IPlayer : public BoThread {
 
     virtual void stop() override;
 
-    virtual void pause();
+    virtual void pause() override;
 
-    virtual void resume();
+    virtual void resume() override;
 
-    void setVideoView(const std::shared_ptr<IVideoView> &newVideoView);
+    virtual void setVideoView(const std::shared_ptr<IVideoView> &newVideoView);
 
-    void setAudioPlayer(const std::shared_ptr<IAudioPlayer> &newAudioPlayer);
+    virtual void setAudioPlayer(const std::shared_ptr<IAudioPlayer> &newAudioPlayer);
+
+    // 0.0 ~ 1.0
+    virtual void seek(double pos);
 
   public:
     std::shared_ptr<IDemux> m_demux;

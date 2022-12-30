@@ -87,6 +87,13 @@ void OpenGLRenderWidget::setSyncAudioPts(long newSyncAudioPts) {
     m_renderingThread->setSyncAudioPts(newSyncAudioPts);
 }
 
+void OpenGLRenderWidget::clear()
+{
+    if (m_renderingThread) {
+        m_renderingThread->clear();
+    }
+}
+
 bool OpenGLRenderWidget::open() { return true; }
 
 bool OpenGLRenderWidget::start() { return startThread(); }

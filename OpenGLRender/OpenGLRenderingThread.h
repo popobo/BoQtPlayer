@@ -52,6 +52,8 @@ class RenderingThread : public QThread {
     void pause();
 
     void resume();
+    
+    void clear();
 
   protected:
     void run() override;

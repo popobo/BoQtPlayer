@@ -20,6 +20,8 @@ class IVideoView : public IObserver {
     virtual void resume() = 0;
 
     virtual void setSyncAudioPts(long newSyncAudioPts) = 0;
+
+    virtual void clear() = 0;
 };
 
 #endif // IVIDEOVIEW_H

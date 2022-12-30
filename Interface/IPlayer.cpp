@@ -92,6 +92,20 @@ void IPlayer::stop() {
 void IPlayer::pause()
 {
     std::unique_lock<std::mutex> locker(m_playerMutex);
+    BoThread::pause();
+
+    if (m_demux) {
+        m_demux->pause();
+    }
+
+    if (m_videoDecoder) {
+        m_videoDecoder->pause();
+    }
+
+    if (m_audioDecoder) {
+        m_audioDecoder->pause();
+    }
+
     if (m_audioPlayer) {
         m_audioPlayer->pause();
     }
@@ -104,6 +118,20 @@ void IPlayer::pause()
 void IPlayer::resume()
 {
     std::unique_lock<std::mutex> locker(m_playerMutex);
+    BoThread::resume();
+
+    if (m_demux) {
+        m_demux->resume();
+    }
+
+    if (m_videoDecoder) {
+        m_videoDecoder->resume();
+    }
+
+    if (m_audioDecoder) {
+        m_audioDecoder->resume();
+    }
+    
     if (m_audioPlayer) {
         m_audioPlayer->resume();
     }
@@ -128,8 +156,22 @@ void IPlayer::setAudioPlayer(
     m_resampler->addObs(m_audioPlayer);
 }
 
+void IPlayer::seek(double pos)
+{
+    if (!m_demux) {
+        BO_ERROR("m_demux is nullptr");
+        return;
+    }
+    pause();
+}
+
 void IPlayer::main() {
     while (!m_isExit) {
+        if (m_isPaused) {
+            boSleep(1);
+            continue;
+        }
+        
         std::unique_lock<std::mutex> locker(m_playerMutex);
         if (!m_audioPlayer || !m_videoDecoder) {
             locker.unlock();

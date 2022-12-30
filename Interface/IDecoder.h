@@ -6,7 +6,7 @@
 #include "IObserver.h"
 #include "IParameter.h"
 #include "ISubject.h"
-#include <list>
+#include <queue>
 
 class IDecoder : public IObserver, public BoThread, public ISubject {
   public:
@@ -32,6 +32,8 @@ class IDecoder : public IObserver, public BoThread, public ISubject {
 
     virtual void close() = 0;
 
+    virtual void clear();
+
     bool isAudio() const;
 
     void setIsAudio(bool newIsAudio);
@@ -43,8 +45,8 @@ class IDecoder : public IObserver, public BoThread, public ISubject {
     bool m_isAudio = false;
 
     //读取缓冲
-    std::list<std::shared_ptr<IBoData>> m_boDataList;
-    std::mutex m_boDataListMutex;
+    std::queue<std::shared_ptr<IBoData>> m_boDataQueue;
+    std::mutex m_boDataQueueMutex;
 
     double m_audioTimeBase = 0.0;
     double m_videoTimeBase = 0.0;

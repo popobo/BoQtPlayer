@@ -19,6 +19,8 @@ class FFDecoder : public IDecoder {
 
     virtual void close() override;
 
+    virtual void clear() override;
+
   private:
     AVCodecContext *m_codecContext = nullptr;
     AVFrame *m_frame = nullptr;

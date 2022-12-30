@@ -43,6 +43,11 @@ class AudioBuffer : public QIODevice {
 
     qint64 writeData(const char *data, qint64 len) override { return 0; }
 
+    void clear() {
+        std::unique_lock<std::mutex> locker{ m_boDataQueueMutex };
+        m_boDataQueue = {};
+    }
+
   private:
     std::queue<std::shared_ptr<IBoData>> m_boDataQueue;
     std::mutex m_boDataQueueMutex;
@@ -153,4 +158,10 @@ void QAudioPlayer::resume()
 {
     m_isPaused = false;
     m_audioSink->resume();
+}
+
+void QAudioPlayer::clear()
+{
+    IAudioPlayer::clear();
+    m_audioBuffer->clear();
 }
