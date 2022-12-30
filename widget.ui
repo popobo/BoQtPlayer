@@ -65,6 +65,22 @@
     <string>Resume</string>
    </property>
   </widget>
+  <widget class="QSlider" name="horizontalSliderPlayProgress">
+   <property name="geometry">
+    <rect>
+     <x>109</x>
+     <y>702</y>
+     <width>600</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="maximum">
+    <number>999</number>
+   </property>
+   <property name="orientation">
+    <enum>Qt::Horizontal</enum>
+   </property>
+  </widget>
  </widget>
  <resources/>
  <connections/>

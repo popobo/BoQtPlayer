@@ -22,6 +22,8 @@ class Widget : public QWidget {
 
     void closeWidget();
 
+    void timerEvent(QTimerEvent* event) override;
+
   private:
     Ui::Widget *ui;
 

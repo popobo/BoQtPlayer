@@ -31,7 +31,11 @@ class IPlayer : public BoThread {
     virtual void setAudioPlayer(const std::shared_ptr<IAudioPlayer> &newAudioPlayer);
 
     // 0.0 ~ 1.0
-    virtual void seek(double pos);
+    virtual bool seek(double pos);
+
+    virtual bool checkModulesValid();
+
+    virtual double getPlayPos();
 
   public:
     std::shared_ptr<IDemux> m_demux;

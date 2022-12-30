@@ -156,13 +156,74 @@ void IPlayer::setAudioPlayer(
     m_resampler->addObs(m_audioPlayer);
 }
 
-void IPlayer::seek(double pos)
+bool IPlayer::seek(double pos)
 {
-    if (!m_demux) {
-        BO_ERROR("m_demux is nullptr");
-        return;
+    if (!checkModulesValid()) {
+        return false;
     }
+
     pause();
+    std::unique_lock<std::mutex> locker(m_playerMutex);
+    m_videoDecoder->clear();
+    m_audioDecoder->clear();
+    m_audioPlayer->clear();
+    m_videoView->clear();
+
+    bool ret = m_demux->seek(pos);//seek跳转到关键帧
+    // 解码实际需要显示的帧
+    int seekPts = pos * m_demux->getTotalTime();
+    while (!m_isExit) {
+        auto pkt = m_demux->read();
+        if (pkt->size() <= 0) {
+            break;
+        }
+
+        if (pkt->isAudio()) {
+            if (pkt->pts() < seekPts) {
+                continue;
+            }
+            // 将需要播放的音频写入缓冲队列
+            m_demux->notify(pkt);
+            continue;
+        }
+
+        //解码需要显示的帧之前的数据
+        m_videoDecoder->sendPacket(pkt);
+        auto data = m_videoDecoder->recvFrame();
+        if (data->size() <= 0) {
+            continue;
+        }
+        if (data->pts() >= seekPts) {
+            break;
+        }
+    }
+    locker.unlock();
+    resume();
+    return ret;
+}
+
+bool IPlayer::checkModulesValid()
+{
+    if (!m_demux || !m_videoDecoder || !m_audioDecoder || !m_videoView || !m_resampler || !m_audioPlayer) {
+        BO_ERROR("one of the modules is nullptr");
+        return false;
+    }
+    
+    return true;
+}
+
+double IPlayer::getPlayPos()
+{
+    if (!checkModulesValid()) {
+        return 0.0;
+    }
+
+    auto totalMs = m_demux->getTotalTime();
+    auto currentPts = m_audioPlayer->getPts();
+    if (totalMs == 0) {
+        return 0.0;
+    }
+    return (double)currentPts / (double)totalMs;
 }
 
 void IPlayer::main() {

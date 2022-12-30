@@ -8,6 +8,10 @@
 #include <QMediaDevices>
 #include <QOpenGLContext>
 
+namespace {
+    const int PROGRESS_SLIDER_UPDATE_TIME = 40;
+}
+
 Widget::Widget(QWidget *parent) : QWidget(parent), ui(new Ui::Widget) {
     ui->setupUi(this);
 
@@ -42,6 +46,8 @@ Widget::Widget(QWidget *parent) : QWidget(parent), ui(new Ui::Widget) {
 
     connect(ui->pushButtonPause, SIGNAL(clicked()), this, SLOT(pause()));
     connect(ui->pushButtonResume, SIGNAL(clicked()), this, SLOT(resume()));
+    
+    startTimer(PROGRESS_SLIDER_UPDATE_TIME);
 }
 
 Widget::~Widget() { delete ui; }
@@ -50,6 +56,16 @@ void Widget::closeWidget() {
     m_player->stop();
 
     QWidget::close();
+}
+
+void Widget::timerEvent(QTimerEvent* event)
+{
+    if (!m_player) {
+        return;
+    }
+
+    auto position = m_player->getPlayPos();
+    ui->horizontalSliderPlayProgress->setValue((int)(position * ui->horizontalSliderPlayProgress->maximum()));
 }
 
 void Widget::pause()
