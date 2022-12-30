@@ -46,7 +46,7 @@ class IPlayer : public BoThread {
     std::shared_ptr<IAudioPlayer> m_audioPlayer;
 
   protected:
-    void main() override;
+    virtual void main() override;
     std::mutex m_playerMutex;
 };
 

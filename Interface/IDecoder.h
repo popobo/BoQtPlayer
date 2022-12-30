@@ -12,7 +12,7 @@ class IDecoder : public IObserver, public BoThread, public ISubject {
   public:
     IDecoder() {}
 
-    virtual ~IDecoder() {}
+    virtual ~IDecoder();
 
     //打开解码器
     virtual bool open(const std::shared_ptr<IParameter> &parameter) = 0;

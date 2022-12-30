@@ -171,7 +171,7 @@ bool IPlayer::seek(double pos)
 
     bool ret = m_demux->seek(pos);//seek跳转到关键帧
     // 解码实际需要显示的帧
-    int seekPts = pos * m_demux->getTotalTime();
+    int64_t seekPts = static_cast<int64_t>(pos * m_demux->getTotalTime());
     while (!m_isExit) {
         auto pkt = m_demux->read();
         if (pkt->size() <= 0) {
@@ -227,22 +227,20 @@ double IPlayer::getPlayPos()
 }
 
 void IPlayer::main() {
-    while (!m_isExit) {
-        if (m_isPaused) {
-            boSleep(1);
-            continue;
-        }
+    if (m_isPaused) {
+        boSleep(1);
+        return;
+    }
         
-        std::unique_lock<std::mutex> locker(m_playerMutex);
-        if (!m_audioPlayer || !m_videoDecoder) {
-            locker.unlock();
-            boSleep(1);
-            continue;
-        }
-
-        m_videoView->setSyncAudioPts(m_audioPlayer->getPts());
-
+    std::unique_lock<std::mutex> locker(m_playerMutex);
+    if (!m_audioPlayer || !m_videoDecoder) {
         locker.unlock();
         boSleep(1);
+        return;
     }
+
+    m_videoView->setSyncAudioPts(m_audioPlayer->getPts());
+
+    locker.unlock();
+    boSleep(1);
 }

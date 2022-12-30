@@ -40,8 +40,8 @@ class IBoData {
 
     virtual void copyBasicAttributes(const IBoData &boData);
 
-    long pts() const;
-    void setPts(long newPts);
+    int64_t pts() const;
+    void setPts(int64_t newPts);
 
     double timeBase() const;
     void setTimeBase(double newTimeBase);
@@ -60,7 +60,7 @@ class IBoData {
     int m_width{0};
     int m_height{0};
     int m_format{0};
-    long m_pts{0};
+    int64_t m_pts{0};
     double m_timeBase{0};
     bool m_isAudio{false};
 };

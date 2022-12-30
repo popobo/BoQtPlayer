@@ -49,9 +49,9 @@ void IBoData::copyBasicAttributes(const IBoData &boData) {
     this->m_pts = boData.m_pts;
 }
 
-long IBoData::pts() const { return m_pts; }
+int64_t IBoData::pts() const { return m_pts; }
 
-void IBoData::setPts(long newPts) { m_pts = newPts; }
+void IBoData::setPts(int64_t newPts) { m_pts = newPts; }
 
 double IBoData::timeBase() const { return m_timeBase; }
 

@@ -39,6 +39,7 @@ bool OpenGLRenderWidget::startThread() {
 }
 
 void OpenGLRenderWidget::stopThread() {
+    BO_INFO("stopThread");
     if (m_renderingThread && m_renderingThread->isRunning()) {
         m_renderingThread->stop();
         m_renderingThread->quit();

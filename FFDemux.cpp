@@ -113,8 +113,8 @@ std::shared_ptr<IBoData> FFDemux::read() {
     }
 
     // 转换pts(ms)
-    pkt->pts = pkt->pts * (r2d(ic->streams[pkt->stream_index]->time_base)) * 1000;
-    pkt->dts = pkt->dts * (r2d(ic->streams[pkt->stream_index]->time_base)) * 1000;
+    pkt->pts = (int64_t)(pkt->pts * (r2d(ic->streams[pkt->stream_index]->time_base)) * 1000);
+    pkt->dts = (int64_t)(pkt->dts * (r2d(ic->streams[pkt->stream_index]->time_base)) * 1000);
     boData->setPts(pkt->pts);
 
     return boData;
@@ -132,5 +132,5 @@ std::shared_ptr<IParameter> FFDemux::getAudioParameter() {
 
 bool FFDemux::seek(double pos)
 {
-    return false;
+    return true;
 }

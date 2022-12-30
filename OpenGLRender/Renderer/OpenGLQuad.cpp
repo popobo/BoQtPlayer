@@ -33,8 +33,8 @@ bool Quad::render(const glm::mat4 &view, const glm::mat4 &projection) {
 Quad::~Quad() {}
 
 void Quad::init() {
-    const float w = m_width * 0.5;
-    const float h = m_height * 0.5;
+    const float w = static_cast<float>(m_width * 0.5);
+    const float h = static_cast<float>(m_height * 0.5);
 
     //        const std::vector<float> vertexData ={
     //            // x   y   z     r     g     b

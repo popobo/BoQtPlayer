@@ -21,7 +21,7 @@ bool FFDecoder::open(const std::shared_ptr<IParameter> &parameter) {
     if (!avc) {
         BO_INFO("avcodec_find_decoder %d failed!", (int)para->codec_id);
     }
-    BO_INFO("avcodec_find_decoder {0} successfully!", para->codec_id);
+    BO_INFO("avcodec_find_decoder {0} successfully!", (int)para->codec_id);
     std::unique_lock<std::mutex> locker{ m_codecContextMutex };
     // 2.创建解码器上下文，并复制参数
     m_codecContext = avcodec_alloc_context3(avc);
