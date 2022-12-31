@@ -5,8 +5,8 @@
 BoThread::BoThread() {}
 
 BoThread::~BoThread() {
-    m_mainTasksVec.clear();
-    m_subTasksQueue = {};
+    clearMainTasks();
+    clearSubTasks();
 }
 
 bool BoThread::start() {
@@ -15,25 +15,16 @@ bool BoThread::start() {
     std::thread th(&BoThread::threadMain, this);
     //当前线程放弃对新建线程的控制, 防止对象被清空时, 新建线程出错
     th.detach();
-    // this的野指针的可能性
-    addMainTask([this]() {
-        this->main();
-    });
     return true;
 }
 
-void BoThread::stop() {
-    m_isExit = true;
-    for (int i = 0; i < 200; ++i) {
-        boSleep(1);
-        if (!m_isRunning) {
-            BO_INFO("stop thread successfully");
-            m_mainTasksVec.clear();
-            return;
+void BoThread::stop() {    
+    std::weak_ptr<BoThread> wself = shared_from_this();
+    addSubTask([wself]() {
+        if (auto self = wself.lock()) {
+            self->_stop();
         }
-        boSleep(1);
-    }
-    BO_INFO("stop thread time out");
+        });
 }
 
 bool BoThread::isPaused()
@@ -43,12 +34,22 @@ bool BoThread::isPaused()
 
 void BoThread::pause()
 {
-    m_isPaused = true;
+    std::weak_ptr<BoThread> wself = shared_from_this();
+    addSubTask([wself]() {
+        if (auto self = wself.lock()) {
+            self->_pause();
+        }
+        });
 }
 
 void BoThread::resume()
 {
-    m_isPaused = false;
+    std::weak_ptr<BoThread> wself = shared_from_this();
+    addSubTask([wself]() {
+        if (auto self = wself.lock()) {
+            self->_resume();
+        }
+        });
 }
 
 void BoThread::addMainTask(std::function<void()> mainTask)
@@ -77,20 +78,42 @@ void BoThread::clearSubTasks()
 
 void BoThread::threadMain() {
     BO_INFO("thread main begin");
-    m_isRunning = true;
     while (!m_isExit) {
+        if (m_isPaused) {
+            boSleep(1);
+            continue;
+        }
+
+        m_mainTasksVecMutex.lock();
         for (const auto& mainTask : m_mainTasksVec) {
             mainTask();
         }
-        
+        m_mainTasksVecMutex.unlock();
+
+        m_subTasksQueueMutex.lock();
         while (!m_subTasksQueue.empty()) {
             auto subTask = m_subTasksQueue.front();
             subTask();
             m_subTasksQueue.pop();
         }
+        m_subTasksQueueMutex.unlock();
     }
-    m_isRunning = false;
     BO_INFO("thread main end");
+}
+
+void BoThread::_stop()
+{
+    m_isExit = true;
+}
+
+void BoThread::_pause()
+{
+    m_isPaused = true;
+}
+
+void BoThread::_resume()
+{
+    m_isPaused = false;
 }
 
 void boSleep(int ms) {

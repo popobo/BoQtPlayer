@@ -9,35 +9,30 @@
 
 void boSleep(int ms);
 
-class BoThread:public std::enable_shared_from_this<BoThread> {
+class BoThread: public std::enable_shared_from_this<BoThread> {
   public:
     BoThread();
 
     virtual ~BoThread();
 
     //启动线程
-    virtual bool start();
+    bool start();
 
-    //通过isExit变量安全停止线程(不一定成功),
-    //在开发中不应该操作线程句柄直接让其停止, 风险大, 因为不知道程序执行到哪
-    virtual void stop();
+    void stop();
 
-    //入口主函数
-    virtual void main(){};
+    bool isPaused();
 
-    virtual bool isPaused();
+    void pause();
 
-    virtual void pause();
+    void resume();
 
-    virtual void resume();
+    void addMainTask(std::function<void()> mainTask);
 
-    virtual void addMainTask(std::function<void()> mainTask);
+    void clearMainTasks();
 
-    virtual void clearMainTasks();
-
-    virtual void addSubTask(std::function<void()> subTask);
+    void addSubTask(std::function<void()> subTask);
     
-    virtual void clearSubTasks();
+    void clearSubTasks();
 
   protected:
     bool m_isExit = false;
@@ -51,6 +46,12 @@ class BoThread:public std::enable_shared_from_this<BoThread> {
 
   private:
     void threadMain();
+
+    void _stop();
+
+    void _pause();
+
+    void _resume();
 };
 
 #endif // BOTHREAD_H
