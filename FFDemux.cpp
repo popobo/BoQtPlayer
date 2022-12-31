@@ -130,6 +130,50 @@ std::shared_ptr<IParameter> FFDemux::getAudioParameter() {
     return m_audioParameter;
 }
 
+bool FFDemux::start()
+{
+    bool ret = m_thread.start();
+    std::weak_ptr<FFDemux> wself = shared_from_this();
+    m_thread.addMainTask([wself]() {
+        if (auto self = wself.lock()) {
+            self->main();
+        }
+        });
+    return ret;
+}
+
+void FFDemux::stop()
+{
+    m_thread.stop();
+}
+
+bool FFDemux::isPaused()
+{
+    return m_thread.isPaused();
+}
+
+void FFDemux::pause()
+{
+    m_thread.pause();
+}
+
+void FFDemux::resume()
+{
+    m_thread.resume();
+}
+
+void FFDemux::main() {
+    auto boData = read();
+    if (boData->size() > 0) {
+        //通知观察者, 如果没有观察者接受数据, 数据应该销毁
+        notify(boData);
+    }
+    else {
+        boSleep(1);
+    }
+}
+
+
 bool FFDemux::seek(double pos)
 {
     return true;

@@ -32,6 +32,11 @@ bool BoThread::isPaused()
     return m_isPaused;
 }
 
+bool BoThread::isExit()
+{
+    return m_isExit;
+}
+
 void BoThread::pause()
 {
     std::weak_ptr<BoThread> wself = shared_from_this();

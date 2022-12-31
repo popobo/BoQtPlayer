@@ -7,11 +7,11 @@
 #include "ISubject.h"
 #include <queue>
 
-class IAudioPlayer : public IObserver, public ISubject, public BoThread {
+class IAudioPlayer : public IObserver, public ISubject {
   public:
-    IAudioPlayer();
+    IAudioPlayer() {};
 
-    ~IAudioPlayer();
+    ~IAudioPlayer() {};
 
     virtual bool open(const std::shared_ptr<IParameter> &parameter) = 0;
 
@@ -22,19 +22,17 @@ class IAudioPlayer : public IObserver, public ISubject, public BoThread {
 
     virtual long getPts() = 0;
 
-    virtual const AudioOutputFormat &audioOutFormat() const;
+    virtual const AudioOutputFormat &audioOutFormat() const = 0;
+
+    virtual bool start() = 0;
+
+    virtual void stop() = 0;
 
     virtual void pause() = 0;
 
     virtual void resume() = 0;
     
-    virtual void clear();
-
-  protected:
-    long m_pts{0};
-    std::queue<std::shared_ptr<IBoData>> m_frames;
-    std::mutex m_framesMutex;
-    AudioOutputFormat m_audioOutFormat;
+    virtual void clear() = 0;
 };
 
 #endif // IAUDIOPLAY_H

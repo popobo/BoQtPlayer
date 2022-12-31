@@ -7,9 +7,9 @@
 #include "ISubject.h"
 
 //解封装接口类
-class IDemux : public BoThread, public ISubject {
+class IDemux : public ISubject {
   public:
-    virtual ~IDemux();
+    virtual ~IDemux() {};
 
     //打开文件或者流媒体 rtmp http rtsp
     virtual bool open(const char *url) = 0;
@@ -26,12 +26,19 @@ class IDemux : public BoThread, public ISubject {
 
     virtual std::shared_ptr<IParameter> getAudioParameter() = 0;
 
+    virtual bool start() = 0;
+
+    virtual void stop() = 0;
+
+    virtual bool isPaused() = 0;
+
+    virtual void pause() = 0;
+
+    virtual void resume() = 0;
+
 protected:
     //不要让用户访问
-    virtual void main();
-
-  protected:
-    int64_t m_totalMs = 0;
+    virtual void main() = 0;
 };
 
 #endif // IDEMUX_H

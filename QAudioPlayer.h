@@ -22,6 +22,7 @@ class QAudioPlayer : public IAudioPlayer {
 
     // IAudioPlayer interface
     virtual bool start() override;
+
     virtual void stop() override;
 
     virtual long getPts() override;
@@ -34,6 +35,8 @@ class QAudioPlayer : public IAudioPlayer {
 
     virtual void clear() override;
 
+    virtual const AudioOutputFormat& audioOutFormat() const override;
+
   private:
     bool m_isStarted{false};
     std::shared_ptr<AudioBuffer> m_audioBuffer;
@@ -43,7 +46,10 @@ class QAudioPlayer : public IAudioPlayer {
     double m_timeBase = 0.0;
     ElapsedTimer m_timer;
     std::atomic<bool> m_isPaused{ false };
+    std::atomic<bool> m_isExit{ false };
 
+    long m_pts{ 0 };
+    AudioOutputFormat m_audioOutFormat;
 };
 
 #endif // QAUDIOPLAYER_H

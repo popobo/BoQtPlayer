@@ -3,6 +3,7 @@
 #include "FFDemux.h"
 #include "FFResampler.h"
 #include "OpenGLRenderWidget.h"
+#include "FFQtPlayer.h"
 
 FFQtPlayerBuilder::FFQtPlayerBuilder() {}
 
@@ -21,5 +22,5 @@ std::shared_ptr<IResampler> FFQtPlayerBuilder::createResampler() {
 }
 
 std::shared_ptr<IPlayer> FFQtPlayerBuilder::createPlayer() {
-    return std::make_shared<IPlayer>();
+    return std::make_shared<FFQtPlayer>();
 }

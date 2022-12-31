@@ -7,7 +7,7 @@ std::shared_ptr<IPlayer> IPlayerBuilder::buildPlayer() {
     std::shared_ptr<IDecoder> videoDecoder = createDecoder();
     std::shared_ptr<IDecoder> audioDecoder = createDecoder();
     std::shared_ptr<IResampler> resampler = createResampler();
-    std::shared_ptr<IPlayer> player = createPlayer();
+    std::shared_ptr<IPlayer> player = createPlayer ();
 
     demux->addObs(videoDecoder);
     demux->addObs(audioDecoder);

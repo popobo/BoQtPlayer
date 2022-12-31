@@ -162,6 +162,10 @@ void QAudioPlayer::resume()
 
 void QAudioPlayer::clear()
 {
-    IAudioPlayer::clear();
     m_audioBuffer->clear();
+}
+
+const AudioOutputFormat& QAudioPlayer::audioOutFormat() const
+{
+    return m_audioOutFormat;
 }

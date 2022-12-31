@@ -22,6 +22,8 @@ class BoThread: public std::enable_shared_from_this<BoThread> {
 
     bool isPaused();
 
+    bool isExit();
+
     void pause();
 
     void resume();
@@ -35,9 +37,8 @@ class BoThread: public std::enable_shared_from_this<BoThread> {
     void clearSubTasks();
 
   protected:
-    bool m_isExit = false;
-    bool m_isRunning = false;
-    bool m_isPaused{false};
+    bool m_isExit{ false };
+    bool m_isPaused{ false };
     
     std::vector<std::function<void()>> m_mainTasksVec;
     std::queue<std::function<void()>> m_subTasksQueue;

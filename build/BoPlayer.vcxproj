@@ -499,7 +499,9 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
     </ClCompile>
     <ClCompile Include="D:\Code\Qt\BoPlayer\main.cpp" />
     <ClCompile Include="D:\Code\Qt\BoPlayer\widget.cpp" />
+    <ClCompile Include="FFQtPlayer.cpp" />
     <ClInclude Include="D:\Code\Qt\BoPlayer\widget.h" />
+    <ClInclude Include="FFQtPlayer.h" />
     <None Include="D:\Code\Qt\BoPlayer\widget.ui">
     </None>
     <ClInclude Include="D:\Code\Qt\BoPlayer\BoLog.h" />

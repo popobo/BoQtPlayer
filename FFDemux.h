@@ -6,7 +6,7 @@ extern "C" {
 #include "libavformat/avformat.h"
 }
 
-class FFDemux : public IDemux {
+class FFDemux : public IDemux, public std::enable_shared_from_this<FFDemux> {
   public:
     FFDemux();
 
@@ -21,6 +21,13 @@ class FFDemux : public IDemux {
     virtual std::shared_ptr<IParameter> getVideoParameter() override;
     virtual std::shared_ptr<IParameter> getAudioParameter() override;
 
+    virtual bool start() override;
+    virtual void stop() override;
+    virtual bool isPaused() override;
+    virtual void pause() override;
+    virtual void resume() override;
+    virtual void main() override;
+
   private:
     AVFormatContext *ic = nullptr;
     std::shared_ptr<IParameter> m_videoParameter;
@@ -28,6 +35,9 @@ class FFDemux : public IDemux {
 
     int m_audioStream = 1;
     int m_videoStream = 0;
+
+    int64_t m_totalMs = 0;
+    BoThread m_thread;
 };
 
 #endif // FFDEMUX_H

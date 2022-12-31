@@ -8,11 +8,11 @@
 #include "ISubject.h"
 #include <queue>
 
-class IDecoder : public IObserver, public BoThread, public ISubject {
+class IDecoder : public IObserver, public ISubject {
   public:
     IDecoder() {}
 
-    virtual ~IDecoder();
+    virtual ~IDecoder() {}
 
     //打开解码器
     virtual bool open(const std::shared_ptr<IParameter> &parameter) = 0;
@@ -25,31 +25,29 @@ class IDecoder : public IObserver, public BoThread, public ISubject {
 
     //由主体notify的数据 达到最大队列缓冲则阻塞
     // IObserver Interface
-    virtual void update(const std::shared_ptr<IBoData> &boData) override;
+    virtual void update(const std::shared_ptr<IBoData> &boData)  = 0;
 
     // BoThread interface
-    virtual void main() override;
-
     virtual void close() = 0;
 
-    virtual void clear();
+    virtual void clear() = 0;
 
-    bool isAudio() const;
+    virtual bool isAudio() const = 0;
 
-    void setIsAudio(bool newIsAudio);
+    virtual void setIsAudio(bool newIsAudio) = 0;
 
-  public:
-    const int MAX_LIST = 100;
+    virtual bool start() = 0;
 
-  protected:
-    bool m_isAudio = false;
+    virtual void stop() = 0;
 
-    //读取缓冲
-    std::queue<std::shared_ptr<IBoData>> m_boDataQueue;
-    std::mutex m_boDataQueueMutex;
+    virtual bool isPaused() = 0;
 
-    double m_audioTimeBase = 0.0;
-    double m_videoTimeBase = 0.0;
+    virtual void pause() = 0;
+
+    virtual void resume() = 0;
+
+  private:
+    virtual void main() = 0;
 };
 
 #endif // IDECODER_H
