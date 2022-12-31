@@ -47,7 +47,7 @@ class FFDecoder : public IDecoder, public std::enable_shared_from_this<FFDecoder
     double m_audioTimeBase = 0.0;
     double m_videoTimeBase = 0.0;
 
-    BoThread m_thread;
+    std::shared_ptr<BoThread> m_thread;
 };
 
 #endif // FFDECODER_H

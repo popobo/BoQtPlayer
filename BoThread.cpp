@@ -84,16 +84,13 @@ void BoThread::clearSubTasks()
 void BoThread::threadMain() {
     BO_INFO("thread main begin");
     while (!m_isExit) {
-        if (m_isPaused) {
-            boSleep(1);
-            continue;
+        if (!m_isPaused) {
+            m_mainTasksVecMutex.lock();
+            for (const auto& mainTask : m_mainTasksVec) {
+                mainTask();
+            }
+            m_mainTasksVecMutex.unlock();
         }
-
-        m_mainTasksVecMutex.lock();
-        for (const auto& mainTask : m_mainTasksVec) {
-            mainTask();
-        }
-        m_mainTasksVecMutex.unlock();
 
         m_subTasksQueueMutex.lock();
         while (!m_subTasksQueue.empty()) {
@@ -102,6 +99,7 @@ void BoThread::threadMain() {
             m_subTasksQueue.pop();
         }
         m_subTasksQueueMutex.unlock();
+        boSleep(1);
     }
     BO_INFO("thread main end");
 }

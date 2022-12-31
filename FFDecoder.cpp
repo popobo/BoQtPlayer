@@ -7,7 +7,9 @@ extern "C" {
 }
 #include <QImage>
 
-FFDecoder::FFDecoder() {}
+FFDecoder::FFDecoder() {
+    m_thread = std::make_shared<BoThread>();
+}
 
 FFDecoder::~FFDecoder() {}
 
@@ -120,9 +122,7 @@ std::shared_ptr<IBoData> FFDecoder::recvFrame() {
 }
 
 void FFDecoder::close() {
-    m_boDataQueueMutex.lock();
-    m_boDataQueue = {};
-    m_boDataQueueMutex.unlock();
+    clear();
 
     std::unique_lock<std::mutex> locker{ m_codecContextMutex };
     if (m_frame) {
@@ -158,9 +158,9 @@ void FFDecoder::setIsAudio(bool newIsAudio)
 
 bool FFDecoder::start()
 {
-    bool ret = m_thread.start();
+    bool ret = m_thread->start();
     std::weak_ptr<FFDecoder> wself = shared_from_this();
-    m_thread.addMainTask([wself]() {
+    m_thread->addMainTask([wself]() {
         if (auto self = wself.lock()) {
             self->main();
         }
@@ -170,22 +170,22 @@ bool FFDecoder::start()
 
 void FFDecoder::stop()
 {
-    m_thread.stop();
+    m_thread->stop();
 }
 
 bool FFDecoder::isPaused()
 {
-    return m_thread.isPaused();
+    return m_thread->isPaused();
 }
 
 void FFDecoder::pause()
 {
-    m_thread.pause();
+    m_thread->pause();
 }
 
 void FFDecoder::resume()
 {
-    m_thread.resume();
+    m_thread->resume();
 }
 
 void FFDecoder::main()
@@ -210,7 +210,7 @@ void FFDecoder::main()
     //开启解码
     //发送数据到解码线程 一个数据包可能解码多个结果(主要是音频)
     if (sendPacket(boData)) {
-        while (!m_thread.isExit()) {
+        while (!m_thread->isExit()) {
             //获取解码器
             //获取解码数据
             auto frame = recvFrame();
@@ -230,11 +230,9 @@ void FFDecoder::update(const std::shared_ptr<IBoData>& boData)
     if (boData->isAudio() != m_isAudio) {
         return;
     }
-    if (!m_isAudio) {
-        //BO_INFO("m_isAudio:{0}, m_boDataQueue.size():{1}", m_isAudio, m_boDataQueue.size());
-    }
+
     // 循环是为了阻塞住FFDemux让其不要读取数据了
-    while (!m_thread.isExit()) {
+    while (!m_thread->isExit()) {
         std::unique_lock<std::mutex> lock(m_boDataQueueMutex);
         if (m_boDataQueue.size() < MAX_LIST) {
             m_boDataQueue.push(boData);

@@ -37,7 +37,7 @@ class FFDemux : public IDemux, public std::enable_shared_from_this<FFDemux> {
     int m_videoStream = 0;
 
     int64_t m_totalMs = 0;
-    BoThread m_thread;
+    std::shared_ptr<BoThread> m_thread;
 };
 
 #endif // FFDEMUX_H

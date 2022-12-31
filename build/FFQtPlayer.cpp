@@ -1,6 +1,10 @@
 ﻿#include "FFQtPlayer.h"
 #include "BoLog.h"
 
+FFQtPlayer::FFQtPlayer() {
+    m_thread = std::make_shared<BoThread>();
+}
+
 bool FFQtPlayer::open(const char* url)
 {
     std::unique_lock<std::mutex> locker(m_playerMutex);
@@ -60,9 +64,9 @@ bool FFQtPlayer::start()
     }
 
     locker.unlock();
-    m_thread.start();
+    m_thread->start();
     std::weak_ptr<FFQtPlayer> wself = shared_from_this();
-    m_thread.addMainTask([wself]() {
+    m_thread->addMainTask([wself]() {
         if (auto self = wself.lock()) {
             self->main();
         }
@@ -100,7 +104,7 @@ void FFQtPlayer::stop()
 void FFQtPlayer::pause()
 {
     std::unique_lock<std::mutex> locker(m_playerMutex);
-    m_thread.pause();
+    m_thread->pause();
 
     if (m_demux) {
         m_demux->pause();
@@ -126,7 +130,7 @@ void FFQtPlayer::pause()
 void FFQtPlayer::resume()
 {
     std::unique_lock<std::mutex> locker(m_playerMutex);
-    m_thread.resume();
+    m_thread->resume();
 
     if (m_demux) {
         m_demux->resume();
@@ -179,7 +183,7 @@ bool FFQtPlayer::seek(double pos)
     bool ret = m_demux->seek(pos);//seek跳转到关键帧
     // 解码实际需要显示的帧
     int64_t seekPts = static_cast<int64_t>(pos * m_demux->getTotalTime());
-    while (!m_thread.isExit()) {
+    while (!m_thread->isExit()) {
         auto pkt = m_demux->read();
         if (pkt->size() <= 0) {
             break;
