@@ -94,17 +94,26 @@ void IPlayer::pause()
     std::unique_lock<std::mutex> locker(m_playerMutex);
     BoThread::pause();
 
-    if (m_demux) {
-        m_demux->pause();
-    }
+    std::weak_ptr<IDemux> weakDemux = m_demux;
+    m_demux->addSubTask([weakDemux]() {
+        if (auto demux = weakDemux.lock()) {
+            demux->pause();
+        }
+    });
 
-    if (m_videoDecoder) {
-        m_videoDecoder->pause();
-    }
+    std::weak_ptr<IDecoder> weakVideoDecoder = m_videoDecoder;
+    m_videoDecoder->addSubTask([weakVideoDecoder]() {
+        if (auto videoDecoder = weakVideoDecoder.lock()) {
+            videoDecoder->pause();
+        }
+    });
 
-    if (m_audioDecoder) {
-        m_audioDecoder->pause();
-    }
+    std::weak_ptr<IDecoder> weakAudioDecoder = m_audioDecoder;
+    m_audioDecoder->addSubTask([weakAudioDecoder]() {
+        if (auto audioDecoder = weakAudioDecoder.lock()) {
+            audioDecoder->pause();
+        }
+    });
 
     if (m_audioPlayer) {
         m_audioPlayer->pause();
@@ -117,21 +126,34 @@ void IPlayer::pause()
 
 void IPlayer::resume()
 {
+    if (!checkModulesValid()) {
+        return;
+    }
+
     std::unique_lock<std::mutex> locker(m_playerMutex);
     BoThread::resume();
 
-    if (m_demux) {
-        m_demux->resume();
-    }
+    std::weak_ptr<IDemux> weakDemux = m_demux;
+    m_demux->addSubTask([weakDemux]() {
+        if (auto demux = weakDemux.lock()) {
+            demux->resume();
+        }
+    });
 
-    if (m_videoDecoder) {
-        m_videoDecoder->resume();
-    }
+    std::weak_ptr<IDecoder> weakVideoDecoder = m_videoDecoder;
+    m_videoDecoder->addSubTask([weakVideoDecoder]() {
+        if (auto videoDecoder = weakVideoDecoder.lock()) {
+            videoDecoder->resume();
+        }
+    });
 
-    if (m_audioDecoder) {
-        m_audioDecoder->resume();
-    }
-    
+    std::weak_ptr<IDecoder> weakAudioDecoder = m_audioDecoder;
+    m_audioDecoder->addSubTask([weakAudioDecoder]() {
+        if(auto audioDecoder = weakAudioDecoder.lock()){
+            audioDecoder->resume();
+        }
+    });
+
     if (m_audioPlayer) {
         m_audioPlayer->resume();
     }
