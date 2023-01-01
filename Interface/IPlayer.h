@@ -33,8 +33,6 @@ class IPlayer {
     // 0.0 ~ 1.0
     virtual bool seek(double pos) = 0;
 
-    virtual bool checkModulesValid() = 0;
-
     virtual double getPlayPos() = 0;
 
 public:

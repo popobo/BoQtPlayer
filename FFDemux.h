@@ -29,7 +29,9 @@ class FFDemux : public IDemux, public std::enable_shared_from_this<FFDemux> {
     virtual void main() override;
 
   private:
-    AVFormatContext *ic = nullptr;
+    AVFormatContext *m_avFormatContext = nullptr;
+    std::mutex m_avFormatContextMutex;
+    
     std::shared_ptr<IParameter> m_videoParameter;
     std::shared_ptr<IParameter> m_audioParameter;
 

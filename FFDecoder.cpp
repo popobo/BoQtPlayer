@@ -17,13 +17,16 @@ bool FFDecoder::open(const std::shared_ptr<IParameter> &parameter) {
     if (!parameter->getPara()) {
         return false;
     }
+
     auto para = (AVCodecParameters *)parameter->getPara();
+    
     // 1.查找解码器
     const AVCodec *avc = avcodec_find_decoder(para->codec_id);
     if (!avc) {
         BO_INFO("avcodec_find_decoder %d failed!", (int)para->codec_id);
     }
     BO_INFO("avcodec_find_decoder {0} successfully!", (int)para->codec_id);
+
     std::unique_lock<std::mutex> locker{ m_codecContextMutex };
     // 2.创建解码器上下文，并复制参数
     m_codecContext = avcodec_alloc_context3(avc);
@@ -71,11 +74,14 @@ bool FFDecoder::sendPacket(const std::shared_ptr<IBoData> &boData) {
 
 std::shared_ptr<IBoData> FFDecoder::recvFrame() {
     auto boData = std::make_shared<BoAVFrameData>();
-    std::unique_lock<std::mutex> locker{ m_codecContextMutex };
+    
+    std::unique_lock<std::mutex> codecContextlocker{ m_codecContextMutex };
+    
     if (!m_codecContext) {
         return nullptr;
     }
 
+    std::unique_lock<std::mutex> frameLocker{ m_frameMutex };
     if (!m_frame) {
         m_frame = av_frame_alloc();
     }
@@ -109,6 +115,9 @@ std::shared_ptr<IBoData> FFDecoder::recvFrame() {
         boData->setIsAudio(true);
         boData->setTimeBase(m_audioTimeBase);
     }
+
+    codecContextlocker.unlock();
+
     // m_frame->data什么时候回收,
     // FFmpeg通过引用计数机制保证，使用需要保证相关方法调用正确
     for (int i = 0; i < AV_NUM_DATA_POINTERS; ++i) {
@@ -122,16 +131,23 @@ std::shared_ptr<IBoData> FFDecoder::recvFrame() {
 }
 
 void FFDecoder::close() {
-    clear();
+    m_boDataQueueMutex.lock();
+    m_boDataQueue = {};
+    m_boDataQueueMutex.unlock();
 
-    std::unique_lock<std::mutex> locker{ m_codecContextMutex };
-    if (m_frame) {
-        av_frame_free(&m_frame);
-    }
+    m_codecContextMutex.lock();
     if (m_codecContext) {
+        avcodec_flush_buffers(m_codecContext);
         avcodec_close(m_codecContext);
         avcodec_free_context(&m_codecContext);
     }
+    m_codecContextMutex.unlock();
+  
+    m_frameMutex.lock();
+    if (m_frame) {
+        av_frame_free(&m_frame);
+    }
+    m_frameMutex.unlock();
 }
 
 void FFDecoder::clear()
@@ -140,10 +156,11 @@ void FFDecoder::clear()
     m_boDataQueue = {};
     m_boDataQueueMutex.unlock();
 
-    std::unique_lock<std::mutex> locker{ m_codecContextMutex };
+    m_codecContextMutex.lock();
     if (m_codecContext) {
         avcodec_flush_buffers(m_codecContext);
     }
+    m_codecContextMutex.unlock();
 }
 
 bool FFDecoder::isAudio() const

@@ -15,9 +15,12 @@ public:
     virtual void setVideoView(const std::shared_ptr<IVideoView>& newVideoView) override;
     virtual void setAudioPlayer(const std::shared_ptr<IAudioPlayer>& newAudioPlayer) override;
     virtual bool seek(double pos) override;
-    virtual bool checkModulesValid() override;
     virtual double getPlayPos() override;
     
+private:
+    bool areAllModulesValid();
+    bool areAllMoudlesPaused();
+
 protected:
     virtual void main() override;
 

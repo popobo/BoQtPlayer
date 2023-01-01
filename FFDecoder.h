@@ -28,15 +28,21 @@ class FFDecoder : public IDecoder, public std::enable_shared_from_this<FFDecoder
     virtual bool isPaused() override;
     virtual void pause() override;
     virtual void resume() override;
-    virtual void main() override;
+    
     virtual void update(const std::shared_ptr<IBoData>& boData) override;
+
+private:
+    virtual void main() override;
+
 
   private:
     const int MAX_LIST = 100;
 
     AVCodecContext *m_codecContext = nullptr;
-    AVFrame *m_frame = nullptr;
     std::mutex m_codecContextMutex;
+    
+    AVFrame *m_frame = nullptr;
+    std::mutex m_frameMutex;
 
     bool m_isAudio = false;
 

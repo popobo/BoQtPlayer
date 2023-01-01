@@ -169,11 +169,19 @@ void FFQtPlayer::setAudioPlayer(const std::shared_ptr<IAudioPlayer>& newAudioPla
 
 bool FFQtPlayer::seek(double pos)
 {
-    if (!checkModulesValid()) {
+    if (!areAllModulesValid()) {
         return false;
     }
 
-    pause();
+    if (!areAllMoudlesPaused()) {
+        pause();
+    }
+    
+    // 等待所有相关模块暂停
+    while (!areAllMoudlesPaused()) {
+        boSleep(1);
+    }
+
     std::unique_lock<std::mutex> locker(m_playerMutex);
     m_videoDecoder->clear();
     m_audioDecoder->clear();
@@ -213,7 +221,7 @@ bool FFQtPlayer::seek(double pos)
     return ret;
 }
 
-bool FFQtPlayer::checkModulesValid()
+bool FFQtPlayer::areAllModulesValid()
 {
     if (!m_demux || !m_videoDecoder || !m_audioDecoder || !m_videoView || !m_resampler || !m_audioPlayer) {
         BO_ERROR("one of the modules is nullptr");
@@ -223,9 +231,24 @@ bool FFQtPlayer::checkModulesValid()
     return true;
 }
 
+bool FFQtPlayer::areAllMoudlesPaused()
+{
+    if (!m_demux || !m_videoDecoder || !m_audioDecoder || !m_videoView || !m_resampler || !m_audioPlayer) {
+        BO_ERROR("one of the modules is nullptr");
+        return false;
+    }
+
+    if (!m_demux->isPaused() || !m_videoDecoder->isPaused() || !m_audioDecoder->isPaused()) {
+        BO_ERROR("one of the modules is nullptr");
+        return false;
+    }
+
+    return true;
+}
+
 double FFQtPlayer::getPlayPos()
 {
-    if (!checkModulesValid()) {
+    if (!areAllModulesValid()) {
         return 0.0;
     }
 
