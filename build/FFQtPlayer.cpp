@@ -2,10 +2,10 @@
 #include "BoLog.h"
 
 FFQtPlayer::FFQtPlayer() {
-    m_playerThread = std::make_shared<BoThread>();
-    m_demuxThread = std::make_shared<BoThread>();
-    m_videoDecoderThread = std::make_shared<BoThread>();
-    m_audioDecoderThread = std::make_shared<BoThread>();
+    m_playerThread = std::make_shared<BoThread>("m_playerThread");
+    m_demuxThread = std::make_shared<BoThread>("m_demuxThread");
+    m_videoDecoderThread = std::make_shared<BoThread>("m_videoDecoderThread");
+    m_audioDecoderThread = std::make_shared<BoThread>("m_audioDecoderThread");
 }
 
 FFQtPlayer::~FFQtPlayer()
@@ -173,25 +173,81 @@ void FFQtPlayer::setAudioPlayer(const std::shared_ptr<IAudioPlayer>& newAudioPla
 
 bool FFQtPlayer::seek(double pos)
 {
+    std::weak_ptr<IPlayer> wself = shared_from_this();
+    m_playerThread->addMainTask([wself, pos]() {
+        if (auto self = wself.lock()) {
+            self->_seek(pos);
+        }
+    });
+    return true;
+}
+
+bool FFQtPlayer::areAllModulesValid()
+{
+    if (!m_demux || !m_videoDecoder || !m_audioDecoder || !m_videoView || !m_resampler || !m_audioPlayer) {
+        BO_ERROR("one of the modules is nullptr");
+        return false;
+    }
+
+    if (!m_demuxThread || !m_videoDecoderThread || !m_audioDecoderThread || !m_playerThread) {
+        BO_ERROR("one of the thread is nullptr");
+        return false;
+    }
+
+    return true;
+}
+
+bool FFQtPlayer::areAllModulesPaused()
+{
     if (!areAllModulesValid()) {
         return false;
     }
 
-    if (!areAllMoudlesPaused()) {
-        pause();
-    }
-    
-    // 等待所有相关模块暂停
-    while (!areAllMoudlesPaused()) {
-        boSleep(1);
+    if (!m_demuxThread->isPaused() || !m_videoDecoderThread->isPaused() || !m_audioDecoderThread->isPaused()) {
+        BO_ERROR("one of the modules is not paused");
+        BO_ERROR("m_demuxThread->isPaused():{0}", m_demuxThread->isPaused());
+        BO_ERROR("m_videoDecoderThread->isPaused():{0}", m_videoDecoderThread->isPaused());
+        BO_ERROR("m_audioDecoderThread->isPaused():{0}", m_audioDecoderThread->isPaused());
+        return false;
     }
 
+    return true;
+}
+
+bool FFQtPlayer::_seek(double pos)
+{
+    BO_INFO("");
+    if (!areAllModulesValid()) {
+        return false;
+    }
+    BO_INFO("");
+    if (!m_demuxThread->isPaused() 
+        || !m_videoDecoderThread->isPaused() 
+        || !m_audioDecoderThread->isPaused()
+        || !m_audioPlayer->isPaused()
+        || !m_videoView->isPaused()) {
+        m_demuxThread->pause();
+        m_videoDecoderThread->pause();
+        m_audioDecoderThread->pause();
+        m_audioPlayer->pause();
+        m_videoView->pause();
+    }
+    BO_INFO("");
+    // 等待所有相关模块暂停
+    while (!m_demuxThread->isPaused()
+            || !m_videoDecoderThread->isPaused()
+            || !m_audioDecoderThread->isPaused()
+            || !m_audioPlayer->isPaused()
+            || !m_videoView->isPaused()) {
+        boSleep(1);
+    }
+    BO_INFO("");
     std::unique_lock<std::mutex> locker(m_playerMutex);
     m_videoDecoder->clear();
     m_audioDecoder->clear();
     m_audioPlayer->clear();
     m_videoView->clear();
-
+    BO_INFO("");
     bool ret = m_demux->seek(pos);//seek跳转到关键帧
     // 解码实际需要显示的帧
     int64_t seekPts = static_cast<int64_t>(pos * m_demux->getTotalTime());
@@ -223,35 +279,6 @@ bool FFQtPlayer::seek(double pos)
     locker.unlock();
     resume();
     return ret;
-}
-
-bool FFQtPlayer::areAllModulesValid()
-{
-    if (!m_demux || !m_videoDecoder || !m_audioDecoder || !m_videoView || !m_resampler || !m_audioPlayer) {
-        BO_ERROR("one of the modules is nullptr");
-        return false;
-    }
-
-    if (!m_demuxThread || !m_videoDecoderThread || !m_audioDecoderThread || !m_playerThread) {
-        BO_ERROR("one of the thread is nullptr");
-        return false;
-    }
-
-    return true;
-}
-
-bool FFQtPlayer::areAllMoudlesPaused()
-{
-    if (!areAllModulesValid()) {
-        return false;
-    }
-
-    if (!m_demuxThread->isPaused() || !m_videoDecoderThread->isPaused() || !m_audioDecoderThread->isPaused()) {
-        BO_ERROR("one of the modules is nullptr");
-        return false;
-    }
-
-    return true;
 }
 
 double FFQtPlayer::getPlayPos()

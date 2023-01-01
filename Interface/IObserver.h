@@ -12,6 +12,8 @@ class IObserver {
     //主体调用观察者的update通知观察者已经收到数据了
     virtual void update(const std::shared_ptr<IBoData> &boData) = 0;
 
+    virtual bool isSatisfied() = 0;
+
     virtual ~IObserver() {}
 };
 

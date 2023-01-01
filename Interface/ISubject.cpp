@@ -43,3 +43,20 @@ void ISubject::notify(const std::shared_ptr<IBoData> &boData) {
         observer->update(boData);
     }
 }
+
+bool ISubject::isAnyObserverSatisfied()
+{
+    bool result = false;
+
+    for (const auto& weakObserver : m_observers) {
+        if (auto observer = weakObserver.lock()) {
+            result = result || observer->isSatisfied();
+        }
+    }
+
+    for (const auto& observer : m_strongObservers) {
+        result = result || observer->isSatisfied();
+    }
+
+    return result;
+}

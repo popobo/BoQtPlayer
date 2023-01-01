@@ -2,7 +2,11 @@
 #include "BoLog.h"
 #include <thread>
 
-BoThread::BoThread() {}
+BoThread::BoThread() :m_threaName{""} {}
+
+BoThread::BoThread(const std::string& threadName) : m_threaName{threadName}
+{
+}
 
 BoThread::~BoThread() {
     clearMainTasks();
@@ -19,12 +23,7 @@ bool BoThread::start() {
 }
 
 void BoThread::stop() {    
-    std::weak_ptr<BoThread> wself = shared_from_this();
-    addSubTask([wself]() {
-        if (auto self = wself.lock()) {
-            self->_stop();
-        }
-    });
+    m_isExit = true;
 }
 
 bool BoThread::isPaused()
@@ -39,22 +38,14 @@ bool BoThread::isExit()
 
 void BoThread::pause()
 {
-    std::weak_ptr<BoThread> wself = shared_from_this();
-    addSubTask([wself]() {
-        if (auto self = wself.lock()) {
-            self->_pause();
-        }
-        });
+    BO_INFO("thread name: {0}", m_threaName);
+    m_isPaused = true;
 }
 
 void BoThread::resume()
 {
-    std::weak_ptr<BoThread> wself = shared_from_this();
-    addSubTask([wself]() {
-        if (auto self = wself.lock()) {
-            self->_resume();
-        }
-        });
+    BO_INFO("thread name: {0}", m_threaName);
+    m_isPaused = false;
 }
 
 void BoThread::addMainTask(std::function<void()> mainTask)
@@ -91,7 +82,7 @@ void BoThread::threadMain() {
             }
             m_mainTasksVecMutex.unlock();
         }
-
+        
         m_subTasksQueueMutex.lock();
         while (!m_subTasksQueue.empty()) {
             auto subTask = m_subTasksQueue.front();
@@ -102,21 +93,6 @@ void BoThread::threadMain() {
         boSleep(1);
     }
     BO_INFO("thread main end");
-}
-
-void BoThread::_stop()
-{
-    m_isExit = true;
-}
-
-void BoThread::_pause()
-{
-    m_isPaused = true;
-}
-
-void BoThread::_resume()
-{
-    m_isPaused = false;
 }
 
 void boSleep(int ms) {

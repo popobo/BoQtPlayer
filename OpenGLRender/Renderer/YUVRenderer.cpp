@@ -112,6 +112,9 @@ long YUVRenderer::renderBoData() {
 
     auto boData = m_boDataQueue.front();
     m_boDataQueue.pop();
+    if (m_boDataQueue.size() < 0.5 * MAX_LENGTH) {
+        m_isSatisfied = false;
+    }
     locker.unlock();
     auto boDataDatas = boData->datas();
     auto width = boData->width();
@@ -152,16 +155,18 @@ long YUVRenderer::renderBoData() {
 int YUVRenderer::textureNumber() { return TEXTURE_NUMBER; }
 
 void YUVRenderer::addBoData(const std::shared_ptr<IBoData> &newBoData) {
-    // 有阻塞
-    while (!m_stopReceiveData) {
-        std::unique_lock<std::mutex> locker{ m_boDataQueueMutex };
-        if (m_boDataQueue.size() < MAX_LENGTH) {
-            m_boDataQueue.push(newBoData);
-            break;
-        } else {
-            locker.unlock();
-            QThread::msleep(1);
-        }
+    // 无阻塞
+    if (m_stopReceiveData) {
+        return;
+    }
+    
+    if (m_boDataQueue.size() > 0.75 * MAX_LENGTH) {
+        m_isSatisfied = true;
+    }
+
+    std::unique_lock<std::mutex> locker{ m_boDataQueueMutex };
+    if (m_boDataQueue.size() < MAX_LENGTH) {
+        m_boDataQueue.push(newBoData);
     }
 }
 
@@ -171,6 +176,11 @@ void YUVRenderer::clear()
 {
     std::unique_lock<std::mutex> locker{ m_boDataQueueMutex };
     m_boDataQueue = {};
+}
+
+bool YUVRenderer::isSatisfied()
+{
+    return m_isSatisfied;
 }
 
 } // namespace OpenGLRender

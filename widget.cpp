@@ -47,6 +47,13 @@ Widget::Widget(QWidget *parent) : QWidget(parent), ui(new Ui::Widget) {
     connect(ui->pushButtonPause, SIGNAL(clicked()), this, SLOT(pause()));
     connect(ui->pushButtonResume, SIGNAL(clicked()), this, SLOT(resume()));
     
+    connect(ui->horizontalSliderPlayProgress, SIGNAL(sliderPressed()), this,
+        SLOT(sliderPressed()));
+    connect(ui->horizontalSliderPlayProgress, SIGNAL(sliderReleased()), this,
+        SLOT(sliderReleased()));
+    connect(ui->horizontalSliderPlayProgress, SIGNAL(sliderMoved(int)), this,
+        SLOT(sliderMoved(int)));
+
     startTimer(PROGRESS_SLIDER_UPDATE_TIME);
 }
 
@@ -66,6 +73,10 @@ void Widget::timerEvent(QTimerEvent* event)
         return;
     }
 
+    if (m_sliderPressed) {
+        return;
+    }
+    
     auto position = m_player->getPlayPos();
     ui->horizontalSliderPlayProgress->setValue((int)(position * ui->horizontalSliderPlayProgress->maximum()));
 }
@@ -87,6 +98,17 @@ void Widget::resume()
         ui->pushButtonResume->hide();
     }
 }
+
+void Widget::sliderPressed() { m_sliderPressed = true; }
+
+void Widget::sliderReleased() { 
+    m_sliderPressed = false; 
+    double pos = static_cast<double>(ui->horizontalSliderPlayProgress->value()) 
+        / static_cast<double>(ui->horizontalSliderPlayProgress->maximum());
+    m_player->seek(pos);
+}
+
+void Widget::sliderMoved(int value) {}
 
 void Widget::openFile() {
     // 测试用代码

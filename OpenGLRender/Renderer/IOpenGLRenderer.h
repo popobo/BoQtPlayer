@@ -40,6 +40,8 @@ class IOpenGLRenderer {
     virtual void stop() {}
 
     virtual void clear() {}
+
+    virtual bool isSatisfied() { return false; }
 };
 
 } // namespace OpenGLRender

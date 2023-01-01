@@ -25,6 +25,8 @@ class YUVRenderer : public IOpenGLRenderer {
 
     virtual void clear() override;
 
+    virtual bool isSatisfied() override;
+
   private:
     std::shared_ptr<Mesh> m_mesh;
     std::shared_ptr<Shader> m_shader;
@@ -37,6 +39,7 @@ class YUVRenderer : public IOpenGLRenderer {
     std::mutex m_boDataQueueMutex;
 
     bool m_stopReceiveData = false;
+    std::atomic<bool> m_isSatisfied{ false };
 };
 
 } // namespace OpenGLRender

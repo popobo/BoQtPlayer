@@ -31,6 +31,8 @@ class QAudioPlayer : public IAudioPlayer {
 
     virtual void pause() override;
 
+    virtual bool isPaused() override;
+
     virtual void resume() override;
 
     virtual void clear() override;
@@ -50,6 +52,9 @@ class QAudioPlayer : public IAudioPlayer {
 
     long m_pts{ 0 };
     AudioOutputFormat m_audioOutFormat;
+
+    // 通过 IAudioPlayer 继承
+    virtual bool isSatisfied() override;
 };
 
 #endif // QAUDIOPLAYER_H

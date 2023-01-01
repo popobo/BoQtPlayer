@@ -51,9 +51,13 @@ class RenderingThread : public QThread {
 
     void pause();
 
+    bool isPaused();
+
     void resume();
     
     void clear();
+
+    bool isSatisfied();
 
   protected:
     void run() override;

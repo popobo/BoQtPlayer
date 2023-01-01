@@ -18,11 +18,12 @@ public:
     virtual void setAudioPlayer(const std::shared_ptr<IAudioPlayer>& newAudioPlayer) override;
     virtual bool seek(double pos) override;
     virtual double getPlayPos() override;
-    
+    virtual bool _seek(double pos) override;
+
 private:
     bool areAllModulesValid();
-    bool areAllMoudlesPaused();
-
+    bool areAllModulesPaused();
+ 
 protected:
     virtual void main() override;
 

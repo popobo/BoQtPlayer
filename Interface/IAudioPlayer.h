@@ -28,6 +28,8 @@ class IAudioPlayer : public IObserver, public ISubject {
 
     virtual void stop() = 0;
 
+    virtual bool isPaused() = 0;
+
     virtual void pause() = 0;
 
     virtual void resume() = 0;

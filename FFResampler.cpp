@@ -105,3 +105,8 @@ FFResampler::resample(const std::shared_ptr<IBoData> &boDataIn) {
 
     return boDataOut;
 }
+
+bool FFResampler::isSatisfied()
+{
+    return false;
+}

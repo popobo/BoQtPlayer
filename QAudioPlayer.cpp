@@ -154,6 +154,11 @@ void QAudioPlayer::pause()
     m_audioSink->suspend();
 }
 
+bool QAudioPlayer::isPaused()
+{
+    return m_isPaused;
+}
+
 void QAudioPlayer::resume()
 {
     m_isPaused = false;
@@ -168,4 +173,9 @@ void QAudioPlayer::clear()
 const AudioOutputFormat& QAudioPlayer::audioOutFormat() const
 {
     return m_audioOutFormat;
+}
+
+bool QAudioPlayer::isSatisfied()
+{
+    return false;
 }

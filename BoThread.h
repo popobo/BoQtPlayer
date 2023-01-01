@@ -13,6 +13,8 @@ class BoThread: public std::enable_shared_from_this<BoThread> {
   public:
     BoThread();
 
+    BoThread(const std::string& threadName);
+
     virtual ~BoThread();
 
     //启动线程
@@ -37,9 +39,10 @@ class BoThread: public std::enable_shared_from_this<BoThread> {
     void clearSubTasks();
 
   protected:
-    bool m_isExit{ false };
-    bool m_isPaused{ false };
-    
+    std::atomic<bool> m_isExit{ false };
+    std::atomic<bool> m_isPaused{ false };
+    std::string m_threaName;
+
     std::vector<std::function<void()>> m_mainTasksVec;
     std::queue<std::function<void()>> m_subTasksQueue;
     std::mutex m_mainTasksVecMutex;
@@ -47,12 +50,6 @@ class BoThread: public std::enable_shared_from_this<BoThread> {
 
   private:
     void threadMain();
-
-    void _stop();
-
-    void _pause();
-
-    void _resume();
 };
 
 #endif // BOTHREAD_H

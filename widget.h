@@ -32,9 +32,14 @@ class Widget : public QWidget {
 
     std::shared_ptr<IPlayer> m_player;
 
+    bool m_sliderPressed{ false };
+
   private slots:
     void openFile();
     void pause();
     void resume();
+    void sliderPressed();
+    void sliderReleased();
+    void sliderMoved(int value);
 };
 #endif // WIDGET_H

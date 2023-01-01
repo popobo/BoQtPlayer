@@ -22,6 +22,8 @@ class FFResampler : public IResampler {
     virtual std::shared_ptr<IBoData>
     resample(const std::shared_ptr<IBoData> &boDataIn) override;
 
+    virtual bool isSatisfied() override;
+
   protected:
     SwrContext *m_swrContext{nullptr};
     AVChannelLayout m_channelLayout;
@@ -30,6 +32,8 @@ class FFResampler : public IResampler {
 
     int outChannels{0};
     int outFormat{0};
+
+    
 };
 
 #endif // FFRESAMPLER_H

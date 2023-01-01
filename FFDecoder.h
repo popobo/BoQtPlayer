@@ -6,7 +6,7 @@ extern "C" {
 #include "libavcodec/avcodec.h"
 }
 
-class FFDecoder : public IDecoder, public std::enable_shared_from_this<FFDecoder> {
+class FFDecoder : public IDecoder {
   public:
     FFDecoder();
 
@@ -28,6 +28,7 @@ class FFDecoder : public IDecoder, public std::enable_shared_from_this<FFDecoder
 
     virtual void main() override;
 
+    virtual bool isSatisfied() override;
 
   private:
     const int MAX_LIST = 100;
@@ -47,7 +48,8 @@ class FFDecoder : public IDecoder, public std::enable_shared_from_this<FFDecoder
     double m_audioTimeBase = 0.0;
     double m_videoTimeBase = 0.0;
 
-    std::shared_ptr<BoThread> m_thread;
+    std::atomic<bool> m_isStatified{false};
+    std::atomic<bool> m_isDecodedDataLeftLastTime{ false };
 };
 
 #endif // FFDECODER_H

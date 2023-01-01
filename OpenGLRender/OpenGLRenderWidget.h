@@ -39,6 +39,8 @@ class OpenGLRenderWidget
 
     virtual void pause() override;
 
+    virtual bool isPaused() override;
+
     virtual void resume() override;
 
     // IObserver interface
@@ -47,6 +49,8 @@ class OpenGLRenderWidget
     virtual void setSyncAudioPts(long newSyncAudioPts) override;
 
     virtual void clear() override;
+
+    virtual bool isSatisfied() override;
 
     const static int BUFFER_MAX_LEN = 1024;
 

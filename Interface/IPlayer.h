@@ -39,6 +39,9 @@ class IPlayer {
     virtual double getPlayPos() = 0;
 
     virtual void main() = 0;
+    
+    virtual bool _seek(double pos) = 0;
+
 public:
     std::shared_ptr<IDemux> m_demux;
     std::shared_ptr<IDecoder> m_videoDecoder;

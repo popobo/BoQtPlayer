@@ -6,7 +6,7 @@ extern "C" {
 #include "libavformat/avformat.h"
 }
 
-class FFDemux : public IDemux, public std::enable_shared_from_this<FFDemux> {
+class FFDemux : public IDemux {
   public:
     FFDemux();
 

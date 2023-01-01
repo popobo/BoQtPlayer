@@ -7,9 +7,7 @@ extern "C" {
 }
 #include <QImage>
 
-FFDecoder::FFDecoder() {
-    m_thread = std::make_shared<BoThread>();
-}
+FFDecoder::FFDecoder() {}
 
 FFDecoder::~FFDecoder() {
     BO_ERROR("");
@@ -91,7 +89,7 @@ std::shared_ptr<IBoData> FFDecoder::recvFrame() {
     //再次调用会复用上次空间，线程不安全
     int ret = avcodec_receive_frame(m_codecContext, m_frame);
     if (ret != 0) {
-        // PRINT_FFMPEG_ERROR(ret);
+        // 读到空了
         return nullptr;
     }
     // 这边对m_frame底下的AVBuffer产生了两次引用，
@@ -191,13 +189,41 @@ void FFDecoder::main()
         return;
     }
 
+    if (m_isDecodedDataLeftLastTime) {
+        while (true) {
+            if (isAnyObserverSatisfied()) {
+                m_isDecodedDataLeftLastTime = true;
+                break;
+            }
+
+            // 获取上次未读取完的解码数据
+            auto frame = recvFrame();
+            if (!frame) {
+                m_isDecodedDataLeftLastTime = false;
+                break;
+            }
+
+            notify(frame);
+        }
+        return;
+    }
+
     std::shared_ptr<IBoData> boData = m_boDataQueue.front();
     m_boDataQueue.pop();
-
+    
+    if (m_boDataQueue.size() < 0.5 * MAX_LIST) {
+        m_isStatified = false;
+    }
+    
     //开启解码
     //发送数据到解码线程 一个数据包可能解码多个结果(主要是音频)
     if (sendPacket(boData)) {
-        while (!m_thread->isExit()) {
+        while (true) {
+            if (isAnyObserverSatisfied()) {
+                m_isDecodedDataLeftLastTime = true;
+                break;
+            }
+
             //获取解码器
             //获取解码数据
             auto frame = recvFrame();
@@ -209,7 +235,13 @@ void FFDecoder::main()
             notify(frame);
         }
     }
+    
     //消费者负责清理, 采用智能指针管理
+}
+
+bool FFDecoder::isSatisfied()
+{
+    return m_isStatified;
 }
 
 void FFDecoder::update(const std::shared_ptr<IBoData>& boData)
@@ -219,13 +251,13 @@ void FFDecoder::update(const std::shared_ptr<IBoData>& boData)
     }
 
     // 循环是为了阻塞住FFDemux让其不要读取数据了
-    while (!m_thread->isExit()) {
-        std::unique_lock<std::mutex> lock(m_boDataQueueMutex);
-        if (m_boDataQueue.size() < MAX_LIST) {
-            m_boDataQueue.push(boData);
-            break;
-        }
-        lock.unlock();
-        boSleep(1);
+    if (m_boDataQueue.size() > 0.75 * MAX_LIST) {
+        // 观察者已经满足了
+        m_isStatified = true;
+    }
+
+    std::unique_lock<std::mutex> lock(m_boDataQueueMutex);
+    if (m_boDataQueue.size() < MAX_LIST) {
+        m_boDataQueue.push(boData);
     }
 }
