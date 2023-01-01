@@ -23,15 +23,9 @@ class FFDecoder : public IDecoder, public std::enable_shared_from_this<FFDecoder
 
     virtual bool isAudio() const override;
     virtual void setIsAudio(bool newIsAudio) override;
-    virtual bool start() override;
-    virtual void stop() override;
-    virtual bool isPaused() override;
-    virtual void pause() override;
-    virtual void resume() override;
     
     virtual void update(const std::shared_ptr<IBoData>& boData) override;
 
-private:
     virtual void main() override;
 
 

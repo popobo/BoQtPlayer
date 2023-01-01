@@ -6,6 +6,8 @@ class FFQtPlayer:
 public:
     FFQtPlayer();
 
+    virtual ~FFQtPlayer();
+
     // 通过 IPlayer 继承
     virtual bool open(const char* url) override;
     virtual bool start() override;
@@ -28,6 +30,9 @@ private:
     
     std::mutex m_playerMutex;
 
-    std::shared_ptr<BoThread> m_thread;
+    std::shared_ptr<BoThread> m_PlayerThread;
+    std::shared_ptr<BoThread> m_demuxThread;
+    std::shared_ptr<BoThread> m_videoDecoderThread;
+    std::shared_ptr<BoThread> m_audioDecoderThread;
 };
 

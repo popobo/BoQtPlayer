@@ -26,18 +26,6 @@ class IDemux : public ISubject {
 
     virtual std::shared_ptr<IParameter> getAudioParameter() = 0;
 
-    virtual bool start() = 0;
-
-    virtual void stop() = 0;
-
-    virtual bool isPaused() = 0;
-
-    virtual void pause() = 0;
-
-    virtual void resume() = 0;
-
-protected:
-    //不要让用户访问
     virtual void main() = 0;
 };
 

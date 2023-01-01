@@ -36,17 +36,6 @@ class IDecoder : public IObserver, public ISubject {
 
     virtual void setIsAudio(bool newIsAudio) = 0;
 
-    virtual bool start() = 0;
-
-    virtual void stop() = 0;
-
-    virtual bool isPaused() = 0;
-
-    virtual void pause() = 0;
-
-    virtual void resume() = 0;
-
-  private:
     virtual void main() = 0;
 };
 

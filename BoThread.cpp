@@ -24,7 +24,7 @@ void BoThread::stop() {
         if (auto self = wself.lock()) {
             self->_stop();
         }
-        });
+    });
 }
 
 bool BoThread::isPaused()

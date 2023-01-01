@@ -50,7 +50,9 @@ Widget::Widget(QWidget *parent) : QWidget(parent), ui(new Ui::Widget) {
     startTimer(PROGRESS_SLIDER_UPDATE_TIME);
 }
 
-Widget::~Widget() { delete ui; }
+Widget::~Widget() { 
+    delete ui;
+}
 
 void Widget::closeWidget() {
     m_player->stop();

@@ -11,7 +11,9 @@ FFDecoder::FFDecoder() {
     m_thread = std::make_shared<BoThread>();
 }
 
-FFDecoder::~FFDecoder() {}
+FFDecoder::~FFDecoder() {
+    BO_ERROR("");
+}
 
 bool FFDecoder::open(const std::shared_ptr<IParameter> &parameter) {
     if (!parameter->getPara()) {
@@ -171,38 +173,6 @@ bool FFDecoder::isAudio() const
 void FFDecoder::setIsAudio(bool newIsAudio)
 {
     m_isAudio = newIsAudio;
-}
-
-bool FFDecoder::start()
-{
-    bool ret = m_thread->start();
-    std::weak_ptr<FFDecoder> wself = shared_from_this();
-    m_thread->addMainTask([wself]() {
-        if (auto self = wself.lock()) {
-            self->main();
-        }
-    });
-    return ret;
-}
-
-void FFDecoder::stop()
-{
-    m_thread->stop();
-}
-
-bool FFDecoder::isPaused()
-{
-    return m_thread->isPaused();
-}
-
-void FFDecoder::pause()
-{
-    m_thread->pause();
-}
-
-void FFDecoder::resume()
-{
-    m_thread->resume();
 }
 
 void FFDecoder::main()

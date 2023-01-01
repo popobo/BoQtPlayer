@@ -28,7 +28,6 @@ FFDemux::FFDemux() {
     }
     m_videoParameter = std::make_shared<FFParameter>();
     m_audioParameter = std::make_shared<FFParameter>();
-    m_thread = std::make_shared<BoThread>();
 }
 
 FFDemux::~FFDemux() { 
@@ -139,38 +138,6 @@ std::shared_ptr<IParameter> FFDemux::getVideoParameter() {
 
 std::shared_ptr<IParameter> FFDemux::getAudioParameter() {
     return m_audioParameter;
-}
-
-bool FFDemux::start()
-{
-    bool ret = m_thread->start();
-    std::weak_ptr<FFDemux> wself = shared_from_this();
-    m_thread->addMainTask([wself]() {
-        if (auto self = wself.lock()) {
-            self->main();
-        }
-        });
-    return ret;
-}
-
-void FFDemux::stop()
-{
-    m_thread->stop();
-}
-
-bool FFDemux::isPaused()
-{
-    return m_thread->isPaused();
-}
-
-void FFDemux::pause()
-{
-    m_thread->pause();
-}
-
-void FFDemux::resume()
-{
-    m_thread->resume();
 }
 
 void FFDemux::main() {

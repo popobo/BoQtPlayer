@@ -7,6 +7,7 @@
 #include "IDemux.h"
 #include "IResampler.h"
 #include "IVideoView.h"
+#include <BoLog.h>
 
 // 使用前置声明有点，作为库提供给用户时，不需要提供头文件，减少头文件改动导致的编译事件
 
@@ -14,7 +15,9 @@ class IPlayer {
   public:
     IPlayer() {}
 
-    virtual ~IPlayer(){};
+    virtual ~IPlayer(){
+        BO_ERROR("");
+    };
 
     virtual bool open(const char *url) = 0;
 
@@ -35,6 +38,7 @@ class IPlayer {
 
     virtual double getPlayPos() = 0;
 
+    virtual void main() = 0;
 public:
     std::shared_ptr<IDemux> m_demux;
     std::shared_ptr<IDecoder> m_videoDecoder;
@@ -43,8 +47,6 @@ public:
     std::shared_ptr<IResampler> m_resampler;
     std::shared_ptr<IAudioPlayer> m_audioPlayer;
 
-protected:
-    virtual void main() = 0;
 };
 
 #endif // IPLAYER_H
