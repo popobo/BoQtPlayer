@@ -30,7 +30,7 @@ private:
     
     std::mutex m_playerMutex;
 
-    std::shared_ptr<BoThread> m_PlayerThread;
+    std::shared_ptr<BoThread> m_playerThread;
     std::shared_ptr<BoThread> m_demuxThread;
     std::shared_ptr<BoThread> m_videoDecoderThread;
     std::shared_ptr<BoThread> m_audioDecoderThread;

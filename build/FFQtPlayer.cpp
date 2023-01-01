@@ -2,7 +2,7 @@
 #include "BoLog.h"
 
 FFQtPlayer::FFQtPlayer() {
-    m_PlayerThread = std::make_shared<BoThread>();
+    m_playerThread = std::make_shared<BoThread>();
     m_demuxThread = std::make_shared<BoThread>();
     m_videoDecoderThread = std::make_shared<BoThread>();
     m_audioDecoderThread = std::make_shared<BoThread>();
@@ -77,9 +77,9 @@ bool FFQtPlayer::start()
         }
     });
 
-    m_PlayerThread->start();
+    m_playerThread->start();
     std::weak_ptr<IPlayer> wself = shared_from_this();
-    m_PlayerThread->addMainTask([wself]() {
+    m_playerThread->addMainTask([wself]() {
         if (auto self = wself.lock()) {
             self->main();
         }
@@ -95,7 +95,7 @@ void FFQtPlayer::stop()
         return;
     }
 
-    m_PlayerThread->stop();
+    m_playerThread->stop();
 
     // （消费者）观察者先于（生产者）通知者停止，否则可能会因为有阻塞操作，导致线程退出超时
     m_audioPlayer->stop();
@@ -116,7 +116,7 @@ void FFQtPlayer::pause()
         return;
     }
 
-    m_PlayerThread->pause();
+    m_playerThread->pause();
 
     m_demuxThread->pause();
 
@@ -132,7 +132,7 @@ void FFQtPlayer::pause()
 void FFQtPlayer::resume()
 {
     std::unique_lock<std::mutex> locker(m_playerMutex);
-    m_PlayerThread->resume();
+    m_playerThread->resume();
 
     m_demuxThread->resume();
 
@@ -195,7 +195,7 @@ bool FFQtPlayer::seek(double pos)
     bool ret = m_demux->seek(pos);//seek跳转到关键帧
     // 解码实际需要显示的帧
     int64_t seekPts = static_cast<int64_t>(pos * m_demux->getTotalTime());
-    while (!m_PlayerThread->isExit()) {
+    while (!m_playerThread->isExit()) {
         auto pkt = m_demux->read();
         if (pkt->size() <= 0) {
             break;
@@ -232,7 +232,7 @@ bool FFQtPlayer::areAllModulesValid()
         return false;
     }
 
-    if (!m_demuxThread || !m_videoDecoderThread || !m_audioDecoderThread || !m_PlayerThread) {
+    if (!m_demuxThread || !m_videoDecoderThread || !m_audioDecoderThread || !m_playerThread) {
         BO_ERROR("one of the thread is nullptr");
         return false;
     }
