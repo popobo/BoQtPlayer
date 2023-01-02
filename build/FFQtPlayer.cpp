@@ -174,7 +174,7 @@ void FFQtPlayer::setAudioPlayer(const std::shared_ptr<IAudioPlayer>& newAudioPla
 bool FFQtPlayer::seek(double pos)
 {
     std::weak_ptr<IPlayer> wself = shared_from_this();
-    m_playerThread->addMainTask([wself, pos]() {
+    m_playerThread->addSubTask([wself, pos]() {
         if (auto self = wself.lock()) {
             self->_seek(pos);
         }
@@ -216,11 +216,11 @@ bool FFQtPlayer::areAllModulesPaused()
 
 bool FFQtPlayer::_seek(double pos)
 {
-    BO_INFO("");
+    BO_INFO("_seek pos:{0}", pos);
     if (!areAllModulesValid()) {
         return false;
     }
-    BO_INFO("");
+ 
     if (!m_demuxThread->isPaused() 
         || !m_videoDecoderThread->isPaused() 
         || !m_audioDecoderThread->isPaused()
@@ -232,7 +232,7 @@ bool FFQtPlayer::_seek(double pos)
         m_audioPlayer->pause();
         m_videoView->pause();
     }
-    BO_INFO("");
+
     // 等待所有相关模块暂停
     while (!m_demuxThread->isPaused()
             || !m_videoDecoderThread->isPaused()
@@ -241,13 +241,13 @@ bool FFQtPlayer::_seek(double pos)
             || !m_videoView->isPaused()) {
         boSleep(1);
     }
-    BO_INFO("");
+
     std::unique_lock<std::mutex> locker(m_playerMutex);
     m_videoDecoder->clear();
     m_audioDecoder->clear();
     m_audioPlayer->clear();
     m_videoView->clear();
-    BO_INFO("");
+
     bool ret = m_demux->seek(pos);//seek跳转到关键帧
     // 解码实际需要显示的帧
     int64_t seekPts = static_cast<int64_t>(pos * m_demux->getTotalTime());
@@ -269,6 +269,10 @@ bool FFQtPlayer::_seek(double pos)
         //解码需要显示的帧之前的数据
         m_videoDecoder->sendPacket(pkt);
         auto data = m_videoDecoder->recvFrame();
+        if (!data) {
+            continue;
+        }
+
         if (data->size() <= 0) {
             continue;
         }

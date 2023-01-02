@@ -54,7 +54,7 @@ Widget::Widget(QWidget *parent) : QWidget(parent), ui(new Ui::Widget) {
     connect(ui->horizontalSliderPlayProgress, SIGNAL(sliderMoved(int)), this,
         SLOT(sliderMoved(int)));
 
-    startTimer(PROGRESS_SLIDER_UPDATE_TIME);
+    
 }
 
 Widget::~Widget() { 
@@ -117,4 +117,5 @@ void Widget::openFile() {
 
     m_player->open(stdFilename.c_str());
     m_player->start();
+    startTimer(PROGRESS_SLIDER_UPDATE_TIME);
 }
