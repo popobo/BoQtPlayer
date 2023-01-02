@@ -9,9 +9,7 @@ extern "C" {
 
 FFDecoder::FFDecoder() {}
 
-FFDecoder::~FFDecoder() {
-    BO_ERROR("");
-}
+FFDecoder::~FFDecoder() { BO_ERROR(""); }
 
 bool FFDecoder::open(const std::shared_ptr<IParameter> &parameter) {
     if (!parameter->getPara()) {
@@ -19,7 +17,7 @@ bool FFDecoder::open(const std::shared_ptr<IParameter> &parameter) {
     }
 
     auto para = (AVCodecParameters *)parameter->getPara();
-    
+
     // 1.查找解码器
     const AVCodec *avc = avcodec_find_decoder(para->codec_id);
     if (!avc) {
@@ -27,7 +25,7 @@ bool FFDecoder::open(const std::shared_ptr<IParameter> &parameter) {
     }
     BO_INFO("avcodec_find_decoder {0} successfully!", (int)para->codec_id);
 
-    std::unique_lock<std::mutex> locker{ m_codecContextMutex };
+    std::unique_lock<std::mutex> locker{m_codecContextMutex};
     // 2.创建解码器上下文，并复制参数
     m_codecContext = avcodec_alloc_context3(avc);
     avcodec_parameters_to_context(m_codecContext, para);
@@ -58,7 +56,7 @@ bool FFDecoder::sendPacket(const std::shared_ptr<IBoData> &boData) {
         return false;
     }
 
-    std::unique_lock<std::mutex> locker{ m_codecContextMutex };
+    std::unique_lock<std::mutex> locker{m_codecContextMutex};
     if (!m_codecContext) {
         return false;
     }
@@ -74,14 +72,14 @@ bool FFDecoder::sendPacket(const std::shared_ptr<IBoData> &boData) {
 
 std::shared_ptr<IBoData> FFDecoder::recvFrame() {
     auto boData = std::make_shared<BoAVFrameData>();
-    
-    std::unique_lock<std::mutex> codecContextlocker{ m_codecContextMutex };
-    
+
+    std::unique_lock<std::mutex> codecContextlocker{m_codecContextMutex};
+
     if (!m_codecContext) {
         return nullptr;
     }
 
-    std::unique_lock<std::mutex> frameLocker{ m_frameMutex };
+    std::unique_lock<std::mutex> frameLocker{m_frameMutex};
     if (!m_frame) {
         m_frame = av_frame_alloc();
     }
@@ -142,7 +140,7 @@ void FFDecoder::close() {
         avcodec_free_context(&m_codecContext);
     }
     m_codecContextMutex.unlock();
-  
+
     m_frameMutex.lock();
     if (m_frame) {
         av_frame_free(&m_frame);
@@ -150,8 +148,7 @@ void FFDecoder::close() {
     m_frameMutex.unlock();
 }
 
-void FFDecoder::clear()
-{
+void FFDecoder::clear() {
     m_boDataQueueMutex.lock();
     m_boDataQueue = {};
     m_boDataQueueMutex.unlock();
@@ -163,27 +160,16 @@ void FFDecoder::clear()
     m_codecContextMutex.unlock();
 }
 
-bool FFDecoder::isAudio() const
-{
-    return m_isAudio;
-}
+bool FFDecoder::isAudio() const { return m_isAudio; }
 
-void FFDecoder::setIsAudio(bool newIsAudio)
-{
-    m_isAudio = newIsAudio;
-}
+void FFDecoder::setIsAudio(bool newIsAudio) { m_isAudio = newIsAudio; }
 
-void FFDecoder::main()
-{
+void FFDecoder::main() {
     std::unique_lock<std::mutex> lock(m_boDataQueueMutex);
-    if (m_boDataQueue.empty()) {
-        lock.unlock();
-        boSleep(1);
-        return;
-    }
-
     //取出packet 消费者
     if (m_boDataQueue.empty()) {
+        m_isStatified = false;
+        m_isDecodedDataLeftLastTime = false;
         lock.unlock();
         boSleep(1);
         return;
@@ -210,11 +196,11 @@ void FFDecoder::main()
 
     std::shared_ptr<IBoData> boData = m_boDataQueue.front();
     m_boDataQueue.pop();
-    
+
     if (m_boDataQueue.size() < 0.5 * MAX_LIST) {
         m_isStatified = false;
     }
-    
+
     //开启解码
     //发送数据到解码线程 一个数据包可能解码多个结果(主要是音频)
     if (sendPacket(boData)) {
@@ -235,17 +221,13 @@ void FFDecoder::main()
             notify(frame);
         }
     }
-    
+
     //消费者负责清理, 采用智能指针管理
 }
 
-bool FFDecoder::isSatisfied()
-{
-    return m_isStatified;
-}
+bool FFDecoder::isSatisfied() { return m_isStatified; }
 
-void FFDecoder::update(const std::shared_ptr<IBoData>& boData)
-{
+void FFDecoder::update(const std::shared_ptr<IBoData> &boData) {
     if (boData->isAudio() != m_isAudio) {
         return;
     }

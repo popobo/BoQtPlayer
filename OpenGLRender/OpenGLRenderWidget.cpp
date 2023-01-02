@@ -74,32 +74,21 @@ void OpenGLRenderWidget::paintGL() {
 
 void OpenGLRenderWidget::closeEvent(QCloseEvent *e) { stopThread(); }
 
-bool OpenGLRenderWidget::isSatisfied()
-{
+bool OpenGLRenderWidget::isSatisfied() {
     return m_renderingThread->isSatisfied();
 }
 
-void OpenGLRenderWidget::pause()
-{
-    m_renderingThread->pause();
-}
+void OpenGLRenderWidget::pause() { m_renderingThread->pause(); }
 
-bool OpenGLRenderWidget::isPaused()
-{
-    return m_renderingThread->isPaused();
-}
+bool OpenGLRenderWidget::isPaused() { return m_renderingThread->isPaused(); }
 
-void OpenGLRenderWidget::resume()
-{
-    m_renderingThread->resume();
-}
+void OpenGLRenderWidget::resume() { m_renderingThread->resume(); }
 
 void OpenGLRenderWidget::setSyncAudioPts(long newSyncAudioPts) {
     m_renderingThread->setSyncAudioPts(newSyncAudioPts);
 }
 
-void OpenGLRenderWidget::clear()
-{
+void OpenGLRenderWidget::clear() {
     if (m_renderingThread) {
         m_renderingThread->clear();
     }

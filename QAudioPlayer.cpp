@@ -67,12 +67,7 @@ QAudioPlayer::QAudioPlayer() {
     connect(this, &QAudioPlayer::signalResume, this, &QAudioPlayer::slotResume);
 }
 
-QAudioPlayer::~QAudioPlayer() {
-    if (m_audioPlayerThread) {
-        m_audioPlayerThread->quit();
-        m_audioPlayerThread->wait();
-    }
-}
+QAudioPlayer::~QAudioPlayer() {}
 
 bool QAudioPlayer::open(const std::shared_ptr<IParameter> &parameter) {
     if (m_isStarted) {
@@ -123,6 +118,16 @@ bool QAudioPlayer::start() {
 
 void QAudioPlayer::stop() { emit signalStop(); }
 
+void QAudioPlayer::setBasePts(long newPts) {
+    if (!m_audioSink) {
+        return;
+    }
+
+    m_basePts = newPts;
+    m_fixPts = -m_audioSink->processedUSecs() / 1000;
+    m_pts = newPts;
+}
+
 namespace {
 qint64 lastProcessedUSecs = 0;
 qint64 currentProcessedUSecs = 0;
@@ -141,11 +146,12 @@ long QAudioPlayer::getPts() {
 
     if (currentProcessedUSecs != lastProcessedUSecs) {
         m_timer.elapsed();
-        m_pts = currentProcessedUSecs;
+        m_pts = currentProcessedUSecs + m_basePts + m_fixPts;
         lastProcessedUSecs = currentProcessedUSecs;
     } else {
         m_pts += m_timer.elapsed();
     }
+    BO_INFO("Test1 m_pts:{0}", m_pts);
     return m_pts;
 }
 

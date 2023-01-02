@@ -9,9 +9,9 @@
 
 class IAudioPlayer : public IObserver, public ISubject {
   public:
-    IAudioPlayer() {};
+    IAudioPlayer(){};
 
-    ~IAudioPlayer() {};
+    ~IAudioPlayer(){};
 
     virtual bool open(const std::shared_ptr<IParameter> &parameter) = 0;
 
@@ -19,6 +19,8 @@ class IAudioPlayer : public IObserver, public ISubject {
     virtual std::shared_ptr<IBoData> getData() = 0;
 
     static const int MAX_FRAME_COUNT = 100;
+
+    virtual void setBasePts(long newPts) = 0;
 
     virtual long getPts() = 0;
 
@@ -33,7 +35,7 @@ class IAudioPlayer : public IObserver, public ISubject {
     virtual void pause() = 0;
 
     virtual void resume() = 0;
-    
+
     virtual void clear() = 0;
 };
 

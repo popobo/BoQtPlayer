@@ -64,6 +64,9 @@
     <ClCompile Include="D:\Code\Qt\BoPlayer\FFQtPlayerBuilder.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="D:\Code\Qt\BoPlayer\FFQtPlayer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="D:\Code\Qt\BoPlayer\QAudioPlayer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -121,7 +124,6 @@
     <ClCompile Include="D:\Code\Qt\BoPlayer\build\BoPlayer_autogen\mocs_compilation_RelWithDebInfo.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="FFQtPlayer.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="D:\Code\Qt\BoPlayer\widget.h">
@@ -179,6 +181,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="D:\Code\Qt\BoPlayer\FFQtPlayerBuilder.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Code\Qt\BoPlayer\FFQtPlayer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="D:\Code\Qt\BoPlayer\QAudioPlayer.h">
@@ -244,7 +249,6 @@
     <ClInclude Include="D:\Code\Qt\BoPlayer\build\BoPlayer_autogen\include_RelWithDebInfo\ui_widget.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="FFQtPlayer.h" />
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="D:\Code\Qt\BoPlayer\build\CMakeFiles\8653a7a914247103d22d35cc14a41078\autouic_(CONFIG).stamp.rule">

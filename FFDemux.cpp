@@ -8,10 +8,12 @@ extern "C" {
 }
 
 namespace {
-    double r2d(AVRational ration) {
-        return ration.num == 0 || ration.den == 0 ? 0.0 : (double)ration.num / (double)ration.den;
-    }
+double r2d(AVRational ration) {
+    return ration.num == 0 || ration.den == 0
+               ? 0.0
+               : (double)ration.num / (double)ration.den;
 }
+} // namespace
 
 FFDemux::FFDemux() {
     // this is not thraed safe, do not create these together
@@ -30,16 +32,16 @@ FFDemux::FFDemux() {
     m_audioParameter = std::make_shared<FFParameter>();
 }
 
-FFDemux::~FFDemux() { 
+FFDemux::~FFDemux() {
     m_avFormatContextMutex.lock();
-    avformat_close_input(&m_avFormatContext); 
+    avformat_close_input(&m_avFormatContext);
     m_avFormatContextMutex.unlock();
 }
 
 bool FFDemux::open(const char *url) {
     BO_INFO("open url begin", url);
 
-    std::unique_lock<std::mutex> locker{ m_avFormatContextMutex };
+    std::unique_lock<std::mutex> locker{m_avFormatContextMutex};
 
     int ret = avformat_open_input(&m_avFormatContext, url, 0, 0);
     if (ret != 0) {
@@ -59,7 +61,8 @@ bool FFDemux::open(const char *url) {
     m_totalMs = m_avFormatContext->duration / AV_TIME_BASE * 1000;
     BO_INFO("total ms = {0}", m_totalMs);
 
-    ret = av_find_best_stream(m_avFormatContext, AVMEDIA_TYPE_VIDEO, -1, -1, nullptr, 0);
+    ret = av_find_best_stream(m_avFormatContext, AVMEDIA_TYPE_VIDEO, -1, -1,
+                              nullptr, 0);
     if (ret < 0) {
         BO_ERROR("av_find_best_stream failed");
     }
@@ -72,7 +75,8 @@ bool FFDemux::open(const char *url) {
                                          static_cast<double>(videoTimeBase.den);
 
     //获取音频流索引
-    ret = av_find_best_stream(m_avFormatContext, AVMEDIA_TYPE_AUDIO, -1, -1, nullptr, 0);
+    ret = av_find_best_stream(m_avFormatContext, AVMEDIA_TYPE_AUDIO, -1, -1,
+                              nullptr, 0);
     if (ret < 0) {
         BO_ERROR("av_find_best_stream failed");
     }
@@ -97,7 +101,7 @@ bool FFDemux::open(const char *url) {
 std::shared_ptr<IBoData> FFDemux::read() {
     auto boData = std::make_shared<BoAVPacketData>();
 
-    std::unique_lock<std::mutex> locker{ m_avFormatContextMutex };
+    std::unique_lock<std::mutex> locker{m_avFormatContextMutex};
 
     if (!m_avFormatContext) {
         return boData;
@@ -123,8 +127,14 @@ std::shared_ptr<IBoData> FFDemux::read() {
     }
 
     // 转换pts(ms)
-    pkt->pts = (int64_t)(pkt->pts * (r2d(m_avFormatContext->streams[pkt->stream_index]->time_base)) * 1000);
-    pkt->dts = (int64_t)(pkt->dts * (r2d(m_avFormatContext->streams[pkt->stream_index]->time_base)) * 1000);
+    pkt->pts = (int64_t)(pkt->pts *
+                         (r2d(m_avFormatContext->streams[pkt->stream_index]
+                                  ->time_base)) *
+                         1000);
+    pkt->dts = (int64_t)(pkt->dts *
+                         (r2d(m_avFormatContext->streams[pkt->stream_index]
+                                  ->time_base)) *
+                         1000);
     boData->setPts(pkt->pts);
 
     return boData;
@@ -152,14 +162,13 @@ void FFDemux::main() {
     }
 }
 
-bool FFDemux::seek(double pos)
-{
+bool FFDemux::seek(double pos) {
     if (pos < 0 || pos > 1) {
         BO_ERROR("seek value must 0.0-1.0");
         return false;
     }
 
-    std::unique_lock<std::mutex> locker{ m_avFormatContextMutex };
+    std::unique_lock<std::mutex> locker{m_avFormatContextMutex};
 
     bool re = false;
     if (!m_avFormatContext) {
@@ -168,9 +177,11 @@ bool FFDemux::seek(double pos)
 
     //清空读取的缓冲, read只取一帧, 缓冲中可能还有帧
     avformat_flush(m_avFormatContext);
-    auto seekPts = static_cast<int64_t>(m_avFormatContext->streams[m_videoStream]->duration * pos);
+    auto seekPts = static_cast<int64_t>(
+        m_avFormatContext->streams[m_videoStream]->duration * pos);
     //往后(进度条左边)跳转到关键帧
-    re = av_seek_frame(m_avFormatContext, m_videoStream, seekPts, AVSEEK_FLAG_FRAME | AVSEEK_FLAG_BACKWARD);
+    re = av_seek_frame(m_avFormatContext, m_videoStream, seekPts,
+                       AVSEEK_FLAG_FRAME | AVSEEK_FLAG_BACKWARD);
 
-    return true;
+    return re;
 }

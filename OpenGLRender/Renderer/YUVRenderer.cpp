@@ -105,8 +105,10 @@ void YUVRenderer::init() {
 }
 
 long YUVRenderer::renderBoData() {
-    std::unique_lock<std::mutex> locker{ m_boDataQueueMutex };
+    std::unique_lock<std::mutex> locker{m_boDataQueueMutex};
     if (m_boDataQueue.empty()) {
+        m_isSatisfied = false;
+        BO_INFO("m_isSatisfied:{0}", m_isSatisfied ? true : false);
         return -1;
     }
 
@@ -114,6 +116,7 @@ long YUVRenderer::renderBoData() {
     m_boDataQueue.pop();
     if (m_boDataQueue.size() < 0.5 * MAX_LENGTH) {
         m_isSatisfied = false;
+        BO_INFO("m_isSatisfied:{0}", m_isSatisfied ? true : false);
     }
     locker.unlock();
     auto boDataDatas = boData->datas();
@@ -134,7 +137,6 @@ long YUVRenderer::renderBoData() {
     GLCall(glBindTexture(GL_TEXTURE_2D, m_vTextureId));
     GLCall(glTexImage2D(GL_TEXTURE_2D, 0, GL_R8, width / 2, height / 2, 0,
                         GL_RED, GL_UNSIGNED_BYTE, boDataDatas[2]));
-
 
     m_mesh->bind();
     m_shader->bind();
@@ -159,12 +161,13 @@ void YUVRenderer::addBoData(const std::shared_ptr<IBoData> &newBoData) {
     if (m_stopReceiveData) {
         return;
     }
-    
+
     if (m_boDataQueue.size() > 0.75 * MAX_LENGTH) {
         m_isSatisfied = true;
+        BO_INFO("m_isSatisfied:{0}", m_isSatisfied ? true : false);
     }
 
-    std::unique_lock<std::mutex> locker{ m_boDataQueueMutex };
+    std::unique_lock<std::mutex> locker{m_boDataQueueMutex};
     if (m_boDataQueue.size() < MAX_LENGTH) {
         m_boDataQueue.push(newBoData);
     }
@@ -172,15 +175,11 @@ void YUVRenderer::addBoData(const std::shared_ptr<IBoData> &newBoData) {
 
 void YUVRenderer::stop() { m_stopReceiveData = true; }
 
-void YUVRenderer::clear()
-{
-    std::unique_lock<std::mutex> locker{ m_boDataQueueMutex };
+void YUVRenderer::clear() {
+    std::unique_lock<std::mutex> locker{m_boDataQueueMutex};
     m_boDataQueue = {};
 }
 
-bool YUVRenderer::isSatisfied()
-{
-    return m_isSatisfied;
-}
+bool YUVRenderer::isSatisfied() { return m_isSatisfied; }
 
 } // namespace OpenGLRender

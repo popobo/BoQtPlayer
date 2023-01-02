@@ -28,6 +28,8 @@ class QAudioPlayer : public QObject, public IAudioPlayer {
 
     virtual void stop() override;
 
+    virtual void setBasePts(long newPts) override;
+
     virtual long getPts() override;
 
     virtual std::shared_ptr<IBoData> getData() override;
@@ -71,7 +73,9 @@ class QAudioPlayer : public QObject, public IAudioPlayer {
     std::atomic<bool> m_isPaused{false};
     std::atomic<bool> m_isExit{false};
 
-    long m_pts{0};
+    std::atomic<long> m_pts{0};
+    std::atomic<long> m_basePts{0};
+    std::atomic<long> m_fixPts{0};
     AudioOutputFormat m_audioOutFormat;
 
     QThread *m_audioPlayerThread;

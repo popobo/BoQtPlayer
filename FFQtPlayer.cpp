@@ -8,13 +8,9 @@ FFQtPlayer::FFQtPlayer() {
     m_audioDecoderThread = std::make_shared<BoThread>("m_audioDecoderThread");
 }
 
-FFQtPlayer::~FFQtPlayer()
-{
-    BO_ERROR("");
-}
+FFQtPlayer::~FFQtPlayer() { BO_ERROR(""); }
 
-bool FFQtPlayer::open(const char* url)
-{
+bool FFQtPlayer::open(const char *url) {
     std::unique_lock<std::mutex> locker(m_playerMutex);
     if (!m_demux || !m_demux->open(url)) {
         BO_ERROR("m_demux failed to open {0}", url);
@@ -34,7 +30,7 @@ bool FFQtPlayer::open(const char* url)
     }
 
     if (!m_resampler || !m_resampler->open(m_demux->getAudioParameter(),
-        m_audioPlayer->audioOutFormat())) {
+                                           m_audioPlayer->audioOutFormat())) {
         BO_ERROR("m_resampler failed to open");
         return false;
     }
@@ -42,8 +38,7 @@ bool FFQtPlayer::open(const char* url)
     return true;
 }
 
-bool FFQtPlayer::start()
-{
+bool FFQtPlayer::start() {
     std::unique_lock<std::mutex> locker(m_playerMutex);
     if (!areAllModulesValid()) {
         return false;
@@ -88,8 +83,7 @@ bool FFQtPlayer::start()
     return true;
 }
 
-void FFQtPlayer::stop()
-{
+void FFQtPlayer::stop() {
     std::unique_lock<std::mutex> locker(m_playerMutex);
     if (!areAllModulesValid()) {
         return;
@@ -109,8 +103,7 @@ void FFQtPlayer::stop()
     m_demuxThread->stop();
 }
 
-void FFQtPlayer::pause()
-{
+void FFQtPlayer::pause() {
     std::unique_lock<std::mutex> locker(m_playerMutex);
     if (!areAllModulesValid()) {
         return;
@@ -125,12 +118,11 @@ void FFQtPlayer::pause()
     m_audioDecoderThread->pause();
 
     m_audioPlayer->pause();
-    
+
     m_videoView->pause();
 }
 
-void FFQtPlayer::resume()
-{
+void FFQtPlayer::resume() {
     std::unique_lock<std::mutex> locker(m_playerMutex);
     m_playerThread->resume();
 
@@ -145,8 +137,7 @@ void FFQtPlayer::resume()
     m_videoView->resume();
 }
 
-void FFQtPlayer::setVideoView(const std::shared_ptr<IVideoView>& newVideoView)
-{
+void FFQtPlayer::setVideoView(const std::shared_ptr<IVideoView> &newVideoView) {
     if (!newVideoView) {
         return;
     }
@@ -158,8 +149,8 @@ void FFQtPlayer::setVideoView(const std::shared_ptr<IVideoView>& newVideoView)
     m_videoDecoder->addObs(m_videoView);
 }
 
-void FFQtPlayer::setAudioPlayer(const std::shared_ptr<IAudioPlayer>& newAudioPlayer)
-{   
+void FFQtPlayer::setAudioPlayer(
+    const std::shared_ptr<IAudioPlayer> &newAudioPlayer) {
     if (!newAudioPlayer) {
         return;
     }
@@ -171,8 +162,7 @@ void FFQtPlayer::setAudioPlayer(const std::shared_ptr<IAudioPlayer>& newAudioPla
     m_resampler->addObs(m_audioPlayer);
 }
 
-bool FFQtPlayer::seek(double pos)
-{
+bool FFQtPlayer::seek(double pos) {
     std::weak_ptr<IPlayer> wself = shared_from_this();
     m_playerThread->addSubTask([wself, pos]() {
         if (auto self = wself.lock()) {
@@ -182,14 +172,15 @@ bool FFQtPlayer::seek(double pos)
     return true;
 }
 
-bool FFQtPlayer::areAllModulesValid()
-{
-    if (!m_demux || !m_videoDecoder || !m_audioDecoder || !m_videoView || !m_resampler || !m_audioPlayer) {
+bool FFQtPlayer::areAllModulesValid() {
+    if (!m_demux || !m_videoDecoder || !m_audioDecoder || !m_videoView ||
+        !m_resampler || !m_audioPlayer) {
         BO_ERROR("one of the modules is nullptr");
         return false;
     }
 
-    if (!m_demuxThread || !m_videoDecoderThread || !m_audioDecoderThread || !m_playerThread) {
+    if (!m_demuxThread || !m_videoDecoderThread || !m_audioDecoderThread ||
+        !m_playerThread) {
         BO_ERROR("one of the thread is nullptr");
         return false;
     }
@@ -197,35 +188,34 @@ bool FFQtPlayer::areAllModulesValid()
     return true;
 }
 
-bool FFQtPlayer::areAllModulesPaused()
-{
+bool FFQtPlayer::areAllModulesPaused() {
     if (!areAllModulesValid()) {
         return false;
     }
 
-    if (!m_demuxThread->isPaused() || !m_videoDecoderThread->isPaused() || !m_audioDecoderThread->isPaused()) {
+    if (!m_demuxThread->isPaused() || !m_videoDecoderThread->isPaused() ||
+        !m_audioDecoderThread->isPaused()) {
         BO_ERROR("one of the modules is not paused");
         BO_ERROR("m_demuxThread->isPaused():{0}", m_demuxThread->isPaused());
-        BO_ERROR("m_videoDecoderThread->isPaused():{0}", m_videoDecoderThread->isPaused());
-        BO_ERROR("m_audioDecoderThread->isPaused():{0}", m_audioDecoderThread->isPaused());
+        BO_ERROR("m_videoDecoderThread->isPaused():{0}",
+                 m_videoDecoderThread->isPaused());
+        BO_ERROR("m_audioDecoderThread->isPaused():{0}",
+                 m_audioDecoderThread->isPaused());
         return false;
     }
 
     return true;
 }
 
-bool FFQtPlayer::_seek(double pos)
-{
+bool FFQtPlayer::_seek(double pos) {
     BO_INFO("_seek pos:{0}", pos);
     if (!areAllModulesValid()) {
         return false;
     }
- 
-    if (!m_demuxThread->isPaused() 
-        || !m_videoDecoderThread->isPaused() 
-        || !m_audioDecoderThread->isPaused()
-        || !m_audioPlayer->isPaused()
-        || !m_videoView->isPaused()) {
+
+    if (!m_demuxThread->isPaused() || !m_videoDecoderThread->isPaused() ||
+        !m_audioDecoderThread->isPaused() || !m_audioPlayer->isPaused() ||
+        !m_videoView->isPaused()) {
         m_demuxThread->pause();
         m_videoDecoderThread->pause();
         m_audioDecoderThread->pause();
@@ -234,11 +224,9 @@ bool FFQtPlayer::_seek(double pos)
     }
 
     // 等待所有相关模块暂停
-    while (!m_demuxThread->isPaused()
-            || !m_videoDecoderThread->isPaused()
-            || !m_audioDecoderThread->isPaused()
-            || !m_audioPlayer->isPaused()
-            || !m_videoView->isPaused()) {
+    while (!m_demuxThread->isPaused() || !m_videoDecoderThread->isPaused() ||
+           !m_audioDecoderThread->isPaused() || !m_audioPlayer->isPaused() ||
+           !m_videoView->isPaused()) {
         boSleep(1);
     }
 
@@ -248,7 +236,7 @@ bool FFQtPlayer::_seek(double pos)
     m_audioPlayer->clear();
     m_videoView->clear();
 
-    bool ret = m_demux->seek(pos);//seek跳转到关键帧
+    bool ret = m_demux->seek(pos); // seek跳转到关键帧
     // 解码实际需要显示的帧
     int64_t seekPts = static_cast<int64_t>(pos * m_demux->getTotalTime());
     while (!m_playerThread->isExit()) {
@@ -258,6 +246,7 @@ bool FFQtPlayer::_seek(double pos)
         }
 
         if (pkt->isAudio()) {
+            m_audioPlayer->setBasePts(pkt->pts());
             if (pkt->pts() < seekPts) {
                 continue;
             }
@@ -281,12 +270,17 @@ bool FFQtPlayer::_seek(double pos)
         }
     }
     locker.unlock();
-    resume();
+
+    m_demuxThread->resume();
+    m_videoDecoderThread->resume();
+    m_audioDecoderThread->resume();
+    m_audioPlayer->resume();
+    m_videoView->resume();
+
     return ret;
 }
 
-double FFQtPlayer::getPlayPos()
-{
+double FFQtPlayer::getPlayPos() {
     if (!areAllModulesValid()) {
         return 0.0;
     }
@@ -299,8 +293,7 @@ double FFQtPlayer::getPlayPos()
     return (double)currentPts / (double)totalMs;
 }
 
-void FFQtPlayer::main()
-{
+void FFQtPlayer::main() {
     std::unique_lock<std::mutex> locker(m_playerMutex);
     if (!m_audioPlayer || !m_videoDecoder) {
         locker.unlock();

@@ -40,32 +40,19 @@ void RenderingThread::setSyncAudioPts(long newSyncAudioPts) {
     m_syncAudioPts = newSyncAudioPts;
 }
 
-void RenderingThread::pause()
-{
-    m_isPaused = true;
-}
+void RenderingThread::pause() { m_isPaused = true; }
 
-bool RenderingThread::isPaused()
-{
-    return m_isPaused;
-}
+bool RenderingThread::isPaused() { return m_isPaused; }
 
-void RenderingThread::resume()
-{
-    m_isPaused = false;
-}
+void RenderingThread::resume() { m_isPaused = false; }
 
-void RenderingThread::clear()
-{
+void RenderingThread::clear() {
     if (m_renderer) {
         m_renderer->clear();
     }
 }
 
-bool RenderingThread::isSatisfied()
-{
-    return m_renderer->isSatisfied();
-}
+bool RenderingThread::isSatisfied() { return m_renderer->isSatisfied(); }
 
 // 只能再run()中调用，且注意线程安全
 bool RenderingThread::renderFrame() {
