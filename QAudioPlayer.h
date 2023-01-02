@@ -11,10 +11,10 @@
 
 class AudioBuffer;
 
-class QAudioPlayer :public QObject, public IAudioPlayer {
-    Q_OBJECT  
+class QAudioPlayer : public QObject, public IAudioPlayer {
+    Q_OBJECT
 
-public:
+  public:
     QAudioPlayer();
 
     ~QAudioPlayer();
@@ -40,34 +40,41 @@ public:
 
     virtual void clear() override;
 
-    virtual const AudioOutputFormat& audioOutFormat() const override;
+    virtual const AudioOutputFormat &audioOutFormat() const override;
 
     virtual bool isSatisfied() override;
 
-signals:
+  signals:
     void signalOpen();
     void signalStart();
+    void signalStop();
+    void signalPause();
+    void signalResume();
 
-public slots:
-
+  public slots:
     void slotOpen();
     void slotStart();
+    void slotStop();
+    void slotPause();
+    void slotResume();
 
   private:
     bool m_isStarted{false};
     std::shared_ptr<AudioBuffer> m_audioBuffer;
     std::shared_ptr<QAudioSink> m_audioSink;
+
     QAudioDevice m_audioDevice;
     QAudioFormat m_qPreferedAudioFormat;
     double m_timeBase = 0.0;
     ElapsedTimer m_timer;
-    std::atomic<bool> m_isPaused{ false };
-    std::atomic<bool> m_isExit{ false };
 
-    long m_pts{ 0 };
+    std::atomic<bool> m_isPaused{false};
+    std::atomic<bool> m_isExit{false};
+
+    long m_pts{0};
     AudioOutputFormat m_audioOutFormat;
 
-    QThread* m_audioPlayerThread;
+    QThread *m_audioPlayerThread;
     std::atomic<bool> m_isSatisfied = false;
 };
 

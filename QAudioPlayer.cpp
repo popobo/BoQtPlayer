@@ -62,9 +62,17 @@ QAudioPlayer::QAudioPlayer() {
             &QObject::deleteLater);
     connect(this, &QAudioPlayer::signalOpen, this, &QAudioPlayer::slotOpen);
     connect(this, &QAudioPlayer::signalStart, this, &QAudioPlayer::slotStart);
+    connect(this, &QAudioPlayer::signalStop, this, &QAudioPlayer::slotStop);
+    connect(this, &QAudioPlayer::signalPause, this, &QAudioPlayer::slotPause);
+    connect(this, &QAudioPlayer::signalResume, this, &QAudioPlayer::slotResume);
 }
 
-QAudioPlayer::~QAudioPlayer() { m_audioPlayerThread->wait(); }
+QAudioPlayer::~QAudioPlayer() {
+    if (m_audioPlayerThread) {
+        m_audioPlayerThread->quit();
+        m_audioPlayerThread->wait();
+    }
+}
 
 bool QAudioPlayer::open(const std::shared_ptr<IParameter> &parameter) {
     if (m_isStarted) {
@@ -113,11 +121,7 @@ bool QAudioPlayer::start() {
     return true;
 }
 
-void QAudioPlayer::stop() {
-    m_audioSink->stop();
-    m_audioBuffer->close();
-    m_isExit = true;
-}
+void QAudioPlayer::stop() { emit signalStop(); }
 
 namespace {
 qint64 lastProcessedUSecs = 0;
@@ -147,17 +151,11 @@ long QAudioPlayer::getPts() {
 
 std::shared_ptr<IBoData> QAudioPlayer::getData() { return nullptr; }
 
-void QAudioPlayer::pause() {
-    m_isPaused = true;
-    m_audioSink->suspend();
-}
+void QAudioPlayer::pause() { emit signalPause(); }
 
 bool QAudioPlayer::isPaused() { return m_isPaused; }
 
-void QAudioPlayer::resume() {
-    m_isPaused = false;
-    m_audioSink->resume();
-}
+void QAudioPlayer::resume() { emit signalResume(); }
 
 void QAudioPlayer::clear() { m_audioBuffer->clear(); }
 
@@ -190,4 +188,33 @@ void QAudioPlayer::slotStart() {
     m_audioSink->start(m_audioBuffer.get());
     m_isPaused = false;
     return;
+}
+
+void QAudioPlayer::slotStop() {
+    if (!m_audioSink || !m_audioBuffer || !m_audioPlayerThread) {
+        return;
+    }
+
+    m_audioSink->stop();
+    m_audioBuffer->close();
+    m_audioPlayerThread->quit();
+    m_isExit = true;
+}
+
+void QAudioPlayer::slotPause() {
+    if (!m_audioSink) {
+        return;
+    }
+
+    m_isPaused = true;
+    m_audioSink->suspend();
+}
+
+void QAudioPlayer::slotResume() {
+    if (!m_audioSink) {
+        return;
+    }
+
+    m_isPaused = false;
+    m_audioSink->resume();
 }
