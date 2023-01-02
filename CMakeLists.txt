@@ -43,6 +43,7 @@ set(PROJECT_SOURCES
         FFDecoder.h FFDecoder.cpp
         FFResampler.h FFResampler.cpp
         FFQtPlayerBuilder.h FFQtPlayerBuilder.cpp
+        FFQtPlayer.h FFQtPlayer.cpp
 
         QAudioPlayer.h QAudioPlayer.cpp
         Data/IBoData.h Data/IBoData.cpp

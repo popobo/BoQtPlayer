@@ -7,11 +7,14 @@
 #include <QAudioDevice>
 #include <QAudioSink>
 #include <QIODevice>
+#include <QThread>
 
 class AudioBuffer;
 
-class QAudioPlayer : public IAudioPlayer {
-  public:
+class QAudioPlayer :public QObject, public IAudioPlayer {
+    Q_OBJECT  
+
+public:
     QAudioPlayer();
 
     ~QAudioPlayer();
@@ -39,6 +42,17 @@ class QAudioPlayer : public IAudioPlayer {
 
     virtual const AudioOutputFormat& audioOutFormat() const override;
 
+    virtual bool isSatisfied() override;
+
+signals:
+    void signalOpen();
+    void signalStart();
+
+public slots:
+
+    void slotOpen();
+    void slotStart();
+
   private:
     bool m_isStarted{false};
     std::shared_ptr<AudioBuffer> m_audioBuffer;
@@ -53,8 +67,8 @@ class QAudioPlayer : public IAudioPlayer {
     long m_pts{ 0 };
     AudioOutputFormat m_audioOutFormat;
 
-    // 通过 IAudioPlayer 继承
-    virtual bool isSatisfied() override;
+    QThread* m_audioPlayerThread;
+    std::atomic<bool> m_isSatisfied = false;
 };
 
 #endif // QAUDIOPLAYER_H

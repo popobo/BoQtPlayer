@@ -4,8 +4,8 @@
 #include <QAudioFormat>
 #include <QMediaDevices>
 #include <QThread>
-#include <queue>
 #include <mutex>
+#include <queue>
 extern "C" {
 #include "libswresample/swresample.h"
 }
@@ -14,7 +14,7 @@ class AudioBuffer : public QIODevice {
   public:
     qint64 readData(char *data, qint64 len) override {
         // 一般len远大于boData->size()
-        std::unique_lock<std::mutex> locker{ m_boDataQueueMutex };
+        std::unique_lock<std::mutex> locker{m_boDataQueueMutex};
         if (m_boDataQueue.empty()) {
             return 0;
         }
@@ -37,14 +37,14 @@ class AudioBuffer : public QIODevice {
     }
 
     void addBoData(const std::shared_ptr<IBoData> &newBoData) {
-        std::unique_lock<std::mutex> locker{ m_boDataQueueMutex };
+        std::unique_lock<std::mutex> locker{m_boDataQueueMutex};
         m_boDataQueue.push(newBoData);
     }
 
     qint64 writeData(const char *data, qint64 len) override { return 0; }
 
     void clear() {
-        std::unique_lock<std::mutex> locker{ m_boDataQueueMutex };
+        std::unique_lock<std::mutex> locker{m_boDataQueueMutex};
         m_boDataQueue = {};
     }
 
@@ -53,18 +53,23 @@ class AudioBuffer : public QIODevice {
     std::mutex m_boDataQueueMutex;
 };
 
-QAudioPlayer::QAudioPlayer() {}
+QAudioPlayer::QAudioPlayer() {
+    m_audioPlayerThread = new QThread;
+    // 别忘记start
+    m_audioPlayerThread->start();
+    this->moveToThread(m_audioPlayerThread);
+    connect(m_audioPlayerThread, &QThread::finished, m_audioPlayerThread,
+            &QObject::deleteLater);
+    connect(this, &QAudioPlayer::signalOpen, this, &QAudioPlayer::slotOpen);
+    connect(this, &QAudioPlayer::signalStart, this, &QAudioPlayer::slotStart);
+}
 
-QAudioPlayer::~QAudioPlayer() {}
+QAudioPlayer::~QAudioPlayer() { m_audioPlayerThread->wait(); }
 
 bool QAudioPlayer::open(const std::shared_ptr<IParameter> &parameter) {
     if (m_isStarted) {
         BO_INFO("QAudioPlayer has been start");
         return false;
-    }
-
-    if (!m_audioBuffer) {
-        m_audioBuffer = std::make_shared<AudioBuffer>();
     }
 
     m_audioDevice = QMediaDevices::defaultAudioOutput();
@@ -88,33 +93,23 @@ bool QAudioPlayer::open(const std::shared_ptr<IParameter> &parameter) {
     m_audioOutFormat.sampleChannelCount = m_qPreferedAudioFormat.channelCount();
     m_audioOutFormat.sampleRate = m_qPreferedAudioFormat.sampleRate();
 
-    m_audioBuffer->open(QIODevice::ReadWrite);
+    emit signalOpen();
 
-    if (!m_audioSink) {
-        m_audioSink =
-            std::make_shared<QAudioSink>(m_audioDevice, m_qPreferedAudioFormat);
-    }
-
-    m_isStarted = true;
     return true;
 }
 
 void QAudioPlayer::update(const std::shared_ptr<IBoData> &boData) {
-    if (!boData || boData->size() <= 0 || !boData->data()) {
+    if (!boData || boData->size() <= 0 || !boData->data() || !m_audioBuffer) {
         return;
     }
+
     if (!m_isExit) {
         m_audioBuffer->addBoData(boData);
     }
 }
 
 bool QAudioPlayer::start() {
-    // 注意这边的生命周期
-    if (!m_audioSink) {
-        return false;
-    }
-    m_audioSink->start(m_audioBuffer.get());
-    m_isPaused = false;
+    emit signalStart();
     return true;
 }
 
@@ -131,6 +126,10 @@ qint64 currentProcessedUSecs = 0;
 
 long QAudioPlayer::getPts() {
     // 单位ms
+    if (!m_audioSink) {
+        return 0;
+    }
+
     currentProcessedUSecs = m_audioSink->processedUSecs() / 1000;
     if (m_isPaused) {
         return currentProcessedUSecs;
@@ -148,34 +147,47 @@ long QAudioPlayer::getPts() {
 
 std::shared_ptr<IBoData> QAudioPlayer::getData() { return nullptr; }
 
-void QAudioPlayer::pause()
-{
+void QAudioPlayer::pause() {
     m_isPaused = true;
     m_audioSink->suspend();
 }
 
-bool QAudioPlayer::isPaused()
-{
-    return m_isPaused;
-}
+bool QAudioPlayer::isPaused() { return m_isPaused; }
 
-void QAudioPlayer::resume()
-{
+void QAudioPlayer::resume() {
     m_isPaused = false;
     m_audioSink->resume();
 }
 
-void QAudioPlayer::clear()
-{
-    m_audioBuffer->clear();
-}
+void QAudioPlayer::clear() { m_audioBuffer->clear(); }
 
-const AudioOutputFormat& QAudioPlayer::audioOutFormat() const
-{
+const AudioOutputFormat &QAudioPlayer::audioOutFormat() const {
     return m_audioOutFormat;
 }
 
-bool QAudioPlayer::isSatisfied()
-{
-    return false;
+bool QAudioPlayer::isSatisfied() { return m_isSatisfied; }
+
+void QAudioPlayer::slotOpen() {
+    if (!m_audioBuffer) {
+        m_audioBuffer = std::make_shared<AudioBuffer>();
+    }
+
+    m_audioBuffer->open(QIODevice::ReadWrite);
+
+    if (!m_audioSink) {
+        m_audioSink =
+            std::make_shared<QAudioSink>(m_audioDevice, m_qPreferedAudioFormat);
+    }
+
+    m_isStarted = true;
+}
+
+void QAudioPlayer::slotStart() {
+    // 注意这边的生命周期
+    if (!m_audioSink) {
+        return;
+    }
+    m_audioSink->start(m_audioBuffer.get());
+    m_isPaused = false;
+    return;
 }
