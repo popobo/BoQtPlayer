@@ -151,7 +151,7 @@ long QAudioPlayer::getPts() {
     } else {
         m_pts += m_timer.elapsed();
     }
-    BO_INFO("Test1 m_pts:{0}", m_pts);
+
     return m_pts;
 }
 
