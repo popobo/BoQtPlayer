@@ -108,15 +108,13 @@ long YUVRenderer::renderBoData() {
     std::unique_lock<std::mutex> locker{m_boDataQueueMutex};
     if (m_boDataQueue.empty()) {
         m_isSatisfied = false;
-        BO_INFO("m_isSatisfied:{0}", m_isSatisfied ? true : false);
         return -1;
     }
 
     auto boData = m_boDataQueue.front();
     m_boDataQueue.pop();
-    if (m_boDataQueue.size() < 0.5 * MAX_LENGTH) {
+    if (m_boDataQueue.size() < UNSATIFIED_BODATA_QUEUE_SIZE) {
         m_isSatisfied = false;
-        BO_INFO("m_isSatisfied:{0}", m_isSatisfied ? true : false);
     }
     locker.unlock();
     auto boDataDatas = boData->datas();
@@ -162,13 +160,12 @@ void YUVRenderer::addBoData(const std::shared_ptr<IBoData> &newBoData) {
         return;
     }
 
-    if (m_boDataQueue.size() > 0.75 * MAX_LENGTH) {
+    if (m_boDataQueue.size() > SATIFIED_BODATA_QUEUE_SIZE) {
         m_isSatisfied = true;
-        BO_INFO("m_isSatisfied:{0}", m_isSatisfied ? true : false);
     }
 
     std::unique_lock<std::mutex> locker{m_boDataQueueMutex};
-    if (m_boDataQueue.size() < MAX_LENGTH) {
+    if (m_boDataQueue.size() < MAX_BODATA_QUEUE_SIZE) {
         m_boDataQueue.push(newBoData);
     }
 }

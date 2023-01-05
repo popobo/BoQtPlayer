@@ -197,7 +197,7 @@ void FFDecoder::main() {
     std::shared_ptr<IBoData> boData = m_boDataQueue.front();
     m_boDataQueue.pop();
 
-    if (m_boDataQueue.size() < 0.5 * MAX_LIST) {
+    if (m_boDataQueue.size() < UNSATISFIED_BODATA_QUEUE_SIZE) {
         m_isStatified = false;
     }
 
@@ -233,13 +233,13 @@ void FFDecoder::update(const std::shared_ptr<IBoData> &boData) {
     }
 
     // 循环是为了阻塞住FFDemux让其不要读取数据了
-    if (m_boDataQueue.size() > 0.75 * MAX_LIST) {
+    if (m_boDataQueue.size() > SATISFIED_BODATA_QUEUE_SIZE) {
         // 观察者已经满足了
         m_isStatified = true;
     }
 
     std::unique_lock<std::mutex> lock(m_boDataQueueMutex);
-    if (m_boDataQueue.size() < MAX_LIST) {
+    if (m_boDataQueue.size() < MAX_BODATA_QUEUE_SIZE) {
         m_boDataQueue.push(boData);
     }
 }

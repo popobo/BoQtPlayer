@@ -3,8 +3,8 @@
 #include "IOpenGLRenderer.h"
 #include "OpenGLMesh.h"
 #include "OpenGLShader.h"
-#include <queue>
 #include <mutex>
+#include <queue>
 
 namespace OpenGLRender {
 
@@ -34,12 +34,14 @@ class YUVRenderer : public IOpenGLRenderer {
     GLuint m_uTextureId = 0;
     GLuint m_vTextureId = 0;
 
-    const static int MAX_LENGTH = 100;
+    const static int MAX_BODATA_QUEUE_SIZE = 100;
+    const static int SATIFIED_BODATA_QUEUE_SIZE = MAX_BODATA_QUEUE_SIZE * 0.75;
+    const static int UNSATIFIED_BODATA_QUEUE_SIZE = MAX_BODATA_QUEUE_SIZE * 0.5;
     std::queue<std::shared_ptr<IBoData>> m_boDataQueue;
     std::mutex m_boDataQueueMutex;
 
     bool m_stopReceiveData = false;
-    std::atomic<bool> m_isSatisfied{ false };
+    std::atomic<bool> m_isSatisfied{false};
 };
 
 } // namespace OpenGLRender
