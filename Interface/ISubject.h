@@ -3,9 +3,9 @@
 
 #include "Data/IBoData.h"
 #include "IObserver.h"
+#include <list>
 #include <memory>
 #include <mutex>
-#include <vector>
 
 class ISubject {
   public:
@@ -26,8 +26,8 @@ class ISubject {
     virtual bool isAnyObserverSatisfied();
 
   protected:
-    std::vector<std::weak_ptr<IObserver>> m_observers;
-    std::vector<std::shared_ptr<IObserver>> m_strongObservers;
+    std::list<std::weak_ptr<IObserver>> m_observers;
+    std::list<std::shared_ptr<IObserver>> m_strongObservers;
     std::mutex m_mux;
 };
 
