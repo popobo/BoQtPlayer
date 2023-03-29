@@ -98,7 +98,7 @@ bool FFDemux::open(const char *url) {
 }
 
 // 读取一帧数据
-std::shared_ptr<IBoData> FFDemux::read() {
+std::shared_ptr<IBoData> FFDemux::read_frame() {
     auto boData = std::make_shared<BoAVPacketData>();
 
     std::unique_lock<std::mutex> locker{m_avFormatContextMutex};
@@ -155,10 +155,10 @@ void FFDemux::mainTask() {
         return;
     }
 
-    auto boData = read();
+    auto boData = read_frame();
     if (boData->size() > 0) {
         notify(boData);
-    }
+    } 
 }
 
 bool FFDemux::seek(double pos) {

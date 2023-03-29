@@ -108,7 +108,7 @@ bool OpenGLRenderWidget::start() { return startThread(); }
 
 void OpenGLRenderWidget::stop() { stopThread(); }
 
-void OpenGLRenderWidget::update(const std::shared_ptr<IBoData> &boData) {
+void OpenGLRenderWidget::update(std::shared_ptr<IBoData> boData) {
     m_renderingThread->addBoData(boData);
 }
 

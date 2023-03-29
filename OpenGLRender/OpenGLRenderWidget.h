@@ -47,7 +47,7 @@ class OpenGLRenderWidget
     virtual void resume() override;
 
     // IObserver interface
-    virtual void update(const std::shared_ptr<IBoData> &boData) override;
+    virtual void update(std::shared_ptr<IBoData> boData) override;
 
     virtual void setSyncAudioPts(long newSyncAudioPts) override;
 

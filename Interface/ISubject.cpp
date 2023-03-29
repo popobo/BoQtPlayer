@@ -1,7 +1,7 @@
 #include "ISubject.h"
 #include <algorithm>
 
-void ISubject::addObs(const std::weak_ptr<IObserver> &observer) {
+void ISubject::addObs(std::weak_ptr<IObserver> observer) {
     if (!observer.lock()) {
         return;
     }
@@ -9,11 +9,11 @@ void ISubject::addObs(const std::weak_ptr<IObserver> &observer) {
     m_observers.push_back(observer);
 }
 
-void ISubject::addStrongObs(const std::shared_ptr<IObserver> &observer) {
+void ISubject::addStrongObs(std::shared_ptr<IObserver> observer) {
     m_strongObservers.push_back(observer);
 }
 
-void ISubject::delObs(const std::weak_ptr<IObserver> &delObserver) {
+void ISubject::delObs(std::weak_ptr<IObserver> delObserver) {
     auto delIterator =
         std::find_if(m_observers.begin(), m_observers.end(),
                      [&delObserver](const std::weak_ptr<IObserver> &observer) {
@@ -22,7 +22,7 @@ void ISubject::delObs(const std::weak_ptr<IObserver> &delObserver) {
     m_observers.erase(delIterator);
 }
 
-void ISubject::delStrongObs(const std::shared_ptr<IObserver> &delObserver) {
+void ISubject::delStrongObs(std::shared_ptr<IObserver> delObserver) {
     auto delIterator = std::find_if(
         m_strongObservers.begin(), m_strongObservers.end(),
         [&delObserver](const std::shared_ptr<IObserver> &observer) {
@@ -31,7 +31,7 @@ void ISubject::delStrongObs(const std::shared_ptr<IObserver> &delObserver) {
     m_strongObservers.erase(delIterator);
 }
 
-void ISubject::notify(const std::shared_ptr<IBoData> &boData) {
+void ISubject::notify(std::shared_ptr<IBoData> boData) {
     std::unique_lock<std::mutex> lock(m_mux);
     // 小心少了引用
     for (auto &observer : m_observers) {

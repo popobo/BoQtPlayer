@@ -227,7 +227,7 @@ void FFDecoder::mainTask() {
 
 bool FFDecoder::isSatisfied() { return m_isStatified; }
 
-void FFDecoder::update(const std::shared_ptr<IBoData> &boData) {
+void FFDecoder::update(std::shared_ptr<IBoData> boData) {
     if (boData->isAudio() != m_isAudio) {
         return;
     }

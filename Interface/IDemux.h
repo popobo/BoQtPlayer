@@ -1,5 +1,4 @@
-#ifndef IDEMUX_H
-#define IDEMUX_H
+#pragma once
 
 #include "BoThread.h"
 #include "Data/IBoData.h"
@@ -15,7 +14,7 @@ class IDemux : public ISubject {
     virtual bool open(const char *url) = 0;
 
     //读取一帧数据。数据由调用者清理
-    virtual std::shared_ptr<IBoData> read() = 0;
+    virtual std::shared_ptr<IBoData> read_frame() = 0;
 
     virtual bool seek(double pos) = 0;
 
@@ -28,5 +27,3 @@ class IDemux : public ISubject {
 
     virtual void mainTask() = 0;
 };
-
-#endif // IDEMUX_H

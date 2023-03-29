@@ -1,6 +1,4 @@
-﻿#ifndef FFDECODER_H
-#define FFDECODER_H
-
+﻿#pragma once
 #include "IDecoder.h"
 extern "C" {
 #include "libavcodec/avcodec.h"
@@ -24,7 +22,7 @@ class FFDecoder : public IDecoder {
     virtual bool isAudio() const override;
     virtual void setIsAudio(bool newIsAudio) override;
 
-    virtual void update(const std::shared_ptr<IBoData> &boData) override;
+    virtual void update(std::shared_ptr<IBoData> boData) override;
 
     virtual void mainTask() override;
 
@@ -54,5 +52,3 @@ class FFDecoder : public IDecoder {
     std::atomic<bool> m_isStatified{false};
     std::atomic<bool> m_isDecodedDataLeftLastTime{false};
 };
-
-#endif // FFDECODER_H

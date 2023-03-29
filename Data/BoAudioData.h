@@ -1,5 +1,4 @@
-#ifndef BOAUDIODATA_H
-#define BOAUDIODATA_H
+#pragma once
 
 #include "IBoData.h"
 
@@ -16,5 +15,3 @@ class BoAudioData : public IBoData {
     virtual bool alloc(int size, const uint8_t *dataIn) override;
     virtual void drop() override;
 };
-
-#endif // BOAUDIODATA_H

@@ -1,5 +1,4 @@
-﻿#ifndef QAUDIOPLAYER_H
-#define QAUDIOPLAYER_H
+﻿#pragma once
 
 #include "BoThread.h"
 #include "ElapsedTimer.h"
@@ -21,7 +20,7 @@ class QAudioPlayer : public QObject, public IAudioPlayer {
 
     virtual bool open(const std::shared_ptr<IParameter> &parameter) override;
 
-    virtual void update(const std::shared_ptr<IBoData> &boData) override;
+    virtual void update(std::shared_ptr<IBoData> boData) override;
 
     // IAudioPlayer interface
     virtual bool start() override;
@@ -81,5 +80,3 @@ class QAudioPlayer : public QObject, public IAudioPlayer {
     QThread *m_audioPlayerThread;
     std::atomic<bool> m_isSatisfied = false;
 };
-
-#endif // QAUDIOPLAYER_H

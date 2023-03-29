@@ -1,6 +1,4 @@
-#ifndef IDECODER_H
-#define IDECODER_H
-
+#pragma once
 #include "BoThread.h"
 #include "Data/IBoData.h"
 #include "IObserver.h"
@@ -25,7 +23,7 @@ class IDecoder : public IObserver, public ISubject {
 
     //由主体notify的数据 达到最大队列缓冲则阻塞
     // IObserver Interface
-    virtual void update(const std::shared_ptr<IBoData> &boData) = 0;
+    virtual void update(std::shared_ptr<IBoData> boData) = 0;
 
     // BoThread interface
     virtual void close() = 0;
@@ -38,5 +36,3 @@ class IDecoder : public IObserver, public ISubject {
 
     virtual void mainTask() = 0;
 };
-
-#endif // IDECODER_H

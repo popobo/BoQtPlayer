@@ -240,7 +240,7 @@ bool FFQtPlayer::_seek(double pos) {
     // 解码实际需要显示的帧
     int64_t seekPts = static_cast<int64_t>(pos * m_demux->getTotalTime());
     while (!m_playerThread->isExit()) {
-        auto pkt = m_demux->read();
+        auto pkt = m_demux->read_frame();
         if (pkt->size() <= 0) {
             break;
         }

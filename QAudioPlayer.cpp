@@ -101,7 +101,7 @@ bool QAudioPlayer::open(const std::shared_ptr<IParameter> &parameter) {
     return true;
 }
 
-void QAudioPlayer::update(const std::shared_ptr<IBoData> &boData) {
+void QAudioPlayer::update(std::shared_ptr<IBoData> boData) {
     if (!boData || boData->size() <= 0 || !boData->data() || !m_audioBuffer) {
         return;
     }

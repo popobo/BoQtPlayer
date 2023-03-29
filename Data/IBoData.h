@@ -1,7 +1,6 @@
-#ifndef IBODATA_H
-#define IBODATA_H
+#pragma once
 
-#include <cinttypes>
+#include <cstdint>
 #include <vector>
 
 class IBoData {
@@ -64,5 +63,3 @@ class IBoData {
     double m_timeBase{0};
     bool m_isAudio{false};
 };
-
-#endif // IBODATA_H

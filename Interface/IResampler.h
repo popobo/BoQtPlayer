@@ -1,6 +1,4 @@
-#ifndef IRESAMPLER_H
-#define IRESAMPLER_H
-
+#pragma once
 #include "IParameter.h"
 #include "IObserver.h"
 #include "ISubject.h"
@@ -20,11 +18,10 @@ class IResampler : public IObserver, public ISubject {
     virtual std::shared_ptr<IBoData>
     resample(const std::shared_ptr<IBoData> &boDataIn) = 0;
 
-    virtual void update(const std::shared_ptr<IBoData> &boData) override;
+    virtual void update(std::shared_ptr<IBoData> boData) override;
 
   private:
     int outChannels = 2;
     int outFormat = 1;
 };
 
-#endif // IRESAMPLER_H

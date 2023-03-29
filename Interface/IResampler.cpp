@@ -4,7 +4,7 @@ IResampler::IResampler() {}
 
 IResampler::~IResampler() {}
 
-void IResampler::update(const std::shared_ptr<IBoData> &boData) {
+void IResampler::update(std::shared_ptr<IBoData> boData) {
     if (!boData->isAudio()) {
         return;
     }

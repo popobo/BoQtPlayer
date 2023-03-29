@@ -1,6 +1,4 @@
-#ifndef FFDEMUX_H
-#define FFDEMUX_H
-
+#pragma once
 #include "IDemux.h"
 extern "C" {
 #include "libavformat/avformat.h"
@@ -14,7 +12,7 @@ class FFDemux : public IDemux {
 
     // IDemux interface
     virtual bool open(const char *url) override;
-    virtual std::shared_ptr<IBoData> read() override;
+    virtual std::shared_ptr<IBoData> read_frame() override;
     virtual int64_t getTotalTime() override;
     virtual bool seek(double pos) override;
 
@@ -35,5 +33,3 @@ class FFDemux : public IDemux {
 
     int64_t m_totalMs = 0;
 };
-
-#endif // FFDEMUX_H
