@@ -82,10 +82,6 @@ void OpenGLRenderWidget::paintGL() {
 
 void OpenGLRenderWidget::closeEvent(QCloseEvent *e) { stopThread(); }
 
-bool OpenGLRenderWidget::isSatisfied() {
-    return m_renderingThread->isSatisfied();
-}
-
 void OpenGLRenderWidget::pause() { m_renderingThread->pause(); }
 
 bool OpenGLRenderWidget::isPaused() { return m_renderingThread->isPaused(); }

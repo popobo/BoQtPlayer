@@ -151,10 +151,6 @@ std::shared_ptr<IParameter> FFDemux::getAudioParameter() {
 }
 
 void FFDemux::mainTask() {
-    if (isAnyObserverSatisfied()) {
-        return;
-    }
-
     auto boData = read_frame();
     if (boData->size() > 0) {
         notify(boData);

@@ -169,8 +169,6 @@ const AudioOutputFormat &QAudioPlayer::audioOutFormat() const {
     return m_audioOutFormat;
 }
 
-bool QAudioPlayer::isSatisfied() { return m_isSatisfied; }
-
 void QAudioPlayer::slotOpen() {
     if (!m_audioBuffer) {
         m_audioBuffer = std::make_shared<AudioBuffer>();

@@ -22,8 +22,6 @@ class ISubject {
 
     virtual void notify(std::shared_ptr<IBoData> boData);
 
-    virtual bool isAnyObserverSatisfied();
-
   protected:
     std::list<std::weak_ptr<IObserver>> m_observers;
     std::list<std::shared_ptr<IObserver>> m_strongObservers;

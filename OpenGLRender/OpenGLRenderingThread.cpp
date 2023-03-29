@@ -52,8 +52,6 @@ void RenderingThread::clear() {
     }
 }
 
-bool RenderingThread::isSatisfied() { return m_renderer->isSatisfied(); }
-
 // 只能再run()中调用，且注意线程安全
 bool RenderingThread::renderFrame() {
     // bind the framebuffer for rendering
@@ -121,9 +119,6 @@ RenderingThread::RenderingThread() {}
 void RenderingThread::stop() {
     lock();
     m_exiting = true;
-    if (m_renderer) {
-        m_renderer->stop();
-    }
     unlock();
 }
 

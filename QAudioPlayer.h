@@ -43,8 +43,6 @@ class QAudioPlayer : public QObject, public IAudioPlayer {
 
     virtual const AudioOutputFormat &audioOutFormat() const override;
 
-    virtual bool isSatisfied() override;
-
   signals:
     void signalOpen();
     void signalStart();
@@ -78,5 +76,4 @@ class QAudioPlayer : public QObject, public IAudioPlayer {
     AudioOutputFormat m_audioOutFormat;
 
     QThread *m_audioPlayerThread;
-    std::atomic<bool> m_isSatisfied = false;
 };

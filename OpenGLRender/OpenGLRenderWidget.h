@@ -53,8 +53,6 @@ class OpenGLRenderWidget
 
     virtual void clear() override;
 
-    virtual bool isSatisfied() override;
-
   protected:
     void paintGL() override;
     void closeEvent(QCloseEvent *e) override;

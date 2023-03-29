@@ -37,11 +37,7 @@ class IOpenGLRenderer {
 
     virtual void addBoData(const std::shared_ptr<IBoData> &newBoData) {}
 
-    virtual void stop() {}
-
     virtual void clear() {}
-
-    virtual bool isSatisfied() { return false; }
 };
 
 } // namespace OpenGLRender

@@ -167,48 +167,21 @@ void FFDecoder::setIsAudio(bool newIsAudio) { m_isAudio = newIsAudio; }
 void FFDecoder::mainTask() {
     std::unique_lock<std::mutex> lock(m_boDataQueueMutex);
     //取出packet 消费者
-    if (m_boDataQueue.empty()) {
-        m_isStatified = false;
-        m_isDecodedDataLeftLastTime = false;
-        lock.unlock();
-        boSleep(1);
-        return;
+    while (m_boDataQueue.size() == 0) {
+        m_boDataQueueCV.wait(lock);
     }
 
-    if (m_isDecodedDataLeftLastTime) {
-        while (true) {
-            if (isAnyObserverSatisfied()) {
-                m_isDecodedDataLeftLastTime = true;
-                break;
-            }
+    assert(m_boDataQueue.size() > 0);
 
-            // 获取上次未读取完的解码数据
-            auto frame = recvFrame();
-            if (!frame) {
-                m_isDecodedDataLeftLastTime = false;
-                break;
-            }
-
-            notify(frame);
-        }
-        return;
-    }
-
-    std::shared_ptr<IBoData> boData = m_boDataQueue.front();
+    auto boData = m_boDataQueue.front();
     m_boDataQueue.pop();
-
-    if (m_boDataQueue.size() < UNSATISFIED_BODATA_QUEUE_SIZE) {
-        m_isStatified = false;
-    }
+    m_boDataQueueCV.notify_all();
+    lock.unlock();
 
     //开启解码
     //发送数据到解码线程 一个数据包可能解码多个结果(主要是音频)
     if (sendPacket(boData)) {
         while (true) {
-            if (isAnyObserverSatisfied()) {
-                m_isDecodedDataLeftLastTime = true;
-                break;
-            }
 
             //获取解码器
             //获取解码数据
@@ -225,21 +198,18 @@ void FFDecoder::mainTask() {
     //消费者负责清理, 采用智能指针管理
 }
 
-bool FFDecoder::isSatisfied() { return m_isStatified; }
-
+// 生产者
 void FFDecoder::update(std::shared_ptr<IBoData> boData) {
     if (boData->isAudio() != m_isAudio) {
         return;
     }
 
-    // 循环是为了阻塞住FFDemux让其不要读取数据了
-    if (m_boDataQueue.size() > SATISFIED_BODATA_QUEUE_SIZE) {
-        // 观察者已经满足了
-        m_isStatified = true;
+    std::unique_lock<std::mutex> lock(m_boDataQueueMutex);
+    while (m_boDataQueue.size() > MAX_BODATA_QUEUE_SIZE) {
+        m_boDataQueueCV.wait(lock);
     }
 
-    std::unique_lock<std::mutex> lock(m_boDataQueueMutex);
-    if (m_boDataQueue.size() < MAX_BODATA_QUEUE_SIZE) {
-        m_boDataQueue.push(boData);
-    }
+    assert(m_boDataQueue.size() <= MAX_BODATA_QUEUE_SIZE);
+    m_boDataQueue.push(boData);
+    m_boDataQueueCV.notify_all();
 }

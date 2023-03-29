@@ -1,5 +1,7 @@
 ﻿#pragma once
+
 #include "IDecoder.h"
+#include <condition_variable>
 extern "C" {
 #include "libavcodec/avcodec.h"
 }
@@ -26,8 +28,6 @@ class FFDecoder : public IDecoder {
 
     virtual void mainTask() override;
 
-    virtual bool isSatisfied() override;
-
   private:
     AVCodecContext *m_codecContext = nullptr;
     std::mutex m_codecContextMutex;
@@ -39,16 +39,11 @@ class FFDecoder : public IDecoder {
 
     //读取缓冲
     const int32_t MAX_BODATA_QUEUE_SIZE = 100;
-    const int32_t SATISFIED_BODATA_QUEUE_SIZE =
-        static_cast<int32_t>(MAX_BODATA_QUEUE_SIZE * 0.75);
-    const int32_t UNSATISFIED_BODATA_QUEUE_SIZE =
-        static_cast<int32_t>(MAX_BODATA_QUEUE_SIZE * 0.5);
+
     std::queue<std::shared_ptr<IBoData>> m_boDataQueue;
     std::mutex m_boDataQueueMutex;
+    std::condition_variable m_boDataQueueCV;
 
     double m_audioTimeBase = 0.0;
     double m_videoTimeBase = 0.0;
-
-    std::atomic<bool> m_isStatified{false};
-    std::atomic<bool> m_isDecodedDataLeftLastTime{false};
 };

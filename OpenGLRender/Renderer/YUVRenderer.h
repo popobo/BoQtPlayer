@@ -22,11 +22,7 @@ class YUVRenderer : public IOpenGLRenderer {
 
     virtual void addBoData(const std::shared_ptr<IBoData> &newBoData) override;
 
-    virtual void stop() override;
-
     virtual void clear() override;
-
-    virtual bool isSatisfied() override;
 
   private:
     std::shared_ptr<Mesh> m_mesh;
@@ -36,15 +32,10 @@ class YUVRenderer : public IOpenGLRenderer {
     GLuint m_vTextureId = 0;
 
     const static int32_t MAX_BODATA_QUEUE_SIZE = 100;
-    const static int32_t SATIFIED_BODATA_QUEUE_SIZE =
-        static_cast<int32_t>(MAX_BODATA_QUEUE_SIZE * 0.75);
-    const static int32_t UNSATIFIED_BODATA_QUEUE_SIZE =
-        static_cast<int32_t>(MAX_BODATA_QUEUE_SIZE * 0.5);
+
     std::queue<std::shared_ptr<IBoData>> m_boDataQueue;
     std::mutex m_boDataQueueMutex;
-
-    bool m_stopReceiveData = false;
-    std::atomic<bool> m_isSatisfied{false};
+    std::condition_variable m_boDataQueueCV;
 };
 
 } // namespace OpenGLRender

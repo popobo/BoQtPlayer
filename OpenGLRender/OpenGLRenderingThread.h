@@ -57,8 +57,6 @@ class RenderingThread : public QThread {
     
     void clear();
 
-    bool isSatisfied();
-
   protected:
     void run() override;
     // this method should be called between
