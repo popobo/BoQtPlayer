@@ -10,9 +10,8 @@ class IBoData {
 
     virtual ~IBoData();
 
-    virtual bool alloc(int size, const uint8_t *dataIn) { return false; }
-
-    virtual void drop() = 0;
+    virtual bool alloc(int size, const uint8_t *dataIn);
+    virtual void drop();
 
     virtual void *structDataPtr() const;
     virtual void setStructDataPtr(void *newStructDataPtr);

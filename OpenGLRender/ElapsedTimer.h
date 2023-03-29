@@ -9,7 +9,7 @@ class ElapsedTimer {
 
     ElapsedTimer();
 
-    int elapsed();
+    int64_t elapsed();
 
   private:
     ClockTimePoint m_prevTime;

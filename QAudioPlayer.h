@@ -28,7 +28,7 @@ class QAudioPlayer : public QObject, public IAudioPlayer {
 
     virtual void stop() override;
 
-    virtual void setBasePts(long newPts) override;
+    virtual void setBasePts(int64_t newPts) override;
 
     virtual long getPts() override;
 

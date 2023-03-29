@@ -2,7 +2,7 @@
 
 ElapsedTimer::ElapsedTimer() { m_prevTime = Clock::now(); }
 
-int ElapsedTimer::elapsed() {
+int64_t ElapsedTimer::elapsed() {
     ClockTimePoint currentTime = Clock::now();
     auto diffTime = currentTime - m_prevTime;
     m_prevTime = currentTime;

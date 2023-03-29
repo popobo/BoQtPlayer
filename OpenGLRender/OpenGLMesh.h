@@ -21,14 +21,14 @@ class Mesh {
                         vertexData.data());
     }
 
-    void writeVertexData(int byteSize, int count, const void *vertexData);
+    void writeVertexData(size_t byteSize, size_t count, const void *vertexData);
 
     template <typename T> void readVertexData(std::vector<T> &vertexData) {
         vertexData.resize(vertexCount());
         readVertexData(vertexData.size() * sizeof(T), vertexData.data());
     }
 
-    void readVertexData(int byteCount, void *data);
+    void readVertexData(size_t byteCount, void *data);
 
     int vertexCount() const;
 
@@ -37,7 +37,7 @@ class Mesh {
                        indexData.data());
     }
 
-    void writeIndexData(int byteSize, int count, const void *indexData);
+    void writeIndexData(size_t byteSize, size_t count, const void *indexData);
 
     template <typename T> void readIndexData(std::vector<T> &indexData) {
         indexData.resize(indexCount());
@@ -49,7 +49,7 @@ class Mesh {
     int indexCount() const;
 
     void setAttributeDefinition(int index, int tupleSize, int stride,
-                                int offset, GLenum type = GL_FLOAT);
+                                int64_t offset, GLenum type = GL_FLOAT);
 
     void bind();
 

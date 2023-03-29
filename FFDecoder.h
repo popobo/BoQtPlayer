@@ -40,9 +40,11 @@ class FFDecoder : public IDecoder {
     bool m_isAudio = false;
 
     //读取缓冲
-    const int MAX_BODATA_QUEUE_SIZE = 100;
-    const int SATISFIED_BODATA_QUEUE_SIZE = MAX_BODATA_QUEUE_SIZE * 0.75;
-    const int UNSATISFIED_BODATA_QUEUE_SIZE = MAX_BODATA_QUEUE_SIZE * 0.5;
+    const int32_t MAX_BODATA_QUEUE_SIZE = 100;
+    const int32_t SATISFIED_BODATA_QUEUE_SIZE =
+        static_cast<int32_t>(MAX_BODATA_QUEUE_SIZE * 0.75);
+    const int32_t UNSATISFIED_BODATA_QUEUE_SIZE =
+        static_cast<int32_t>(MAX_BODATA_QUEUE_SIZE * 0.5);
     std::queue<std::shared_ptr<IBoData>> m_boDataQueue;
     std::mutex m_boDataQueueMutex;
 

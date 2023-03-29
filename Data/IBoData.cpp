@@ -4,6 +4,10 @@ IBoData::IBoData() {}
 
 IBoData::~IBoData() {}
 
+bool IBoData::alloc(int size, const uint8_t *dataIn) { return false; }
+
+void IBoData::drop() {}
+
 void *IBoData::structDataPtr() const { return m_structDataPtr; }
 
 void IBoData::setStructDataPtr(void *newStructDataPtr) {

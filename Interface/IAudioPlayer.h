@@ -20,7 +20,7 @@ class IAudioPlayer : public IObserver, public ISubject {
 
     static const int MAX_FRAME_COUNT = 100;
 
-    virtual void setBasePts(long newPts) = 0;
+    virtual void setBasePts(int64_t newPts) = 0;
 
     virtual long getPts() = 0;
 

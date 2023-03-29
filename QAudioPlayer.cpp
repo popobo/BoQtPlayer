@@ -118,7 +118,7 @@ bool QAudioPlayer::start() {
 
 void QAudioPlayer::stop() { emit signalStop(); }
 
-void QAudioPlayer::setBasePts(long newPts) {
+void QAudioPlayer::setBasePts(int64_t newPts) {
     if (!m_audioSink) {
         return;
     }

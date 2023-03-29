@@ -11,3 +11,4 @@ CMakeSettings.json
 /build/x64/Debug
 /CppProperties.json
 *.user
+CMakeLists.txt.user

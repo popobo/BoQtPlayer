@@ -35,9 +35,11 @@ class YUVRenderer : public IOpenGLRenderer {
     GLuint m_uTextureId = 0;
     GLuint m_vTextureId = 0;
 
-    const static int MAX_BODATA_QUEUE_SIZE = 100;
-    const static int SATIFIED_BODATA_QUEUE_SIZE = MAX_BODATA_QUEUE_SIZE * 0.75;
-    const static int UNSATIFIED_BODATA_QUEUE_SIZE = MAX_BODATA_QUEUE_SIZE * 0.5;
+    const static int32_t MAX_BODATA_QUEUE_SIZE = 100;
+    const static int32_t SATIFIED_BODATA_QUEUE_SIZE =
+        static_cast<int32_t>(MAX_BODATA_QUEUE_SIZE * 0.75);
+    const static int32_t UNSATIFIED_BODATA_QUEUE_SIZE =
+        static_cast<int32_t>(MAX_BODATA_QUEUE_SIZE * 0.5);
     std::queue<std::shared_ptr<IBoData>> m_boDataQueue;
     std::mutex m_boDataQueueMutex;
 
