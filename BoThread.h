@@ -1,19 +1,20 @@
 #ifndef BOTHREAD_H
 #define BOTHREAD_H
 
+#include <atomic>
+#include <functional>
 #include <memory>
+#include <mutex>
 #include <queue>
 #include <vector>
-#include <functional>
-#include <mutex>
 
 void boSleep(int ms);
 
-class BoThread: public std::enable_shared_from_this<BoThread> {
+class BoThread : public std::enable_shared_from_this<BoThread> {
   public:
     BoThread();
 
-    BoThread(const std::string& threadName);
+    BoThread(const std::string &threadName);
 
     virtual ~BoThread();
 
@@ -35,12 +36,12 @@ class BoThread: public std::enable_shared_from_this<BoThread> {
     void clearMainTasks();
 
     void addSubTask(std::function<void()> subTask);
-    
+
     void clearSubTasks();
 
   protected:
-    std::atomic<bool> m_isExit{ false };
-    std::atomic<bool> m_isPaused{ false };
+    std::atomic<bool> m_isExit{false};
+    std::atomic<bool> m_isPaused{false};
     std::string m_threaName;
 
     std::vector<std::function<void()>> m_mainTasksVec;

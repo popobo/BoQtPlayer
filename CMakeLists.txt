@@ -10,7 +10,6 @@ set(CMAKE_AUTORCC ON)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
-set(CMAKE_PREFIX_PATH D:/Software/Qt_6_4/6.3.2/msvc2019_64)
 
 find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Widgets)
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets)
@@ -63,6 +62,8 @@ set(PROJECT_SOURCES
         OpenGLRender/Renderer/OpenGLQuadFactory.h OpenGLRender/Renderer/OpenGLQuadFactory.cpp
         OpenGLRender/Renderer/YUVRenderer.h OpenGLRender/Renderer/YUVRenderer.cpp
         OpenGLRender/Renderer/YUVRendererFactory.h OpenGLRender/Renderer/YUVRendererFactory.cpp
+        OpenGLRender/IRenderWorker.h OpenGLRender/IRenderWorker.cpp
+        OpenGLRender/YUVRenderWorker.h OpenGLRender/YUVRenderWorker.cpp
 
         Dependency/OpenGL/glad/glad.c
     )

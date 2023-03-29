@@ -1,4 +1,5 @@
 #include "ISubject.h"
+#include <algorithm>
 
 void ISubject::addObs(const std::weak_ptr<IObserver> &observer) {
     if (!observer.lock()) {
@@ -44,17 +45,16 @@ void ISubject::notify(const std::shared_ptr<IBoData> &boData) {
     }
 }
 
-bool ISubject::isAnyObserverSatisfied()
-{
+bool ISubject::isAnyObserverSatisfied() {
     bool result = false;
 
-    for (const auto& weakObserver : m_observers) {
+    for (const auto &weakObserver : m_observers) {
         if (auto observer = weakObserver.lock()) {
             result = result || observer->isSatisfied();
         }
     }
 
-    for (const auto& observer : m_strongObservers) {
+    for (const auto &observer : m_strongObservers) {
         result = result || observer->isSatisfied();
     }
 

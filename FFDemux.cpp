@@ -150,7 +150,7 @@ std::shared_ptr<IParameter> FFDemux::getAudioParameter() {
     return m_audioParameter;
 }
 
-void FFDemux::main() {
+void FFDemux::mainTask() {
     if (isAnyObserverSatisfied()) {
         return;
     }

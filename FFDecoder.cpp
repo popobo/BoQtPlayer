@@ -164,7 +164,7 @@ bool FFDecoder::isAudio() const { return m_isAudio; }
 
 void FFDecoder::setIsAudio(bool newIsAudio) { m_isAudio = newIsAudio; }
 
-void FFDecoder::main() {
+void FFDecoder::mainTask() {
     std::unique_lock<std::mutex> lock(m_boDataQueueMutex);
     //取出packet 消费者
     if (m_boDataQueue.empty()) {

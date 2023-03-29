@@ -1,6 +1,4 @@
-/build/.qt
-/build/.vs
-
+/build
 
 /out
 /.vs

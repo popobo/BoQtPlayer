@@ -52,7 +52,7 @@ bool FFQtPlayer::start() {
     std::weak_ptr<IDecoder> weakVideoDecoder = m_videoDecoder;
     m_videoDecoderThread->addMainTask([weakVideoDecoder]() {
         if (auto videoDecoder = weakVideoDecoder.lock()) {
-            videoDecoder->main();
+            videoDecoder->mainTask();
         }
     });
 
@@ -60,7 +60,7 @@ bool FFQtPlayer::start() {
     std::weak_ptr<IDecoder> weakAudioDecoder = m_audioDecoder;
     m_audioDecoderThread->addMainTask([weakAudioDecoder]() {
         if (auto audioDecoder = weakAudioDecoder.lock()) {
-            audioDecoder->main();
+            audioDecoder->mainTask();
         }
     });
 
@@ -68,7 +68,7 @@ bool FFQtPlayer::start() {
     std::weak_ptr<IDemux> weakDemux = m_demux;
     m_demuxThread->addMainTask([weakDemux]() {
         if (auto demux = weakDemux.lock()) {
-            demux->main();
+            demux->mainTask();
         }
     });
 
@@ -76,7 +76,7 @@ bool FFQtPlayer::start() {
     std::weak_ptr<IPlayer> wself = shared_from_this();
     m_playerThread->addMainTask([wself]() {
         if (auto self = wself.lock()) {
-            self->main();
+            self->mainTask();
         }
     });
 
@@ -293,7 +293,7 @@ double FFQtPlayer::getPlayPos() {
     return (double)currentPts / (double)totalMs;
 }
 
-void FFQtPlayer::main() {
+void FFQtPlayer::mainTask() {
     std::unique_lock<std::mutex> locker(m_playerMutex);
     if (!m_audioPlayer || !m_videoDecoder) {
         locker.unlock();

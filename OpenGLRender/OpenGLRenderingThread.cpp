@@ -103,6 +103,7 @@ void RenderingThread::setOpenGLContext(QOpenGLContext *context) {
     m_context->create();
     m_context->moveToThread(this);
 
+    // 线程还没退出
     // 延迟删除，否则在关闭窗口时会报错, 具体原因有待学习
     m_surface = {new QOffscreenSurface{},
                  [](QOffscreenSurface *surface) { surface->deleteLater(); }};

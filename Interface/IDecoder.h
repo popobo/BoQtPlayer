@@ -25,7 +25,7 @@ class IDecoder : public IObserver, public ISubject {
 
     //由主体notify的数据 达到最大队列缓冲则阻塞
     // IObserver Interface
-    virtual void update(const std::shared_ptr<IBoData> &boData)  = 0;
+    virtual void update(const std::shared_ptr<IBoData> &boData) = 0;
 
     // BoThread interface
     virtual void close() = 0;
@@ -36,7 +36,7 @@ class IDecoder : public IObserver, public ISubject {
 
     virtual void setIsAudio(bool newIsAudio) = 0;
 
-    virtual void main() = 0;
+    virtual void mainTask() = 0;
 };
 
 #endif // IDECODER_H

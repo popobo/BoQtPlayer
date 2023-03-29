@@ -3,6 +3,7 @@
 #include "IOpenGLRenderer.h"
 #include "OpenGLMesh.h"
 #include "OpenGLShader.h"
+#include <atomic>
 #include <mutex>
 #include <queue>
 

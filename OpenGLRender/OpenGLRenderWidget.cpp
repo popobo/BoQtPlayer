@@ -9,7 +9,15 @@ OpenGLRenderWidget::OpenGLRenderWidget(QWidget *widget)
 
 OpenGLRenderWidget::OpenGLRenderWidget(
     std::shared_ptr<IRendererFactory> rendererFactory, QWidget *widget)
-    : QOpenGLWidget(widget), m_rendererFactory{rendererFactory} {}
+    : QOpenGLWidget(widget), m_rendererFactory{rendererFactory},
+      m_renderWorker(new YUVRenderWorker) {
+    m_renderWorker->moveToThread(&m_renderThread);
+}
+
+OpenGLRenderWidget::~OpenGLRenderWidget() {
+    m_renderThread.quit();
+    m_renderThread.wait();
+}
 
 bool OpenGLRenderWidget::startThread() {
     if (m_renderingThread) {

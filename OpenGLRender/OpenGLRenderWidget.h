@@ -5,6 +5,7 @@
 #include "OpenGLRenderingThread.h"
 #include "OpenGLViewportTarget.h"
 #include "Renderer/IRendererFactory.h"
+#include "YUVRenderWorker.h"
 #include <QOpenGLWidget>
 #include <memory>
 #include <queue>
@@ -23,6 +24,8 @@ class OpenGLRenderWidget
 
     OpenGLRenderWidget(std::shared_ptr<IRendererFactory> rendererFactory,
                        QWidget *widget = nullptr);
+
+    ~OpenGLRenderWidget();
 
     bool startThread();
 
@@ -52,8 +55,6 @@ class OpenGLRenderWidget
 
     virtual bool isSatisfied() override;
 
-    const static int BUFFER_MAX_LEN = 1024;
-
   protected:
     void paintGL() override;
     void closeEvent(QCloseEvent *e) override;
@@ -66,6 +67,9 @@ class OpenGLRenderWidget
     std::shared_ptr<IRendererFactory> m_rendererFactory;
     std::shared_ptr<RenderingThread> m_renderingThread;
     std::shared_ptr<ViewportTarget> m_viewportTarget;
+
+    YUVRenderWorker *m_renderWorker;
+    QThread m_renderThread;
 
     ElapsedTimer m_timer;
 };

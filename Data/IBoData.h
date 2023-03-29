@@ -1,6 +1,7 @@
 #ifndef IBODATA_H
 #define IBODATA_H
 
+#include <cinttypes>
 #include <vector>
 
 class IBoData {

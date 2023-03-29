@@ -21,12 +21,12 @@ class FFDemux : public IDemux {
     virtual std::shared_ptr<IParameter> getVideoParameter() override;
     virtual std::shared_ptr<IParameter> getAudioParameter() override;
 
-    virtual void main() override;
+    virtual void mainTask() override;
 
   private:
     AVFormatContext *m_avFormatContext = nullptr;
     std::mutex m_avFormatContextMutex;
-    
+
     std::shared_ptr<IParameter> m_videoParameter;
     std::shared_ptr<IParameter> m_audioParameter;
 

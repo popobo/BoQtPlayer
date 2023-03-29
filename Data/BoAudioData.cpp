@@ -1,4 +1,5 @@
 #include "BoAudioData.h"
+#include <cstring>
 
 BoAudioData::BoAudioData() {}
 

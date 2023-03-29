@@ -15,9 +15,7 @@ class IPlayer {
   public:
     IPlayer() {}
 
-    virtual ~IPlayer(){
-        BO_ERROR("");
-    };
+    virtual ~IPlayer() { BO_ERROR(""); };
 
     virtual bool open(const char *url) = 0;
 
@@ -29,27 +27,28 @@ class IPlayer {
 
     virtual void resume() = 0;
 
-    virtual void setVideoView(const std::shared_ptr<IVideoView> &newVideoView) = 0;
+    virtual void
+    setVideoView(const std::shared_ptr<IVideoView> &newVideoView) = 0;
 
-    virtual void setAudioPlayer(const std::shared_ptr<IAudioPlayer> &newAudioPlayer) = 0;
+    virtual void
+    setAudioPlayer(const std::shared_ptr<IAudioPlayer> &newAudioPlayer) = 0;
 
     // 0.0 ~ 1.0
     virtual bool seek(double pos) = 0;
 
     virtual double getPlayPos() = 0;
 
-    virtual void main() = 0;
-    
+    virtual void mainTask() = 0;
+
     virtual bool _seek(double pos) = 0;
 
-public:
+  public:
     std::shared_ptr<IDemux> m_demux;
     std::shared_ptr<IDecoder> m_videoDecoder;
     std::shared_ptr<IDecoder> m_audioDecoder;
     std::shared_ptr<IVideoView> m_videoView;
     std::shared_ptr<IResampler> m_resampler;
     std::shared_ptr<IAudioPlayer> m_audioPlayer;
-
 };
 
 #endif // IPLAYER_H

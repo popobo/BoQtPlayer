@@ -26,7 +26,7 @@ class FFDecoder : public IDecoder {
 
     virtual void update(const std::shared_ptr<IBoData> &boData) override;
 
-    virtual void main() override;
+    virtual void mainTask() override;
 
     virtual bool isSatisfied() override;
 
