@@ -38,6 +38,7 @@ set(PROJECT_SOURCES
         FFDemux.h FFDemux.cpp
         BoUtil.h BoUtil.cpp
         BoThread.h BoThread.cpp
+        BoThreadBase.h BoThreadBase.cpp
         FFParameter.h FFParameter.cpp
         FFDecoder.h FFDecoder.cpp
         FFResampler.h FFResampler.cpp
