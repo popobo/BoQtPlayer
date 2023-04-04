@@ -129,9 +129,7 @@ std::shared_ptr<IBoData> FFDecoder::recvFrame() {
 }
 
 void FFDecoder::close() {
-    m_boDataQueueMutex.lock();
-    m_boDataQueue = {};
-    m_boDataQueueMutex.unlock();
+    m_boData_queue.clean();
 
     m_codecContextMutex.lock();
     if (m_codecContext) {
@@ -149,9 +147,7 @@ void FFDecoder::close() {
 }
 
 void FFDecoder::clear() {
-    m_boDataQueueMutex.lock();
-    m_boDataQueue = {};
-    m_boDataQueueMutex.unlock();
+    m_boData_queue.clean();
 
     m_codecContextMutex.lock();
     if (m_codecContext) {
@@ -165,18 +161,10 @@ bool FFDecoder::isAudio() const { return m_isAudio; }
 void FFDecoder::setIsAudio(bool newIsAudio) { m_isAudio = newIsAudio; }
 
 void FFDecoder::mainTask() {
-    std::unique_lock<std::mutex> lock(m_boDataQueueMutex);
-    //取出packet 消费者
-    while (m_boDataQueue.size() == 0) {
-        m_boDataQueueCV.wait(lock);
+    std::shared_ptr<IBoData> boData;
+    if (!m_boData_queue.wait_for_pop(boData, 100)) {
+        return;
     }
-
-    assert(m_boDataQueue.size() > 0);
-
-    auto boData = m_boDataQueue.front();
-    m_boDataQueue.pop();
-    m_boDataQueueCV.notify_all();
-    lock.unlock();
 
     //开启解码
     //发送数据到解码线程 一个数据包可能解码多个结果(主要是音频)
@@ -204,12 +192,5 @@ void FFDecoder::update(std::shared_ptr<IBoData> boData) {
         return;
     }
 
-    std::unique_lock<std::mutex> lock(m_boDataQueueMutex);
-    while (m_boDataQueue.size() > MAX_BODATA_QUEUE_SIZE) {
-        m_boDataQueueCV.wait(lock);
-    }
-
-    assert(m_boDataQueue.size() <= MAX_BODATA_QUEUE_SIZE);
-    m_boDataQueue.push(boData);
-    m_boDataQueueCV.notify_all();
+    m_boData_queue.push(boData);
 }

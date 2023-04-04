@@ -1,7 +1,7 @@
 ﻿#pragma once
 
 #include "IDecoder.h"
-#include <condition_variable>
+#include "bo_thread_safe_queue.h"
 extern "C" {
 #include "libavcodec/avcodec.h"
 }
@@ -38,11 +38,10 @@ class FFDecoder : public IDecoder {
     bool m_isAudio = false;
 
     //读取缓冲
-    const int32_t MAX_BODATA_QUEUE_SIZE = 100;
+    static const int32_t MAX_BODATA_QUEUE_SIZE = 100;
 
-    std::queue<std::shared_ptr<IBoData>> m_boDataQueue;
-    std::mutex m_boDataQueueMutex;
-    std::condition_variable m_boDataQueueCV;
+    bo_thread_safe_queue<std::shared_ptr<IBoData>> m_boData_queue{
+        MAX_BODATA_QUEUE_SIZE};
 
     double m_audioTimeBase = 0.0;
     double m_videoTimeBase = 0.0;

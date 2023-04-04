@@ -45,7 +45,7 @@ class RenderingThread : public QThread {
 
     bool isInitialized();
 
-    void addBoData(const std::shared_ptr<IBoData> &newBoData);
+    void addBoData(std::shared_ptr<IBoData> &newBoData);
 
     void setSyncAudioPts(long newSyncAudioPts);
 
@@ -54,7 +54,7 @@ class RenderingThread : public QThread {
     bool isPaused();
 
     void resume();
-    
+
     void clear();
 
   protected:
@@ -79,7 +79,7 @@ class RenderingThread : public QThread {
     bool m_exiting = false;
     bool m_initialized = false;
     std::atomic<bool> m_isCurrentFramePainted = true;
-    std::atomic<bool> m_isPaused{ false };
+    std::atomic<bool> m_isPaused{false};
 
     std::function<void()> m_triggerPaintGLFunc;
 

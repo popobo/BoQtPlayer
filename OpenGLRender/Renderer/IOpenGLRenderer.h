@@ -35,7 +35,7 @@ class IOpenGLRenderer {
 
     virtual int textureNumber() { return 0; }
 
-    virtual void addBoData(const std::shared_ptr<IBoData> &newBoData) {}
+    virtual void addBoData(std::shared_ptr<IBoData> &newBoData) {}
 
     virtual void clear() {}
 };

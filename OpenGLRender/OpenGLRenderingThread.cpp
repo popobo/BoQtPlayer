@@ -128,7 +128,7 @@ void RenderingThread::unlock() { m_mutex.unlock(); }
 
 bool RenderingThread::isInitialized() { return m_initialized; }
 
-void RenderingThread::addBoData(const std::shared_ptr<IBoData> &newBoData) {
+void RenderingThread::addBoData(std::shared_ptr<IBoData> &newBoData) {
     m_renderer->addBoData(newBoData);
 }
 

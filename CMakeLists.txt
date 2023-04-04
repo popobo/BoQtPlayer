@@ -44,6 +44,7 @@ set(PROJECT_SOURCES
         FFResampler.h FFResampler.cpp
         FFQtPlayerBuilder.h FFQtPlayerBuilder.cpp
         FFQtPlayer.h FFQtPlayer.cpp
+        bo_thread_safe_queue.h
 
         QAudioPlayer.h QAudioPlayer.cpp
         Data/IBoData.h Data/IBoData.cpp

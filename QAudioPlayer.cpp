@@ -9,26 +9,27 @@
 extern "C" {
 #include "libswresample/swresample.h"
 }
+#include "bo_thread_safe_queue.h"
 
 class AudioBuffer : public QIODevice {
   public:
     qint64 readData(char *data, qint64 len) override {
         // 一般len远大于boData->size()
-        std::unique_lock<std::mutex> locker{m_boDataQueueMutex};
-        if (m_boDataQueue.empty()) {
+        if (m_boData_queue.empty()) {
             return 0;
         }
         qint64 readLen = 0;
-        locker.unlock();
 
-        while (!m_boDataQueue.empty()) {
-            locker.lock();
-            auto boData = m_boDataQueue.front();
+        while (!m_boData_queue.empty()) {
+            std::shared_ptr<IBoData> boData;
+            m_boData_queue.try_pop(boData);
+
+            assert(boData != nullptr);
+
             if (readLen + boData->size() > len) {
                 break;
             }
-            m_boDataQueue.pop();
-            locker.unlock();
+
             memcpy(data + readLen, boData->data(), boData->size());
             readLen += boData->size();
         }
@@ -36,21 +37,18 @@ class AudioBuffer : public QIODevice {
         return readLen;
     }
 
-    void addBoData(const std::shared_ptr<IBoData> &newBoData) {
-        std::unique_lock<std::mutex> locker{m_boDataQueueMutex};
-        m_boDataQueue.push(newBoData);
+    void addBoData(std::shared_ptr<IBoData> &newBoData) {
+        m_boData_queue.push(newBoData);
     }
 
     qint64 writeData(const char *data, qint64 len) override { return 0; }
 
-    void clear() {
-        std::unique_lock<std::mutex> locker{m_boDataQueueMutex};
-        m_boDataQueue = {};
-    }
+    void clear() { m_boData_queue.clean(); }
 
   private:
-    std::queue<std::shared_ptr<IBoData>> m_boDataQueue;
-    std::mutex m_boDataQueueMutex;
+    static const int32_t MAX_BODATA_QUEUE_SIZE = 100;
+    bo_thread_safe_queue<std::shared_ptr<IBoData>> m_boData_queue{
+        MAX_BODATA_QUEUE_SIZE};
 };
 
 QAudioPlayer::QAudioPlayer() {

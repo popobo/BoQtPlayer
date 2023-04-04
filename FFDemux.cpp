@@ -154,7 +154,7 @@ void FFDemux::mainTask() {
     auto boData = read_frame();
     if (boData->size() > 0) {
         notify(boData);
-    } 
+    }
 }
 
 bool FFDemux::seek(double pos) {

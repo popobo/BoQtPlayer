@@ -105,19 +105,10 @@ void YUVRenderer::init() {
 }
 
 long YUVRenderer::renderBoData() {
-    //消费者
-    std::unique_lock<std::mutex> locker{m_boDataQueueMutex};
-    while (m_boDataQueue.size() == 0) {
-        m_boDataQueueCV.wait(locker);
+    std::shared_ptr<IBoData> boData;
+    if (!m_boData_queue.wait_for_pop(boData, 100)) {
+        return -1;
     }
-
-    assert(m_boDataQueue.size() > 0);
-
-    auto boData = m_boDataQueue.front();
-    m_boDataQueue.pop();
-
-    m_boDataQueueCV.notify_all();
-    locker.unlock();
 
     auto boDataDatas = boData->datas();
     auto width = boData->width();
@@ -156,25 +147,11 @@ long YUVRenderer::renderBoData() {
 
 int YUVRenderer::textureNumber() { return TEXTURE_NUMBER; }
 
-void YUVRenderer::addBoData(const std::shared_ptr<IBoData> &newBoData) {
+void YUVRenderer::addBoData(std::shared_ptr<IBoData> &newBoData) {
     // 生产者
-    std::unique_lock<std::mutex> locker{m_boDataQueueMutex};
-    while (m_boDataQueue.size() > MAX_BODATA_QUEUE_SIZE) {
-        m_boDataQueueCV.wait(locker);
-    }
-
-    assert(m_boDataQueue.size() <= MAX_BODATA_QUEUE_SIZE);
-
-    // 这边<=少了一个=的话会导致播放卡顿
-    if (m_boDataQueue.size() <= MAX_BODATA_QUEUE_SIZE) {
-        m_boDataQueue.push(newBoData);
-    }
-    m_boDataQueueCV.notify_all();
+    m_boData_queue.push(newBoData);
 }
 
-void YUVRenderer::clear() {
-    std::unique_lock<std::mutex> locker{m_boDataQueueMutex};
-    m_boDataQueue = {};
-}
+void YUVRenderer::clear() { m_boData_queue.clean(); }
 
 } // namespace OpenGLRender
