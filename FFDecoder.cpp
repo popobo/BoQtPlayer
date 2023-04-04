@@ -162,7 +162,7 @@ void FFDecoder::setIsAudio(bool newIsAudio) { m_isAudio = newIsAudio; }
 
 void FFDecoder::mainTask() {
     std::shared_ptr<IBoData> boData;
-    if (!m_boData_queue.wait_for_pop(boData, 100)) {
+    if (!m_boData_queue.wait_for_pop_front(boData, 100)) {
         return;
     }
 
@@ -192,5 +192,5 @@ void FFDecoder::update(std::shared_ptr<IBoData> boData) {
         return;
     }
 
-    m_boData_queue.push(boData);
+    m_boData_queue.push_for(boData);
 }

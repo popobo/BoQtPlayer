@@ -1,6 +1,5 @@
 #include "QAudioPlayer.h"
 #include "BoLog.h"
-
 #include <QAudioFormat>
 #include <QMediaDevices>
 #include <QThread>
@@ -15,20 +14,16 @@ class AudioBuffer : public QIODevice {
   public:
     qint64 readData(char *data, qint64 len) override {
         // 一般len远大于boData->size()
-        if (m_boData_queue.empty()) {
-            return 0;
-        }
         qint64 readLen = 0;
 
         while (!m_boData_queue.empty()) {
-            std::shared_ptr<IBoData> boData;
-            m_boData_queue.try_pop(boData);
-
-            assert(boData != nullptr);
+            auto boData = m_boData_queue.front();
 
             if (readLen + boData->size() > len) {
                 break;
             }
+
+            m_boData_queue.pop();
 
             memcpy(data + readLen, boData->data(), boData->size());
             readLen += boData->size();
@@ -46,9 +41,7 @@ class AudioBuffer : public QIODevice {
     void clear() { m_boData_queue.clean(); }
 
   private:
-    static const int32_t MAX_BODATA_QUEUE_SIZE = 100;
-    bo_thread_safe_queue<std::shared_ptr<IBoData>> m_boData_queue{
-        MAX_BODATA_QUEUE_SIZE};
+    bo_thread_safe_queue<std::shared_ptr<IBoData>> m_boData_queue{};
 };
 
 QAudioPlayer::QAudioPlayer() {

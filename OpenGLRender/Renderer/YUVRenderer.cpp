@@ -106,7 +106,7 @@ void YUVRenderer::init() {
 
 long YUVRenderer::renderBoData() {
     std::shared_ptr<IBoData> boData;
-    if (!m_boData_queue.wait_for_pop(boData, 100)) {
+    if (!m_boData_queue.wait_for_pop_front(boData, 100)) {
         return -1;
     }
 
@@ -149,7 +149,7 @@ int YUVRenderer::textureNumber() { return TEXTURE_NUMBER; }
 
 void YUVRenderer::addBoData(std::shared_ptr<IBoData> &newBoData) {
     // 生产者
-    m_boData_queue.push(newBoData);
+    m_boData_queue.push_for(newBoData);
 }
 
 void YUVRenderer::clear() { m_boData_queue.clean(); }
