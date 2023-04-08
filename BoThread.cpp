@@ -2,14 +2,12 @@
 #include "BoLog.h"
 #include <thread>
 
-BoThread::BoThread() :m_threaName{""} {}
+BoThread::BoThread() : m_threaName{""} {}
 
-BoThread::BoThread(const std::string& threadName) : m_threaName{threadName}
-{
-}
+BoThread::BoThread(const std::string &threadName) : m_threaName{threadName} {}
 
 BoThread::~BoThread() {
-    clearMainTasks();
+    cancel_main_task();
     clearSubTasks();
 }
 
@@ -22,80 +20,56 @@ bool BoThread::start() {
     return true;
 }
 
-void BoThread::stop() {    
+void BoThread::stop() {
+    BO_INFO("{0} stop", m_threaName);
     m_isExit = true;
 }
 
-bool BoThread::isPaused()
-{
-    return m_isPaused;
-}
+bool BoThread::isPaused() { return m_isPaused; }
 
-bool BoThread::isExit()
-{
-    return m_isExit;
-}
+bool BoThread::isExit() { return m_isExit; }
 
-void BoThread::pause()
-{
+void BoThread::pause() {
     BO_INFO("thread name: {0}", m_threaName);
     m_isPaused = true;
 }
 
-void BoThread::resume()
-{
+void BoThread::resume() {
     BO_INFO("thread name: {0}", m_threaName);
     m_isPaused = false;
 }
 
-void BoThread::addMainTask(std::function<void()> mainTask)
-{
-    std::unique_lock<std::mutex> locker{ m_mainTasksVecMutex };
-    m_mainTasksVec.push_back(mainTask);
+void BoThread::set_main_task(const std::function<void()> &mainTask) {
+    m_main_task = mainTask;
 }
 
-void BoThread::clearMainTasks()
-{
-    std::unique_lock<std::mutex> locker{ m_mainTasksVecMutex };
-    m_mainTasksVec.clear();
+void BoThread::cancel_main_task() { m_main_task = nullptr; }
+
+void BoThread::addSubTask(const std::function<void()> &subTask) {
+    m_sub_tasks_queue.push(subTask);
 }
 
-void BoThread::addSubTask(std::function<void()> subTask)
-{
-    std::unique_lock<std::mutex> locker{ m_subTasksQueueMutex };
-    m_subTasksQueue.push(subTask);
-}
-
-void BoThread::clearSubTasks()
-{
-    std::unique_lock<std::mutex> locker{ m_subTasksQueueMutex };
-    m_subTasksQueue = {};
-}
+void BoThread::clearSubTasks() { m_sub_tasks_queue.clean(); }
 
 void BoThread::threadMain() {
     BO_INFO("thread main begin");
     while (!m_isExit) {
-        if (!m_isPaused) {
-            m_mainTasksVecMutex.lock();
-            for (const auto& mainTask : m_mainTasksVec) {
-                mainTask();
+        {
+            std::lock_guard lg{m_main_task_mutex};
+            if (!m_isPaused && m_main_task) {
+                m_main_task();
             }
-            m_mainTasksVecMutex.unlock();
         }
-        
-        m_subTasksQueueMutex.lock();
-        while (!m_subTasksQueue.empty()) {
-            auto subTask = m_subTasksQueue.front();
-            subTask();
-            m_subTasksQueue.pop();
+
+        while (auto sub_task_ptr = m_sub_tasks_queue.try_pop_front()) {
+            (*sub_task_ptr)();
         }
-        m_subTasksQueueMutex.unlock();
-        boSleep(1);
+        this_thread_sleep(1);
     }
     BO_INFO("thread main end");
 }
 
-void boSleep(int ms) {
+void this_thread_sleep(int ms) {
     std::chrono::milliseconds sTime(ms);
     std::this_thread::sleep_for(sTime);
 }

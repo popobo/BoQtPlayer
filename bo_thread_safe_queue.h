@@ -36,13 +36,13 @@ template <typename T> class bo_thread_safe_queue {
         m_cv.notify_one();
     }
 
-    void push(T &value) {
+    void push(const T &value) {
         std::lock_guard lg{m_mut};
         m_queue.push(value);
         m_cv.notify_one();
     }
 
-    void push_for(T &value, int32_t ms = DEFAULT_WAIT_TIME) {
+    void push_for(const T &value, int32_t ms = DEFAULT_WAIT_TIME) {
         std::unique_lock ul{m_mut};
         if (!m_cv.wait_for(ul, std::chrono::milliseconds(ms),
                            [this] { return m_queue.size() < m_max_size; })) {
@@ -67,7 +67,7 @@ template <typename T> class bo_thread_safe_queue {
     std::shared_ptr<T> try_pop_front() {
         std::lock_guard lg{m_mut};
         if (m_queue.empty()) {
-            return false;
+            return nullptr;
         }
         auto res{std::make_shared<T>(m_queue.front())};
         m_queue.pop();

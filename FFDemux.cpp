@@ -36,6 +36,7 @@ FFDemux::~FFDemux() {
     m_avFormatContextMutex.lock();
     avformat_close_input(&m_avFormatContext);
     m_avFormatContextMutex.unlock();
+    BO_INFO("~FFDemux");
 }
 
 bool FFDemux::open(const char *url) {

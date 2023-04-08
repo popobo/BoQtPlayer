@@ -1,6 +1,7 @@
 #ifndef BOTHREAD_H
 #define BOTHREAD_H
 
+#include "bo_thread_safe_queue.h"
 #include <atomic>
 #include <functional>
 #include <memory>
@@ -8,7 +9,7 @@
 #include <queue>
 #include <vector>
 
-void boSleep(int ms);
+void this_thread_sleep(int ms);
 
 class BoThread : public std::enable_shared_from_this<BoThread> {
   public:
@@ -31,11 +32,11 @@ class BoThread : public std::enable_shared_from_this<BoThread> {
 
     void resume();
 
-    void addMainTask(std::function<void()> mainTask);
+    void set_main_task(const std::function<void()> &mainTask);
 
-    void clearMainTasks();
+    void cancel_main_task();
 
-    void addSubTask(std::function<void()> subTask);
+    void addSubTask(const std::function<void()> &subTask);
 
     void clearSubTasks();
 
@@ -44,10 +45,9 @@ class BoThread : public std::enable_shared_from_this<BoThread> {
     std::atomic<bool> m_isPaused{false};
     std::string m_threaName;
 
-    std::vector<std::function<void()>> m_mainTasksVec;
-    std::queue<std::function<void()>> m_subTasksQueue;
-    std::mutex m_mainTasksVecMutex;
-    std::mutex m_subTasksQueueMutex;
+    std::mutex m_main_task_mutex;
+    std::function<void()> m_main_task;
+    bo_thread_safe_queue<std::function<void()>> m_sub_tasks_queue;
 
   private:
     void threadMain();
