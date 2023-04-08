@@ -76,6 +76,10 @@ void Widget::timerEvent(QTimerEvent* event)
     if (m_sliderPressed) {
         return;
     }
+
+    if (m_player && m_player->is_paused()) {
+        return;
+    }
     
     auto position = m_player->getPlayPos();
     ui->horizontalSliderPlayProgress->setValue((int)(position * ui->horizontalSliderPlayProgress->maximum()));

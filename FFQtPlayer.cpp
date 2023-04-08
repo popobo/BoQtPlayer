@@ -137,6 +137,11 @@ void FFQtPlayer::resume() {
     m_videoView->resume();
 }
 
+bool FFQtPlayer::is_paused()
+{
+    return m_playerThread->isPaused();
+}
+
 void FFQtPlayer::setVideoView(const std::shared_ptr<IVideoView> &newVideoView) {
     if (!newVideoView) {
         return;

@@ -13,6 +13,7 @@ class FFQtPlayer : public IPlayer,
     virtual void stop() override;
     virtual void pause() override;
     virtual void resume() override;
+    bool is_paused() override;
     virtual void
     setVideoView(const std::shared_ptr<IVideoView> &newVideoView) override;
     virtual void setAudioPlayer(

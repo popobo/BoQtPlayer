@@ -27,6 +27,8 @@ class IPlayer {
 
     virtual void resume() = 0;
 
+    virtual bool is_paused() = 0;
+
     virtual void
     setVideoView(const std::shared_ptr<IVideoView> &newVideoView) = 0;
 
