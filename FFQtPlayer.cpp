@@ -1,12 +1,7 @@
 ﻿#include "FFQtPlayer.h"
 #include "BoLog.h"
 
-FFQtPlayer::FFQtPlayer() {
-    m_playerThread = std::make_shared<BoThread>("m_playerThread");
-    m_demuxThread = std::make_shared<BoThread>("m_demuxThread");
-    m_videoDecoderThread = std::make_shared<BoThread>("m_videoDecoderThread");
-    m_audioDecoderThread = std::make_shared<BoThread>("m_audioDecoderThread");
-}
+FFQtPlayer::FFQtPlayer() {}
 
 FFQtPlayer::~FFQtPlayer() { BO_ERROR(""); }
 
@@ -48,33 +43,33 @@ bool FFQtPlayer::start() {
 
     m_audioPlayer->start();
 
-    m_videoDecoderThread->start();
+    m_videoDecoderThread.start();
     std::weak_ptr<IDecoder> weakVideoDecoder = m_videoDecoder;
-    m_videoDecoderThread->set_main_task([weakVideoDecoder]() {
+    m_videoDecoderThread.set_main_task([weakVideoDecoder]() {
         if (auto videoDecoder = weakVideoDecoder.lock()) {
             videoDecoder->mainTask();
         }
     });
 
-    m_audioDecoderThread->start();
+    m_audioDecoderThread.start();
     std::weak_ptr<IDecoder> weakAudioDecoder = m_audioDecoder;
-    m_audioDecoderThread->set_main_task([weakAudioDecoder]() {
+    m_audioDecoderThread.set_main_task([weakAudioDecoder]() {
         if (auto audioDecoder = weakAudioDecoder.lock()) {
             audioDecoder->mainTask();
         }
     });
 
-    m_demuxThread->start();
+    m_demuxThread.start();
     std::weak_ptr<IDemux> weakDemux = m_demux;
-    m_demuxThread->set_main_task([weakDemux]() {
+    m_demuxThread.set_main_task([weakDemux]() {
         if (auto demux = weakDemux.lock()) {
             demux->mainTask();
         }
     });
 
-    m_playerThread->start();
+    m_playerThread.start();
     std::weak_ptr<IPlayer> wself = shared_from_this();
-    m_playerThread->set_main_task([wself]() {
+    m_playerThread.set_main_task([wself]() {
         if (auto self = wself.lock()) {
             self->mainTask();
         }
@@ -89,18 +84,18 @@ void FFQtPlayer::stop() {
         return;
     }
 
-    m_playerThread->stop();
+    m_playerThread.stop();
 
     // （消费者）观察者先于（生产者）通知者停止，否则可能会因为有阻塞操作，导致线程退出超时
     m_audioPlayer->stop();
 
     m_videoView->stop();
 
-    m_videoDecoderThread->stop();
+    m_videoDecoderThread.stop();
 
-    m_audioDecoderThread->stop();
+    m_audioDecoderThread.stop();
 
-    m_demuxThread->stop();
+    m_demuxThread.stop();
 }
 
 void FFQtPlayer::pause() {
@@ -109,13 +104,13 @@ void FFQtPlayer::pause() {
         return;
     }
 
-    m_playerThread->pause();
+    m_playerThread.pause();
 
-    m_demuxThread->pause();
+    m_demuxThread.pause();
 
-    m_videoDecoderThread->pause();
+    m_videoDecoderThread.pause();
 
-    m_audioDecoderThread->pause();
+    m_audioDecoderThread.pause();
 
     m_audioPlayer->pause();
 
@@ -124,20 +119,20 @@ void FFQtPlayer::pause() {
 
 void FFQtPlayer::resume() {
     std::unique_lock<std::mutex> locker(m_playerMutex);
-    m_playerThread->resume();
+    m_playerThread.resume();
 
-    m_demuxThread->resume();
+    m_demuxThread.resume();
 
-    m_videoDecoderThread->resume();
+    m_videoDecoderThread.resume();
 
-    m_audioDecoderThread->resume();
+    m_audioDecoderThread.resume();
 
     m_audioPlayer->resume();
 
     m_videoView->resume();
 }
 
-bool FFQtPlayer::is_paused() { return m_playerThread->isPaused(); }
+bool FFQtPlayer::is_paused() { return m_playerThread.isPaused(); }
 
 void FFQtPlayer::setVideoView(const std::shared_ptr<IVideoView> &newVideoView) {
     if (!newVideoView) {
@@ -166,7 +161,7 @@ void FFQtPlayer::setAudioPlayer(
 
 bool FFQtPlayer::seek(double pos) {
     std::weak_ptr<IPlayer> wself = shared_from_this();
-    m_playerThread->addSubTask([wself, pos]() {
+    m_playerThread.addSubTask([wself, pos]() {
         if (auto self = wself.lock()) {
             self->_seek(pos);
         }
@@ -181,12 +176,6 @@ bool FFQtPlayer::areAllModulesValid() {
         return false;
     }
 
-    if (!m_demuxThread || !m_videoDecoderThread || !m_audioDecoderThread ||
-        !m_playerThread) {
-        BO_ERROR("one of the thread is nullptr");
-        return false;
-    }
-
     return true;
 }
 
@@ -195,14 +184,14 @@ bool FFQtPlayer::areAllModulesPaused() {
         return false;
     }
 
-    if (!m_demuxThread->isPaused() || !m_videoDecoderThread->isPaused() ||
-        !m_audioDecoderThread->isPaused()) {
+    if (!m_demuxThread.isPaused() || !m_videoDecoderThread.isPaused() ||
+        !m_audioDecoderThread.isPaused()) {
         BO_ERROR("one of the modules is not paused");
-        BO_ERROR("m_demuxThread->isPaused():{0}", m_demuxThread->isPaused());
-        BO_ERROR("m_videoDecoderThread->isPaused():{0}",
-                 m_videoDecoderThread->isPaused());
-        BO_ERROR("m_audioDecoderThread->isPaused():{0}",
-                 m_audioDecoderThread->isPaused());
+        BO_ERROR("m_demuxThread.isPaused():{0}", m_demuxThread.isPaused());
+        BO_ERROR("m_videoDecoderThread.isPaused():{0}",
+                 m_videoDecoderThread.isPaused());
+        BO_ERROR("m_audioDecoderThread.isPaused():{0}",
+                 m_audioDecoderThread.isPaused());
         return false;
     }
 
@@ -215,19 +204,19 @@ bool FFQtPlayer::_seek(double pos) {
         return false;
     }
 
-    if (!m_demuxThread->isPaused() || !m_videoDecoderThread->isPaused() ||
-        !m_audioDecoderThread->isPaused() || !m_audioPlayer->isPaused() ||
+    if (!m_demuxThread.isPaused() || !m_videoDecoderThread.isPaused() ||
+        !m_audioDecoderThread.isPaused() || !m_audioPlayer->isPaused() ||
         !m_videoView->isPaused()) {
-        m_demuxThread->pause();
-        m_videoDecoderThread->pause();
-        m_audioDecoderThread->pause();
+        m_demuxThread.pause();
+        m_videoDecoderThread.pause();
+        m_audioDecoderThread.pause();
         m_audioPlayer->pause();
         m_videoView->pause();
     }
 
     // 等待所有相关模块暂停
-    while (!m_demuxThread->isPaused() || !m_videoDecoderThread->isPaused() ||
-           !m_audioDecoderThread->isPaused() || !m_audioPlayer->isPaused() ||
+    while (!m_demuxThread.isPaused() || !m_videoDecoderThread.isPaused() ||
+           !m_audioDecoderThread.isPaused() || !m_audioPlayer->isPaused() ||
            !m_videoView->isPaused()) {
         this_thread_sleep(1);
     }
@@ -241,7 +230,7 @@ bool FFQtPlayer::_seek(double pos) {
     bool ret = m_demux->seek(pos); // seek跳转到关键帧
     // 解码实际需要显示的帧
     int64_t seekPts = static_cast<int64_t>(pos * m_demux->getTotalTime());
-    while (!m_playerThread->isExit()) {
+    while (!m_playerThread.isExit()) {
         auto pkt = m_demux->read_frame();
         if (pkt->size() <= 0) {
             break;
@@ -273,9 +262,9 @@ bool FFQtPlayer::_seek(double pos) {
     }
     locker.unlock();
 
-    m_demuxThread->resume();
-    m_videoDecoderThread->resume();
-    m_audioDecoderThread->resume();
+    m_demuxThread.resume();
+    m_videoDecoderThread.resume();
+    m_audioDecoderThread.resume();
     m_audioPlayer->resume();
     m_videoView->resume();
 

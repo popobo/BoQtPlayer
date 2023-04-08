@@ -9,14 +9,15 @@ BoThread::BoThread(const std::string &threadName) : m_threaName{threadName} {}
 BoThread::~BoThread() {
     cancel_main_task();
     clearSubTasks();
+    if (m_thread.joinable())
+        m_thread.join();
 }
 
 bool BoThread::start() {
     m_isExit = false;
     m_isPaused = false;
-    std::thread th(&BoThread::threadMain, this);
+    m_thread = std::thread(&BoThread::threadMain, this);
     //当前线程放弃对新建线程的控制, 防止对象被清空时, 新建线程出错
-    th.detach();
     return true;
 }
 

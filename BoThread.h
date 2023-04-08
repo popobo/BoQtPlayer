@@ -49,6 +49,8 @@ class BoThread : public std::enable_shared_from_this<BoThread> {
     std::function<void()> m_main_task;
     bo_thread_safe_queue<std::function<void()>> m_sub_tasks_queue;
 
+    std::thread m_thread;
+
   private:
     void threadMain();
 };
