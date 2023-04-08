@@ -12,3 +12,4 @@ CMakeSettings.json
 /CppProperties.json
 *.user
 CMakeLists.txt.user
+/.vscode
